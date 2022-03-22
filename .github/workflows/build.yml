@@ -34,17 +34,19 @@ jobs:
         
       - name: Git Version
         uses: codacy/git-version@2.4.0
+        id: version
         with:
           release-branch: main
           
       - name: Zip
-        run: zip -r build.zip build
+        run: zip -r fim-queueing-${{steps.version.outputs.version}}.zip build
         
       - name: Release
         uses: marvinpinto/action-automatic-releases@v1.2.1
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
+          title: Release ${{steps.version.outputs.version}}
           automatic_release_tag: latest
           prerelease: false
-          files: build.zip
+          files: fim-queueing-${{steps.version.outputs.version}}.zip
           
