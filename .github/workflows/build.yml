@@ -32,13 +32,13 @@ jobs:
       - name: Build
         run: npm run build
         
-      - name: Zip
-        run: zip build
-        
       - name: Git Version
         uses: codacy/git-version@2.4.0
         with:
           release-branch: main
+          
+      - name: Zip
+        run: zip -r build.zip build
         
       - name: Release
         uses: marvinpinto/action-automatic-releases@v1.2.1
