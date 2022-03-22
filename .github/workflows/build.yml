@@ -36,7 +36,7 @@ jobs:
         run: zip build
         
       - name: Git Version
-        uses: codacygit-version@2.4.0
+        uses: codacy/git-version@2.4.0
         with:
           release-branch: main
         
