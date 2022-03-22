@@ -34,12 +34,6 @@ jobs:
         
       - name: Build
         run: npm run build
-        
-      - name: Git Version
-        uses: codacy/git-version@2.4.0
-        id: version
-        with:
-          release-branch: main
           
       - name: Zip
         run: zip -r fim-queueing-${{env.VERSION}}.zip build
