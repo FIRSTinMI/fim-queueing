@@ -11,6 +11,9 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+env:
+  VERSION: "1.0.0.${{github.run_attempt}}"
+
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
@@ -39,14 +42,14 @@ jobs:
           release-branch: main
           
       - name: Zip
-        run: zip -r fim-queueing-${{steps.version.outputs.version}}.zip build
+        run: zip -r fim-queueing-${{env.VERSION}}.zip build
         
       - name: Release
         uses: marvinpinto/action-automatic-releases@v1.2.1
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          title: Release ${{steps.version.outputs.version}}
+          title: Release ${{env.VERSION}}
           automatic_release_tag: latest
           prerelease: false
-          files: fim-queueing-${{steps.version.outputs.version}}.zip
+          files: fim-queueing-${{env.VERSION}}.zip
           
