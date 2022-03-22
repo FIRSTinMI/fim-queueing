@@ -1,0 +1,42 @@
+.matchDisplay {
+    width: 100%;
+    display: grid; 
+    grid-template-columns: auto 3fr; 
+    grid-template-rows: 1fr 1fr; 
+    gap: 15px 1.5em; 
+    grid-template-areas: 
+      "matchNumber ."
+      "matchNumber ."; 
+
+    .matchNumber { grid-area: matchNumber; }
+
+    align-items: center;
+
+    text-align: left;
+
+    .red { color: lighten(red, 20%); }
+    .blue { color: lighten(blue, 20%); }
+
+    .red, .blue {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr; 
+        justify-content: space-between;
+        & > * {
+            //font-family: monospace;
+            font-weight: 700;
+        }
+    }
+
+    .avatar {
+        display: inline-block;
+        width: calc(1.2em + 15px);
+        height: 1em;
+        vertical-align: middle;
+
+        img {
+            //margin-right: 0.5em;
+            //width: 100%;
+            height: 100%;
+        }
+    }
+}
