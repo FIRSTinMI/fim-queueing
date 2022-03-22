@@ -35,8 +35,11 @@ jobs:
       - name: Build
         run: npm run build
           
+      # Make a zip file with an inner directory which includes the version number
       - name: Zip
-        run: zip -r fim-queueing-${{env.VERSION}}.zip build
+        run: |
+          mv build ${{env.VERSION}}
+          zip -r fim-queueing-${{env.VERSION}}.zip ${{env.VERSION}}
         
       - name: Release
         uses: marvinpinto/action-automatic-releases@v1.2.1
