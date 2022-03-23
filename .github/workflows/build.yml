@@ -31,9 +31,10 @@ jobs:
       
       - name: Install packages
         run: npm ci
-        
+      
+      # Build, with no base url since in prod it's expected to be hosted on the same server at the root
       - name: Build
-        run: npm run build
+        run: PREACT_APP_BASEURL= npm run build
           
       # Make a zip file with an inner directory which includes the version number
       - name: Zip
