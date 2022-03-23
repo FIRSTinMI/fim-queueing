@@ -7,6 +7,11 @@ $text-color: #ccc;
     color: $text-color;
 }
 
+.infoText {
+    padding-top: 2em;
+    text-align: center;
+}
+
 .matches {
     height: 100%;
     display: flex;

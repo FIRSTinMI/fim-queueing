@@ -5,10 +5,10 @@ import MatchDisplay from './matchDisplay';
 import styles from "./app.scss";
 
 type AppState = {
-    isLoading: boolean;
-    currentMatch?: Match;
-    nextMatch?: Match;
-    queueingMatches?: Match[];
+    loadingState: "loading" | "ready" | "error";
+    currentMatch: Match | null;
+    nextMatch: Match | null;
+    queueingMatches: Match[];
     teamAvatars?: TeamAvatars;
 }
 
@@ -19,41 +19,47 @@ export default class App extends Component<{}, AppState> {
     constructor(props: {}) {
         super(props);
         this.state = {
-            isLoading: true,
-            currentMatch: undefined,
-            nextMatch: undefined,
-            queueingMatches: undefined,
+            loadingState: "loading",
+            currentMatch: null,
+            nextMatch: null,
+            queueingMatches: [],
             teamAvatars: undefined
         };
         console.log("Initializing");
         this._scheduleService = new ScheduleService();
 
         this._scheduleService.updateSchedule().then(() => {
-            this._scheduleService.updateAvatars().then((x) => {
+            this._scheduleService.updateAvatars().then((avatars) => {
                 this.setState({
-                    teamAvatars: x
+                    teamAvatars: avatars
                 });
-            })
-            this.updateMatches().then(() => {
-                this.setState({
-                    isLoading: false
-                });
-        
+            }).catch(() => {
+                // The app will work just fine without avatars
+                console.error("Failed to fetch team avatars. Continuing without them.");
+            });
+            this.updateMatches().finally(() => {
                 this._updateInterval = window.setInterval(() => this.updateMatches(), 1000);
             });
         });
     }
 
     private async updateMatches(): Promise<void> {
-        const matchNumber = Number.parseInt(await (await fetch("/currentMatch.txt")).text(), 10);
-        if (Number.isNaN(matchNumber)) throw new Error("Unable to get current match");
-        if (matchNumber !== this.state.currentMatch?.matchNumber)
-        {
-            console.log("Match number changed, updating state");
+        try {
+            const matchNumber = await this._scheduleService.getCurrentMatch();
+            if (matchNumber !== this.state.currentMatch?.matchNumber)
+            {
+                console.log("Match number changed, updating state");
+                this.setState({
+                    currentMatch: this._scheduleService.getMatchByNumber(matchNumber),
+                    nextMatch: this._scheduleService.getMatchByNumber(matchNumber + 1),
+                    // By default, we'll take the three matches after the one on deck
+                    queueingMatches: [2, 3, 4].map(x => this._scheduleService.getMatchByNumber(matchNumber + x)).filter(x => x !== null) as Match[],
+                    loadingState: "ready"
+                });
+            }
+        } catch (e) {
             this.setState({
-                currentMatch: this._scheduleService.getMatchByNumber(matchNumber),
-                nextMatch: this._scheduleService.getMatchByNumber(matchNumber + 1),
-                queueingMatches: [2, 3, 4].map(x => this._scheduleService.getMatchByNumber(matchNumber + x))
+                loadingState: "error"
             });
         }
     }
@@ -65,14 +71,15 @@ export default class App extends Component<{}, AppState> {
     render(): JSX.Element {
         return (
             <div id="preact_root" class={styles.app}>
-                {this.state.isLoading && <div>Loading matches...</div>}
-                {!this.state.isLoading &&
+                {this.state.loadingState == "loading" && <div class={styles.infoText}>Loading matches...</div>}
+                {this.state.loadingState == "error" && <div class={styles.infoText}>Failed to fetch matches</div>}
+                {this.state.loadingState == "ready" &&
                     <div class={styles.matches}>
                         <div class={styles.topBar}>
-                            <div>{this.state.currentMatch && <MatchDisplay match={this.state.currentMatch} teamAvatars={this.state.teamAvatars} />}<span class={styles.description}>On Field</span></div>
-                            <div>{this.state.nextMatch && <MatchDisplay match={this.state.nextMatch} teamAvatars={this.state.teamAvatars} />}<span class={styles.description}>On Deck</span></div>
+                            {this.state.currentMatch && <div><MatchDisplay match={this.state.currentMatch} teamAvatars={this.state.teamAvatars} /><span class={styles.description}>On Field</span></div>}
+                            {this.state.nextMatch && <div><MatchDisplay match={this.state.nextMatch} teamAvatars={this.state.teamAvatars} /><span class={styles.description}>On Deck</span></div>}
                         </div>
-                        {this.state.queueingMatches?.map(x => <MatchDisplay match={x} key={x.matchNumber} teamAvatars={this.state.teamAvatars} />)}
+                        {this.state.queueingMatches.map(x => <MatchDisplay match={x} key={x.matchNumber} teamAvatars={this.state.teamAvatars} />)}
                     </div>
                 }
             </div>
