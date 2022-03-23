@@ -15,11 +15,11 @@ The main goals of this project are as follows:
 
 ### Web app
 
-This Preact app is the main way that the queueing system interacts with the world. It will pull match and team data on the initial load, and occasionally poll for changes to the current match.
+This Preact app is the main way that the queueing system interacts with the world. It will pull match and team data on the initial load, and occasionally poll for changes to the current match. A sample nginx config is provided which directs schedule-related requests to one directory and everything else to where the webapp lives, allowing PUT requests to the current match to support real(-ish) time updating.
 
 ### Schedule generation
 
-This set of Python scripts allows for pulling all necessary event data from the FRC Events API. It should be run at the beginning of the event after the qualification schedule has been generated and posted.
+This set of Python scripts allows for pulling all necessary event data from the FRC Events API. It should be run at the beginning of the event after the qualification schedule has been generated and posted. This is not currently completed and will be coming to the repo soon.
 
 ## CLI Commands
 *   `npm install`: Installs dependencies
