@@ -105,7 +105,7 @@ exports.generateSchedule = functions.https.onRequest(async (req, res) => {
     admin
         .database()
         .ref(`/events/${season}/${eventKey}`)
-        .update({ matches: eventJson["Schedule"], mode: "automatic" });
+        .update({matches: eventJson["Schedule"], mode: "automatic"});
 
     let teamsAtEvent: any[] = [];
     eventJson["Schedule"].forEach((match: any) => {
