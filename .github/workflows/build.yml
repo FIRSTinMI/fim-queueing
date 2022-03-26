@@ -35,11 +35,18 @@ jobs:
       # Build, with no base url since in prod it's expected to be hosted on the same server at the root
       - name: Build
         run: PREACT_APP_BASEURL= npm run build
+        
+      - name: Firebase deploy
+        uses: w9jds/firebase-action@v2.0.0
+        with:
+          args: deploy
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
           
       # Make a zip file with an inner directory which includes the version number
       - name: Zip
         run: |
-          mv build ${{env.VERSION}}
+          cp build ${{env.VERSION}}
           zip -r fim-queueing-${{env.VERSION}}.zip ${{env.VERSION}}
         
       - name: Release
@@ -50,4 +57,3 @@ jobs:
           title: Release ${{env.VERSION}}
           prerelease: false
           files: fim-queueing-${{env.VERSION}}.zip
-          
