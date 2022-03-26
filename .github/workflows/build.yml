@@ -32,15 +32,17 @@ jobs:
       - name: Install packages
         run: npm ci
       
+      # Environment variables
+      - name: create env files
+        run: |
+          touch functions/.env;
+          echo "${{ secrets.FIREBASE_ENV_VARS }}" >> functions/.env;
+          touch .env;
+          echo "${{ secrets.APP_ENV_VARS }}" > .env;
+      
       # Build, with no base url since in prod it's expected to be hosted on the same server at the root
       - name: Build
-        run: PREACT_APP_BASEURL= npm run build
-        
-      # Environment variables
-      - name: create env file
-        run: |
-          touch functions/.env
-          echo "${{ secrets.FIREBASE_ENV_VARS }}" >> functions/.env
+        run: npm run build
         
       - name: Firebase deploy
         uses: w9jds/firebase-action@v2.0.0
