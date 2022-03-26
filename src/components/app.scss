@@ -1,41 +1,13 @@
-$text-color: #ccc;
+$text-color: #111;
 
 .app {
     min-height: 100vh;
     font-size: 3vw;
-    background: #222;
+    background: #eee;
     color: $text-color;
 }
 
 .infoText {
     padding-top: 2em;
     text-align: center;
-}
-
-.matches {
-    height: 100vh;
-    display: flex;
-    //gap: 30px;
-    flex-direction: column;
-    justify-content: space-around;
-
-    &>:not(.topBar) {height: 100%; padding: 0 2vw; }
-    &>:not(:last-child) { border-bottom: 5px solid darken($text-color, 30%); }
-
-    .topBar {
-        display: flex;
-        justify-content: space-between;
-        gap: 20px;
-        &>* {
-            width: 100%;
-            padding: 2vw;
-        }
-
-        &>:not(:last-child) { border-right: 5px solid darken($text-color, 30%); }
-
-        .description {
-            text-align: center;
-            display: block;
-        }
-    }
 }

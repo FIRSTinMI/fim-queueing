@@ -1,171 +1,97 @@
-import { Component, createRef, h } from 'preact';
+import { Component, h, createContext, Context } from 'preact';
+import Cookies from 'js-cookie';
+import { FirebaseApp, initializeApp } from 'firebase/app';
+import { get, getDatabase, onValue, ref } from 'firebase/database';
 
-import { Match, ScheduleService, TeamAvatars } from '../services/scheduleService';
-import MatchDisplay from './matchDisplay';
 import styles from "./app.scss";
+import Queueing from './queueing';
+import LoginForm from './LoginForm';
+import { Match } from '../services/scheduleService';
 
-type AppMode = "automatic" | "assisted";
+export type AppMode = "automatic" | "assisted";
+
+export type Event = {
+    start: Date;
+    end: Date;
+    name: string;
+    eventCode: string;
+    currentMatchNumber: number | null;
+    matches: Match[];
+    mode: AppMode;
+}
 
 type AppState = {
-    loadingState: "loading" | "ready" | "error" | "noAutomatic";
-    mode: AppMode;
-    matchNumber: number | null;
-    currentMatch: Match | null;
-    nextMatch: Match | null;
-    queueingMatches: Match[];
-    teamAvatars?: TeamAvatars;
+    isAuthenticated: boolean;
+    event?: Event;
+    season?: number;
 }
 
 export default class App extends Component<{}, AppState> {
-    private _scheduleService: ScheduleService;
-    private _updateInterval?: number;
-
     constructor(props: {}) {
         super(props);
         this.state = {
-            loadingState: "loading",
-            mode: "automatic",
-            matchNumber: null,
-            currentMatch: null,
-            nextMatch: null,
-            queueingMatches: [],
-            teamAvatars: undefined
+            isAuthenticated: false
         };
         console.log("Initializing");
-        this._scheduleService = new ScheduleService();
 
-        this._scheduleService.updateSchedule().then(() => {
-            this._scheduleService.updateAvatars().then((avatars) => {
-                this.setState({
-                    teamAvatars: avatars
-                });
-            }).catch(() => {
-                // The app will work just fine without avatars
-                console.error("Failed to fetch team avatars. Continuing without them.");
+        this.onLogin = this.onLogin.bind(this);
+
+        const firebaseConfig = {
+            apiKey: process.env.PREACT_APP_FIRE_KEY,
+            databaseURL: process.env.PREACT_APP_RTDB_URL,
+            projectId: process.env.PREACT_APP_FIRE_PROJ,
+            appId: process.env.PREACT_APP_FIRE_APPID
+          };
+          
+        initializeApp(firebaseConfig);
+
+        const token = Cookies.get("queueing-event-key");
+
+        if (token !== undefined) {
+            this.setState({
+                isAuthenticated: true
             });
-            this.setupAutomaticMode();
+
+            this.onLogin(token);
+        }
+    }
+
+    /**
+     * This should only be called once
+     * @param token Event key
+     */
+    async onLogin(token: string): Promise<void> {
+        this.setState({
+            isAuthenticated: true
         });
-    }
 
-    componentDidMount(): void {
-        if (typeof document === undefined) return;
-        document.addEventListener("keydown", this.handleKeyPress.bind(this));
-    }
+        const db = getDatabase();
 
-    private async updateMatches(matchNumber: number, force = false): Promise<void> {
-        if (this.state.mode === "assisted") {
-            this._scheduleService.sendMatchNumber(matchNumber).catch((e) => {
-                console.warn("Failed to send match number in assisted mode. Continuing.", e);
-            });
+        const seasonData = await get(ref(db, '/current_season'));
+        if (!seasonData || !seasonData.exists) {
+            throw new Error("Unable to get season...");
         }
 
-        try {
-            if (force || matchNumber !== this.state.currentMatch?.matchNumber)
-            {
-                console.log("Match number changed, updating state");
-                this.setState({
-                    matchNumber,
-                    currentMatch: this._scheduleService.getMatchByNumber(matchNumber),
-                    nextMatch: this._scheduleService.getMatchByNumber(matchNumber + 1),
-                    // By default, we'll take the three matches after the one on deck
-                    queueingMatches: [2, 3, 4].map(x => this._scheduleService.getMatchByNumber(matchNumber + x)).filter(x => x !== null) as Match[],
-                    loadingState: "ready"
-                });
-            }
-        } catch (e) {
-            this.setState({
-                loadingState: "error"
-            });
-        }
-    }
+        const season = Number.parseInt(seasonData.val(), 10);
 
-    private setupAutomaticMode(): void {
-        this.fetchCurrentMatch().finally(() => {
-            this._updateInterval = window.setInterval(() => this.fetchCurrentMatch(), 1000);
+        this.setState({
+            season
         });
-    }
 
-    private tearDownAutomaticMode(): void {
-        if (this._updateInterval) window.clearInterval(this._updateInterval);
-    }
-
-    private async fetchCurrentMatch(): Promise<void> {
-        try {
-            const matchNumber = await this._scheduleService.getCurrentMatch();
-            await this.updateMatches(matchNumber);
-        } catch (e) {
+        onValue(ref(db, `/events/${season}/${token}`), (snap) => {
             this.setState({
-                loadingState: "noAutomatic"
+                event: snap.val() as Event
             });
-        }
-    }
-
-    handleKeyPress(e: KeyboardEvent): void {
-        switch (e.code) {
-            case "KeyA":
-                this.swapMode();
-                break;
-            case "ArrowLeft":
-                this.decrementMatchNumber();
-                break;
-            case "ArrowRight":
-                this.incrementMatchNumber();
-                break;
-        }
-        return;
-    }
-
-    private swapMode(mode: AppMode | null = null): void {
-        if (mode === null) mode = this.state.mode === "assisted" ? "automatic" : "assisted";
-        if (mode === "assisted") {
-            this.tearDownAutomaticMode();
-            if (this.state.loadingState === "noAutomatic" || this.state.matchNumber === null) {
-                this.updateMatches(1, true);
-            }
-            this.setState({
-                mode: "assisted"
-            });
-        } else if (mode === "automatic") {
-            this.setupAutomaticMode();
-            this.setState({
-                mode: "automatic"
-            });
-        }
-    }
-
-    private incrementMatchNumber(): void {
-        if (this.state.mode !== "assisted") return;
-        const matchNumber = this.state.matchNumber ?? 0;
-        this.updateMatches(matchNumber + 1);
-    }
-
-    private decrementMatchNumber(): void {
-        if (this.state.mode !== "assisted") return;
-        const matchNumber = this.state.matchNumber ?? 0;
-        this.updateMatches(matchNumber - 1);
-    }
-
-    componentWillUnmount(): void {
-        this.tearDownAutomaticMode();
-        if (typeof document !== undefined) document.removeEventListener("keypress", this.handleKeyPress.bind(this));
+        });
     }
 
     render(): JSX.Element {
         return (
             <div id="preact_root" class={styles.app}>
                 <div>
-                    {this.state.loadingState == "loading" && <div class={styles.infoText}>Loading matches...</div>}
-                    {this.state.loadingState == "error" && <div class={styles.infoText}>Failed to fetch matches</div>}
-                    {this.state.loadingState == "noAutomatic" && <div class={styles.infoText}>Unable to run in automatic mode. Press the 'a' key to switch modes.</div>}
-                    {this.state.loadingState == "ready" &&
-                        <div class={styles.matches}>
-                            <div class={styles.topBar}>
-                                {this.state.currentMatch && <div><MatchDisplay match={this.state.currentMatch} teamAvatars={this.state.teamAvatars} /><span class={styles.description}>On Field</span></div>}
-                                {this.state.nextMatch && <div><MatchDisplay match={this.state.nextMatch} teamAvatars={this.state.teamAvatars} /><span class={styles.description}>On Deck</span></div>}
-                            </div>
-                            {this.state.queueingMatches.map(x => <MatchDisplay match={x} key={x.matchNumber} teamAvatars={this.state.teamAvatars} />)}
-                        </div>
-                    }
+                    { this.state.isAuthenticated && this.state.event == null && <div class={styles.infoText}>Loading...</div>}
+                    { this.state.event != null && this.state.isAuthenticated && <Queueing event={this.state.event} season={this.state.season ?? 9999} /> }
+                    { !this.state.isAuthenticated && <LoginForm onLogin={this.onLogin} /> }
                 </div>
             </div>
         );
