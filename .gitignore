@@ -6,3 +6,4 @@ node_modules
 .firebase/hosting.*.cache
 functions/firebase-debug.log
 functions/ui-debug.log
+size-plugin.json

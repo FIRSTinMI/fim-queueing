@@ -58,7 +58,7 @@ export default class Queueing extends Component<QueueingProps, QueueingState> {
     }
 
     private getMatchByNumber(matchNumber: number): Match | null {
-        return this.props.event.matches.find(x => x.matchNumber == matchNumber) ?? null;
+        return this.props.event.matches?.find(x => x.matchNumber == matchNumber) ?? null;
     }
 
     private updateMatches(): void {
@@ -168,7 +168,8 @@ export default class Queueing extends Component<QueueingProps, QueueingState> {
                 {this.state.loadingState == "loading" && <div class={styles.infoText}>Loading matches...</div>}
                 {this.state.loadingState == "error" && <div class={styles.infoText}>Failed to fetch matches</div>}
                 {this.state.loadingState == "noAutomatic" && <div class={styles.infoText}>Unable to run in automatic mode. Press the 'a' key to switch modes.</div>}
-                {this.state.loadingState == "ready" &&
+                {this.state.loadingState == "ready" && !this.props.event.matches?.length && <div class={styles.infoText}>Waiting for schedule to be posted...</div>}
+                {this.state.loadingState == "ready" && this.props.event.matches?.length &&
                     <div class={styles.matches}>
                         <div class={styles.topBar}>
                             {this.state.currentMatch && <div><MatchDisplay match={this.state.currentMatch} teamAvatars={this.state.teamAvatars} /><span class={styles.description}>On Field</span></div>}
