@@ -14,5 +14,5 @@ html, body {
 }
 
 #preact_root {
-	height: 100%;
+	/* height: 100%; */
 }

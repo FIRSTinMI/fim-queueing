@@ -14,8 +14,20 @@
 
     text-align: left;
 
-    .red { color: lighten(red, 20%); }
-    .blue { color: lighten(blue, 20%); }
+    .red { 
+        color: red;
+
+        .avatar>img {
+            background-color: red;
+        }
+    }
+    .blue { 
+        color: blue;
+
+        .avatar>img {
+            background-color: blue;
+        }
+    }
 
     .red, .blue {
         display: grid;
@@ -28,7 +40,8 @@
 
     .avatar {
         display: inline-block;
-        width: calc(1.2em + 15px);
+        width: 1em;
+        margin-right: 15px;
         height: 1em;
         vertical-align: middle;
 

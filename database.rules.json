@@ -1,0 +1,30 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": "(auth.token == root.child('admin_token').val())",
+    "current_season": {
+      ".read": true
+    },
+    "events": {
+      "$season": {
+        ".read": false,
+        "avatars": {
+          ".read": true,
+          ".write": false
+        },
+        "$eventKey": {
+          ".read": true,
+          ".write": false,
+          "currentMatchNumber": {
+            ".write": true,
+            ".validate": "newData.isNumber() && newData.val() > -5 && newData.val() < 200"
+          },
+          "mode": {
+            ".write": true,
+            ".validate": "newData.val() =='assisted' || newData.val() == 'automatic'"
+          }
+        }
+      }
+    }
+  }
+}

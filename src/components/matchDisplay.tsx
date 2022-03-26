@@ -7,7 +7,7 @@ type MatchDisplayProps = {
     teamAvatars: TeamAvatars | undefined;
 }
 function getAvatarForTeam(avatars: TeamAvatars | undefined, teamNumber: number | undefined): string | null {
-    if (avatars == undefined || teamNumber == undefined) return null;
+    if (avatars == undefined || teamNumber == undefined || !avatars[teamNumber] || avatars[teamNumber] === "NONE") return null;
     const avatar = avatars[teamNumber];
     if (avatar == undefined) return null;
     return avatar;
@@ -23,7 +23,7 @@ export default function MatchDisplay(props: MatchDisplayProps): JSX.Element {
         const avatar = getAvatarForTeam(props.teamAvatars, team.teamNumber);
         return (
             <div>
-                <span class={styles.avatar}>{avatar && <img src={`data:image/png;base64,${getAvatarForTeam(props.teamAvatars, team.teamNumber)}`} />}</span>{team.teamNumber}
+                <span class={styles.avatar}>{avatar && <img src={`data:image/png;base64,${avatar}`} />}</span>{team.teamNumber}
             </div>
         )
     }

@@ -1,87 +1,98 @@
-import { Component, h } from 'preact';
+import { Component, h, createContext, Context } from 'preact';
+import Cookies from 'js-cookie';
+import { FirebaseApp, initializeApp } from 'firebase/app';
+import { get, getDatabase, onValue, ref } from 'firebase/database';
 
-import { Match, ScheduleService, TeamAvatars } from '../services/scheduleService';
-import MatchDisplay from './matchDisplay';
 import styles from "./app.scss";
+import Queueing from './queueing';
+import LoginForm from './LoginForm';
+import { Match } from '../services/scheduleService';
+
+export type AppMode = "automatic" | "assisted";
+
+export type Event = {
+    start: Date;
+    end: Date;
+    name: string;
+    eventCode: string;
+    currentMatchNumber: number | null;
+    matches: Match[];
+    mode: AppMode;
+}
 
 type AppState = {
-    loadingState: "loading" | "ready" | "error";
-    currentMatch: Match | null;
-    nextMatch: Match | null;
-    queueingMatches: Match[];
-    teamAvatars?: TeamAvatars;
+    isAuthenticated: boolean;
+    event?: Event;
+    season?: number;
 }
 
 export default class App extends Component<{}, AppState> {
-    private _scheduleService: ScheduleService;
-    private _updateInterval?: number;
-
     constructor(props: {}) {
         super(props);
         this.state = {
-            loadingState: "loading",
-            currentMatch: null,
-            nextMatch: null,
-            queueingMatches: [],
-            teamAvatars: undefined
+            isAuthenticated: false
         };
         console.log("Initializing");
-        this._scheduleService = new ScheduleService();
 
-        this._scheduleService.updateSchedule().then(() => {
-            this._scheduleService.updateAvatars().then((avatars) => {
-                this.setState({
-                    teamAvatars: avatars
-                });
-            }).catch(() => {
-                // The app will work just fine without avatars
-                console.error("Failed to fetch team avatars. Continuing without them.");
-            });
-            this.updateMatches().finally(() => {
-                this._updateInterval = window.setInterval(() => this.updateMatches(), 1000);
-            });
-        });
-    }
+        this.onLogin = this.onLogin.bind(this);
 
-    private async updateMatches(): Promise<void> {
-        try {
-            const matchNumber = await this._scheduleService.getCurrentMatch();
-            if (matchNumber !== this.state.currentMatch?.matchNumber)
-            {
-                console.log("Match number changed, updating state");
-                this.setState({
-                    currentMatch: this._scheduleService.getMatchByNumber(matchNumber),
-                    nextMatch: this._scheduleService.getMatchByNumber(matchNumber + 1),
-                    // By default, we'll take the three matches after the one on deck
-                    queueingMatches: [2, 3, 4].map(x => this._scheduleService.getMatchByNumber(matchNumber + x)).filter(x => x !== null) as Match[],
-                    loadingState: "ready"
-                });
-            }
-        } catch (e) {
+        const firebaseConfig = {
+            apiKey: process.env.PREACT_APP_FIRE_KEY,
+            databaseURL: process.env.PREACT_APP_RTDB_URL,
+            projectId: process.env.PREACT_APP_FIRE_PROJ,
+            appId: process.env.PREACT_APP_FIRE_APPID
+          };
+          
+        initializeApp(firebaseConfig);
+
+        const token = Cookies.get("queueing-event-key");
+
+        if (token !== undefined) {
             this.setState({
-                loadingState: "error"
+                isAuthenticated: true
             });
+
+            this.onLogin(token);
         }
     }
 
-    componentWillUnmount(): void {
-        if (this._updateInterval) window.clearInterval(this._updateInterval);
+    /**
+     * This should only be called once
+     * @param token Event key
+     */
+    async onLogin(token: string): Promise<void> {
+        this.setState({
+            isAuthenticated: true
+        });
+
+        const db = getDatabase();
+
+        const seasonData = await get(ref(db, '/current_season'));
+        if (!seasonData || !seasonData.exists) {
+            throw new Error("Unable to get season...");
+        }
+
+        const season = Number.parseInt(seasonData.val(), 10);
+
+        this.setState({
+            season
+        });
+
+        onValue(ref(db, `/events/${season}/${token}`), (snap) => {
+            this.setState({
+                event: snap.val() as Event
+            });
+        });
     }
 
     render(): JSX.Element {
         return (
             <div id="preact_root" class={styles.app}>
-                {this.state.loadingState == "loading" && <div class={styles.infoText}>Loading matches...</div>}
-                {this.state.loadingState == "error" && <div class={styles.infoText}>Failed to fetch matches</div>}
-                {this.state.loadingState == "ready" &&
-                    <div class={styles.matches}>
-                        <div class={styles.topBar}>
-                            {this.state.currentMatch && <div><MatchDisplay match={this.state.currentMatch} teamAvatars={this.state.teamAvatars} /><span class={styles.description}>On Field</span></div>}
-                            {this.state.nextMatch && <div><MatchDisplay match={this.state.nextMatch} teamAvatars={this.state.teamAvatars} /><span class={styles.description}>On Deck</span></div>}
-                        </div>
-                        {this.state.queueingMatches.map(x => <MatchDisplay match={x} key={x.matchNumber} teamAvatars={this.state.teamAvatars} />)}
-                    </div>
-                }
+                <div>
+                    { this.state.isAuthenticated && this.state.event == null && <div class={styles.infoText}>Loading...</div>}
+                    { this.state.event != null && this.state.isAuthenticated && <Queueing event={this.state.event} season={this.state.season ?? 9999} /> }
+                    { !this.state.isAuthenticated && <LoginForm onLogin={this.onLogin} /> }
+                </div>
             </div>
         );
     }

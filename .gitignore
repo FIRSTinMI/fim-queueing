@@ -2,3 +2,7 @@ node_modules
 /build
 /*.log
 /web
+.env
+.firebase/hosting.*.cache
+functions/firebase-debug.log
+functions/ui-debug.log

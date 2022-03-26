@@ -11,6 +11,13 @@ export class ScheduleService {
         return matchNumber;
     }
 
+    async sendMatchNumber(matchNumber: number): Promise<void> {
+        await fetch(`${process.env.PREACT_APP_BASEURL}/currentMatch.txt`, {
+            method: "PUT",
+            body: matchNumber.toString()
+        })
+    }
+
     async updateSchedule(): Promise<Match[]> {
         const scheduleFetch = await fetch(`${process.env.PREACT_APP_BASEURL}/schedule.json`);
         if (!scheduleFetch.ok) throw new Error("Unable to load matches");
