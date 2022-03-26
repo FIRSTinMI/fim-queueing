@@ -54,17 +54,3 @@ jobs:
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
           
-      # Make a zip file with an inner directory which includes the version number
-      - name: Zip
-        run: |
-          cp build ${{env.VERSION}}
-          zip -r fim-queueing-${{env.VERSION}}.zip ${{env.VERSION}}
-        
-      - name: Release
-        uses: marvinpinto/action-automatic-releases@v1.2.1
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          automatic_release_tag: latest
-          title: Release ${{env.VERSION}}
-          prerelease: false
-          files: fim-queueing-${{env.VERSION}}.zip
