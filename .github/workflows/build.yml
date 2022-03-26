@@ -44,6 +44,9 @@ jobs:
       - name: Build
         run: npm run build
         
+      - name: Functions npm ci
+        run: npm ci --prefix "functions"
+
       - name: Firebase deploy
         uses: w9jds/firebase-action@v2.0.0
         with:
