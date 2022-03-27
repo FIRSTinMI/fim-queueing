@@ -52,48 +52,6 @@ type ApiMatchResults = {
 admin.initializeApp();
 functions.logger.info("Initialized Firebase app");
 
-exports.generateSchedule = functions.https.onRequest(async (req, res) => {
-  if (req.method !== "POST" || !req.body) {
-    res.status(400).send();
-    return;
-  }
-
-  const eventKey = req.body;
-
-  functions.logger.debug("Got event key", eventKey);
-
-  const token = Buffer.from(process.env.FRC_API_TOKEN as string)
-      .toString("base64");
-
-  // Get the event data from the DB based on key
-  try {
-    const season = (await admin.database().ref("/current_season").get()).val();
-
-    const eventSnap = await admin
-        .database()
-        .ref(`/events/${season}/${eventKey}`)
-        .once("value");
-
-    const event: any = eventSnap.val();
-    if (!event || (event.matches?.length ?? 0) !== 0) {
-      functions.logger.info("Bailing out, event doesn't exist or it has " +
-        "matches already");
-      res.status(400).send();
-      return;
-    }
-
-    const eventSchedule = await getSchedule(season, event.eventCode, token);
-
-    updateSchedule(eventSchedule, season, eventKey, token);
-
-    res.send(
-        `${eventSchedule["Schedule"].length} matches added to queueing system`);
-  } catch (e) {
-    functions.logger.error(e);
-    res.status(500).send();
-  }
-});
-
 exports.updateCurrentMatch = functions.pubsub.schedule("every 1 minutes")
     .onRun(async (ctx) => {
       const season = (await admin.database().ref("/current_season").get())
@@ -104,7 +62,7 @@ exports.updateCurrentMatch = functions.pubsub.schedule("every 1 minutes")
 
       const eventsSnap = await admin
           .database()
-          .ref(`/events/${season}`)
+          .ref(`/seasons/${season}/events`)
           .once("value");
 
       const events = await eventsSnap.val();
@@ -114,8 +72,7 @@ exports.updateCurrentMatch = functions.pubsub.schedule("every 1 minutes")
       try {
         const now = new Date();
         for (const eventKey in events) {
-          if (eventKey === "avatars" ||
-            !Object.prototype.hasOwnProperty.call(events, eventKey)) {
+          if (!Object.prototype.hasOwnProperty.call(events, eventKey)) {
             continue;
           }
 
@@ -125,7 +82,7 @@ exports.updateCurrentMatch = functions.pubsub.schedule("every 1 minutes")
             new Date(event.end) < now ||
             !event.eventCode) continue;
 
-          if ((event.matches?.length ?? 0) <= 0) {
+          if (!(event.hasQualSchedule ?? false)) {
             // Try to fetch the schedule
             const eventSchedule = (await getSchedule(season, event.eventCode,
                 token));
@@ -170,7 +127,8 @@ exports.updateCurrentMatch = functions.pubsub.schedule("every 1 minutes")
               functions.logger.info("Updating current match for ", eventKey,
                   "to", latestMatch.matchNumber + 1);
 
-              await admin.database().ref(`/events/${season}/${eventKey}`)
+              await admin.database()
+                  .ref(`/seasons/${season}/events/${eventKey}`)
                   .update({
                     currentMatchNumber: latestMatch.matchNumber + 1,
                   });
@@ -225,8 +183,13 @@ async function updateSchedule(schedule: ApiSchedule, season: number,
   const matchSchedule = schedule["Schedule"];
   admin
       .database()
-      .ref(`/events/${season}/${eventKey}`)
-      .update({matches: matchSchedule, mode: "automatic"});
+      .ref(`/seasons/${season}/events/${eventKey}`)
+      .update({mode: "automatic", hasQualSchedule: true});
+
+  admin
+      .database()
+      .ref(`/seasons/${season}/matches/${eventKey}`)
+      .set(matchSchedule)
 
   let teamsAtEvent: any[] = [];
   matchSchedule.forEach((match: any) => {
@@ -237,7 +200,7 @@ async function updateSchedule(schedule: ApiSchedule, season: number,
       (val, idx, self) => self.indexOf(val) === idx);
 
   const teamsWithAvatars = Object.keys(await admin.database()
-      .ref("/events/2022/avatars").get());
+      .ref(`/seasons/${season}/avatars`).get());
 
   const teamsThatNeedAvatars = teamsAtEvent.filter(
       (x) => !teamsWithAvatars.includes(x));
@@ -265,7 +228,7 @@ async function updateSchedule(schedule: ApiSchedule, season: number,
         avatar = avatarJson["teams"][0]["encodedAvatar"];
       }
 
-      admin.database().ref(`/events/${season}/avatars/${team}`).set(
+      admin.database().ref(`/seasons/${season}/avatars/${team}`).set(
           avatar
       );
     } catch (e) {

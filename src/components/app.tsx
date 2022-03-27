@@ -1,6 +1,6 @@
-import { Component, h, createContext, Context } from 'preact';
+import { Component, h } from 'preact';
 import Cookies from 'js-cookie';
-import { FirebaseApp, initializeApp } from 'firebase/app';
+import { initializeApp } from 'firebase/app';
 import { get, getDatabase, onValue, ref } from 'firebase/database';
 
 import styles from "./app.scss";
@@ -16,13 +16,14 @@ export type Event = {
     name: string;
     eventCode: string;
     currentMatchNumber: number | null;
-    matches: Match[];
+    hasQualSchedule: boolean;
     mode: AppMode;
 }
 
 type AppState = {
     isAuthenticated: boolean;
     event?: Event;
+    matches?: Match[];
     season?: number;
 }
 
@@ -78,10 +79,18 @@ export default class App extends Component<{}, AppState> {
             season
         });
 
-        onValue(ref(db, `/events/${season}/${token}`), (snap) => {
+        onValue(ref(db, `/seasons/${season}/events/${token}`), (snap) => {
+            console.log('got event data', snap.val());
             this.setState({
-                event: snap.val() as Event
-            });
+                event: snap.val() as Event,
+            }, () => console.log('new state from event', this.state));
+        });
+
+        onValue(ref(db, `/seasons/${season}/matches/${token}`), (snap) => {
+            console.log('got match data', snap.val());
+            this.setState({
+                matches: snap.val() as Match[],
+            }), () => console.log('new state from match', this.state);
         });
     }
 
@@ -90,7 +99,7 @@ export default class App extends Component<{}, AppState> {
             <div id="preact_root" class={styles.app}>
                 <div>
                     { this.state.isAuthenticated && this.state.event == null && <div class={styles.infoText}>Loading...</div>}
-                    { this.state.event != null && this.state.isAuthenticated && <Queueing event={this.state.event} season={this.state.season ?? 9999} /> }
+                    { this.state.event != null && this.state.isAuthenticated && <Queueing event={this.state.event} matches={this.state.matches} season={this.state.season ?? 9999} /> }
                     { !this.state.isAuthenticated && <LoginForm onLogin={this.onLogin} /> }
                 </div>
             </div>
