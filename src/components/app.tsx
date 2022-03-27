@@ -98,7 +98,7 @@ export default class App extends Component<{}, AppState> {
                 <div>
                     { this.state.isAuthenticated && this.state.event == null && <div class={styles.infoText}>Loading...</div>}
                     { this.state.event != null && this.state.isAuthenticated && <Queueing event={this.state.event} matches={this.state.matches} season={this.state.season ?? 9999} /> }
-                    { !this.state.isAuthenticated && <LoginForm onLogin={this.onLogin} /> }
+                    { !this.state.isAuthenticated && <LoginForm season={this.state.season ?? 9999} onLogin={this.onLogin} /> }
                 </div>
             </div>
         );

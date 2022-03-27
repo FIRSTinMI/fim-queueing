@@ -37,9 +37,9 @@ export default class Queueing extends Component<QueueingProps, QueueingState> {
         const token = Cookies.get("queueing-event-key")
         if (!token) throw new Error("Token was somehow empty.");
 
-        this._eventRef = ref(getDatabase(), `/events/${props.season}/${token}`);
+        this._eventRef = ref(getDatabase(), `/seasons/${props.season}/events/${token}`);
 
-        onValue(ref(getDatabase(), `/events/${props.season}/avatars`), (snap) => {
+        onValue(ref(getDatabase(), `/seasons/${props.season}/avatars`), (snap) => {
             this.setState({
                 teamAvatars: snap.val()
             });

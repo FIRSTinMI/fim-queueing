@@ -6,6 +6,7 @@ import styles from './LoginForm.scss';
 
 type LoginFormProps = { 
     onLogin: (token: string) => void;
+    season: number;
 }
 
 export default class LoginForm extends Component<LoginFormProps, { eventToken: string; badToken: boolean }> {
@@ -24,7 +25,7 @@ export default class LoginForm extends Component<LoginFormProps, { eventToken: s
         if (!this.state.eventToken || this.state.eventToken === '') this.handleFailedLogin();
 
         try {
-            const event = await get(ref(getDatabase(), `events/2022/${this.state.eventToken}`));
+            const event = await get(ref(getDatabase(), `/seasons/${this.props.season}/events/${this.state.eventToken}`));
             if (!event) {
                 this.handleFailedLogin();
                 return;
