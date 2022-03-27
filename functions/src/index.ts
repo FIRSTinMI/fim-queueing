@@ -189,7 +189,7 @@ async function updateSchedule(schedule: ApiSchedule, season: number,
   admin
       .database()
       .ref(`/seasons/${season}/matches/${eventKey}`)
-      .set(matchSchedule)
+      .set(matchSchedule);
 
   let teamsAtEvent: any[] = [];
   matchSchedule.forEach((match: any) => {

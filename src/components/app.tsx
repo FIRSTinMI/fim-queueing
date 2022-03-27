@@ -80,17 +80,15 @@ export default class App extends Component<{}, AppState> {
         });
 
         onValue(ref(db, `/seasons/${season}/events/${token}`), (snap) => {
-            console.log('got event data', snap.val());
             this.setState({
                 event: snap.val() as Event,
-            }, () => console.log('new state from event', this.state));
+            });
         });
 
         onValue(ref(db, `/seasons/${season}/matches/${token}`), (snap) => {
-            console.log('got match data', snap.val());
             this.setState({
                 matches: snap.val() as Match[],
-            }), () => console.log('new state from match', this.state);
+            });
         });
     }
 
