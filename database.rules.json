@@ -9,7 +9,7 @@
       "$season": {
         "events": {
           "$eventKey": {
-            ".read": true,
+            ".read": "data.child('startMs').val() < now && data.child('endMs').val() > now",
             ".write": false,
             "currentMatchNumber": {
               ".write": true,
@@ -23,7 +23,7 @@
         },
         "matches": {
           "$eventKey": {
-            ".read": true,
+            ".read": "root.child('seasons/'+$season+'/events/'+$eventKey).child('startMs').val() < now && root.child('seasons/'+$season+'/events/'+$eventKey).child('startMs').val() > now",
             ".write": false
           }
         },
@@ -34,27 +34,7 @@
           }
         }
       }
-    },
-    "events": {
-      "$season": {
-        ".read": false,
-        "avatars": {
-          ".read": true,
-          ".write": false
-        },
-        "$eventKey": {
-          ".read": true,
-          ".write": false,
-          "currentMatchNumber": {
-            ".write": true,
-            ".validate": "newData.isNumber() && newData.val() > -5 && newData.val() < 200"
-          },
-          "mode": {
-            ".write": true,
-            ".validate": "newData.val() =='assisted' || newData.val() == 'automatic'"
-          }
-        }
-      }
     }
   }
 }
+
