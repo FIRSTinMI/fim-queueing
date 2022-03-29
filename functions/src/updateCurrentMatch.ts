@@ -1,56 +1,7 @@
-import * as functions from "firebase-functions";
-import * as admin from "firebase-admin";
+const functions = require('firebase-functions');
+const admin = require("firebase-admin");
 const fetch = require("node-fetch");
-
-type ApiSchedule = {
-  "Schedule": {
-    "field": string;
-    "tournamentLevel": string;
-    "description": string;
-    "startTime": string;
-    "matchNumber": number;
-    "teams": {
-        "teamNumber": number;
-        "station": string;
-        "surrogate": boolean;
-      }[]
-  }[]
-}
-
-type ApiAvatars = {
-  "teams": {
-      "teamNumber": number;
-      "encodedAvatar": string
-    }[];
-  "teamCountTotal": number,
-  "teamCountPage": number,
-  "pageCurrent": number,
-  "pageTotal": number
-}
-
-type ApiMatchResults = {
-  "Matches": {
-    "actualStartTime": string;
-    "tournamentLevel": string;
-    "postResultTime": string;
-    "description": string;
-    "matchNumber": number;
-    "scoreRedFinal": number;
-    "scoreRedFoul": number;
-    "scoreRedAuto": number;
-    "scoreBlueFinal": number;
-    "scoreBlueFoul": number;
-    "scoreBlueAuto": number;
-    "teams": {
-        "teamNumber": number;
-        "station": string;
-        "dq": boolean;
-      }[],
-    }[];
-}
-
-admin.initializeApp();
-functions.logger.info("Initialized Firebase app");
+import {ApiAvatars, ApiMatchResults, ApiSchedule} from './apiTypes';
 
 exports.updateCurrentMatch = functions.pubsub.schedule("every 1 minutes")
     .onRun(async () => {

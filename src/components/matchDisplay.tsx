@@ -5,6 +5,7 @@ import styles from "./matchDisplay.scss";
 type MatchDisplayProps = {
     match: Match | null;
     teamAvatars: TeamAvatars | undefined;
+    halfWidth?: boolean;
 }
 function getAvatarForTeam(avatars: TeamAvatars | undefined, teamNumber: number | undefined): string | null {
     if (avatars == undefined || teamNumber == undefined || !avatars[teamNumber] || avatars[teamNumber] === "NONE") return null;
@@ -28,7 +29,7 @@ export default function MatchDisplay(props: MatchDisplayProps): JSX.Element {
         )
     }
 
-    return (<div class={styles.matchDisplay}>
+    return (<div class={`${styles.matchDisplay} ${props.halfWidth === true ? styles.halfWidth : ''}`}>
         {/* Just show a blank entry if the match doesn't exist. Either we're in a test match or at the end of the schedule */}
         {props.match && <Fragment>
             <span class={styles.matchNumber}>{props.match.matchNumber}</span>

@@ -54,7 +54,8 @@ export default class Queueing extends Component<QueueingProps, QueueingState> {
     }
 
     componentDidUpdate(prevProps: QueueingProps): void {
-        if (prevProps.event.currentMatchNumber !== this.props.event.currentMatchNumber)
+        if (prevProps.event.currentMatchNumber !== this.props.event.currentMatchNumber ||
+            prevProps.matches !== this.props.matches)
             this.updateMatches();
     }
 
@@ -161,10 +162,12 @@ export default class Queueing extends Component<QueueingProps, QueueingState> {
                                 <option value="assisted">Assisted</option>
                             </select>
                         </div>
-                        <span>{this.props.event.name} ({this.props.season})</span>
+                        <span>
+                            {this.props.event.name} ({this.props.season})
+                            <div class={styles.scrollInstruction}>Scroll the page down to hide this menu</div>
+                        </span>
                         <button onClick={(): void => this.onLogout()}>Log out</button>
                     </div>
-                    <span>Scroll the page down to hide this menu</span>
                 </div>
                 {this.state.loadingState == "loading" && <div class={styles.infoText}>Loading matches...</div>}
                 {this.state.loadingState == "error" && <div class={styles.infoText}>Failed to fetch matches</div>}
@@ -173,8 +176,8 @@ export default class Queueing extends Component<QueueingProps, QueueingState> {
                 {this.state.loadingState == "ready" && this.props.matches?.length &&
                     <div class={styles.matches}>
                         <div class={styles.topBar}>
-                            {this.state.currentMatch && <div><MatchDisplay match={this.state.currentMatch} teamAvatars={this.state.teamAvatars} /><span class={styles.description}>On Field</span></div>}
-                            {this.state.nextMatch && <div><MatchDisplay match={this.state.nextMatch} teamAvatars={this.state.teamAvatars} /><span class={styles.description}>On Deck</span></div>}
+                            {this.state.currentMatch && <div><MatchDisplay halfWidth match={this.state.currentMatch} teamAvatars={this.state.teamAvatars} /><span class={styles.description}>On Field</span></div>}
+                            {this.state.nextMatch && <div><MatchDisplay halfWidth match={this.state.nextMatch} teamAvatars={this.state.teamAvatars} /><span class={styles.description}>On Deck</span></div>}
                         </div>
                         {this.state.queueingMatches.map(x => <MatchDisplay match={x} key={x.matchNumber} teamAvatars={this.state.teamAvatars} />)}
                     </div>

@@ -49,4 +49,16 @@
             height: 100%;
         }
     }
+
+    &.halfWidth {
+        @media only screen and (max-width: 1200px) {
+            text-align: center;
+
+            font-size: 3vw;
+            .avatar {
+                display: block;
+                margin: 0 auto;
+            }
+        }
+    }
 }
