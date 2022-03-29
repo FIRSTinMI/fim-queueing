@@ -161,6 +161,7 @@ export default class Queueing extends Component<QueueingProps, QueueingState> {
                                 <option value="automatic">Automatic</option>
                                 <option value="assisted">Assisted</option>
                             </select>
+                            {this.props.event.mode === "assisted" && <div class={styles.assistedInstruction}>Use the left/right arrow keys to change</div>}
                         </div>
                         <span>
                             {this.props.event.name} ({this.props.season})

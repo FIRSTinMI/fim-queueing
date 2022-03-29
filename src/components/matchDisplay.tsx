@@ -24,7 +24,7 @@ export default function MatchDisplay(props: MatchDisplayProps): JSX.Element {
         const avatar = getAvatarForTeam(props.teamAvatars, team.teamNumber);
         return (
             <div>
-                <span class={styles.avatar}>{avatar && <img src={`data:image/png;base64,${avatar}`} />}</span>{team.teamNumber}
+                {/*<span class={styles.avatar}>{avatar && <img src={`data:image/png;base64,${avatar}`} />}</span>*/}{team.teamNumber}
             </div>
         )
     }
