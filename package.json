@@ -20,13 +20,31 @@
     ],
     "ignorePatterns": [
       "build/"
-    ]
+    ],
+    "rules": {
+      "no-console": "off",
+      "react/react-in-jsx-scope": "off",
+      "react/jsx-one-expression-per-line": "off",
+      "react/jsx-filename-extension": [
+        "error",
+        {
+          "extensions": [".jsx", ".tsx"]
+        }
+      ]
+    },
+    "settings": {
+      "react": {
+        "//": "This is just to make it not complain, obviously we aren't using React",
+        "version": "18.0.0"
+      }
+    }
   },
   "dependencies": {
     "firebase": "^9.6.10",
     "js-cookie": "^3.0.1",
     "preact": "^10.3.1",
-    "preact-render-to-string": "^5.1.4"
+    "preact-render-to-string": "^5.1.4",
+    "preact-cli": "^3.0.0"
   },
   "devDependencies": {
     "eslint-config-airbnb": "^19.0.4",
@@ -34,7 +52,6 @@
     "@types/js-cookie": "^3.0.1",
     "@types/react": "^17.0.43",
     "dotenv-webpack": "^7.1.0",
-    "preact-cli": "^3.0.0",
     "sass": "^1.49.9",
     "sass-loader": "^10.2.1",
     "typescript": "^4.6.3"
