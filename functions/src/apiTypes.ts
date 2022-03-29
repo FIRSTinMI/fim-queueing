@@ -12,7 +12,7 @@ export type ApiSchedule = {
     }[]
   }[]
 }
-  
+
 export type ApiAvatars = {
   "teams": {
     "teamNumber": number;
@@ -23,7 +23,7 @@ export type ApiAvatars = {
   "pageCurrent": number,
   "pageTotal": number
 }
-  
+
 export type ApiMatchResults = {
   "Matches": {
     "actualStartTime": string;
