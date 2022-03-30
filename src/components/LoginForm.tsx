@@ -39,8 +39,8 @@ export default class LoginForm extends Component<LoginFormProps, LoginFormState>
       }
 
       const now = new Date();
-      const start = new Date(event.child('start').val());
-      const end = new Date(event.child('end').val());
+      const start = new Date(event.child('start').val().replace(' ', 'T'));
+      const end = new Date(event.child('end').val().replace(' ', 'T'));
 
       if (start > now || end < now) {
         this.handleFailedLogin();
