@@ -2,6 +2,7 @@ import { Component, h } from 'preact';
 import Cookies from 'js-cookie';
 import { initializeApp } from 'firebase/app';
 import {
+  Database,
   get, getDatabase, onValue, ref,
 } from 'firebase/database';
 
@@ -18,6 +19,8 @@ type AppState = {
 };
 
 export default class App extends Component<{}, AppState> {
+  private db: Database;
+
   constructor(props: {}) {
     super(props);
     this.state = {
@@ -35,10 +38,11 @@ export default class App extends Component<{}, AppState> {
     };
 
     initializeApp(firebaseConfig);
+    this.db = getDatabase();
+  }
 
-    const db = getDatabase();
-
-    const seasonData = await get(ref(db, '/current_season'));
+  async componentDidMount() {
+    const seasonData = await get(ref(this.db, '/current_season'));
     if (!seasonData || !seasonData.exists) {
       throw new Error('Unable to get season...');
     }
@@ -65,17 +69,18 @@ export default class App extends Component<{}, AppState> {
      * @param token Event key
      */
   async onLogin(token: string): Promise<void> {
+    const { season } = this.state;
     this.setState({
       isAuthenticated: true,
     });
 
-    onValue(ref(db, `/seasons/${season}/events/${token}`), (snap) => {
+    onValue(ref(this.db, `/seasons/${season}/events/${token}`), (snap) => {
       this.setState({
         event: snap.val() as Event,
       });
     });
 
-    onValue(ref(db, `/seasons/${season}/matches/${token}`), (snap) => {
+    onValue(ref(this.db, `/seasons/${season}/matches/${token}`), (snap) => {
       this.setState({
         matches: snap.val() as Match[],
       });
