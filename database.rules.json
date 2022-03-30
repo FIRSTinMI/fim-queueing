@@ -23,15 +23,13 @@
         },
         "matches": {
           "$eventKey": {
-            ".read": "root.child('seasons/'+$season+'/events/'+$eventKey).child('startMs').val() < now && root.child('seasons/'+$season+'/events/'+$eventKey).child('startMs').val() > now",
+            ".read": "root.child('seasons/'+$season+'/events/'+$eventKey).child('startMs').val() < now && root.child('seasons/'+$season+'/events/'+$eventKey).child('endMs').val() > now",
             ".write": false
           }
         },
         "avatars": {
-          "$teamNumber": {
-            ".read": true,
-            ".write": false
-          }
+          ".read": true,
+          ".write": false
         }
       }
     }

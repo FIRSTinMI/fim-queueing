@@ -14,19 +14,22 @@ $border-color: #222;
         font-size: 0.5em;
     }
 
-    >span {
-        font-size: 0.5em;
-        text-align: center;
-        width: 100%;
-        display: block;
-    }
-
     .actions {
         display: flex;
         justify-content: space-between;
 
         span {
             text-overflow: ellipsis;
+            text-align: center;
+        }
+
+        .scrollInstruction {
+            font-size: 0.5em;
+        }
+
+        .assistedInstruction {
+            font-size: 12px;
+            width: 20vw;
         }
     }
 }
