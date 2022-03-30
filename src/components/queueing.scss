@@ -34,8 +34,11 @@ $border-color: #222;
     }
 }
 
+.fullHeight {
+    min-height: 100vh;
+}
+
 .matches {
-    height: 100vh;
     display: flex;
     //gap: 30px;
     flex-direction: column;

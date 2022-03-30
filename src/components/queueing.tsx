@@ -197,32 +197,34 @@ export default class Queueing extends Component<QueueingProps, QueueingState> {
             <button type="button" onClick={(): void => Queueing.onLogout()}>Log out</button>
           </div>
         </div>
-        {loadingState === 'loading' && <div className={styles.infoText}>Loading matches...</div>}
-        {loadingState === 'error' && <div className={styles.infoText}>Failed to fetch matches</div>}
-        {loadingState === 'noAutomatic' && <div className={styles.infoText}>Unable to run in automatic mode. Press the &apos;a&apos; key to switch modes.</div>}
-        {loadingState === 'ready' && !matches?.length && <div className={styles.infoText}>Waiting for schedule to be posted...</div>}
-        {loadingState === 'ready' && matches?.length
-          && (
-          <div className={styles.matches}>
-            <div className={styles.topBar}>
-              {currentMatch && (
-              <div>
-                <MatchDisplay halfWidth match={currentMatch} teamAvatars={teamAvatars} />
-                <span className={styles.description}>On Field</span>
+        <div className={styles.fullHeight}>
+          {loadingState === 'loading' && <div className={styles.infoText}>Loading matches...</div>}
+          {loadingState === 'error' && <div className={styles.infoText}>Failed to fetch matches</div>}
+          {loadingState === 'noAutomatic' && <div className={styles.infoText}>Unable to run in automatic mode. Press the &apos;a&apos; key to switch modes.</div>}
+          {loadingState === 'ready' && !matches?.length && <div className={styles.infoText}>Waiting for schedule to be posted...</div>}
+          {loadingState === 'ready' && matches?.length
+            && (
+            <div className={styles.matches}>
+              <div className={styles.topBar}>
+                {currentMatch && (
+                <div>
+                  <MatchDisplay halfWidth match={currentMatch} teamAvatars={teamAvatars} />
+                  <span className={styles.description}>On Field</span>
+                </div>
+                )}
+                {nextMatch && (
+                <div>
+                  <MatchDisplay halfWidth match={nextMatch} teamAvatars={teamAvatars} />
+                  <span className={styles.description}>On Deck</span>
+                </div>
+                )}
               </div>
-              )}
-              {nextMatch && (
-              <div>
-                <MatchDisplay halfWidth match={nextMatch} teamAvatars={teamAvatars} />
-                <span className={styles.description}>On Deck</span>
-              </div>
-              )}
+              {queueingMatches.map((x) => (
+                <MatchDisplay match={x} key={x.matchNumber} teamAvatars={teamAvatars} />
+              ))}
             </div>
-            {queueingMatches.map((x) => (
-              <MatchDisplay match={x} key={x.matchNumber} teamAvatars={teamAvatars} />
-            ))}
-          </div>
-          )}
+            )}
+        </div>
       </div>
     );
   }
