@@ -5,95 +5,95 @@ const fetch = require("node-fetch");
 import {ApiAvatars, ApiMatchResults, ApiSchedule} from "./apiTypes";
 
 exports.updateCurrentMatch = async () => {
-    const season = (await admin.database().ref("/current_season").get())
-        .val();
+  const season = (await admin.database().ref("/current_season").get())
+      .val();
 
-    const token = Buffer.from(process.env.FRC_API_TOKEN as string)
-        .toString("base64");
+  const token = Buffer.from(process.env.FRC_API_TOKEN as string)
+      .toString("base64");
 
-    const eventsSnap = await admin
-        .database()
-        .ref(`/seasons/${season}/events`)
-        .once("value");
+  const eventsSnap = await admin
+      .database()
+      .ref(`/seasons/${season}/events`)
+      .once("value");
 
-    const events = await eventsSnap.val();
+  const events = await eventsSnap.val();
 
-    functions.logger.info("Updating current matches");
+  functions.logger.info("Updating current matches");
 
-    try {
-      const now = new Date();
-      for (const eventKey in events) {
-        if (!Object.prototype.hasOwnProperty.call(events, eventKey)) {
-          continue;
-        }
+  try {
+    const now = new Date();
+    for (const eventKey in events) {
+      if (!Object.prototype.hasOwnProperty.call(events, eventKey)) {
+        continue;
+      }
 
-        const event = events[eventKey];
+      const event = events[eventKey];
 
-        if (new Date(event.start) > now ||
-          new Date(event.end) < now ||
-          !event.eventCode) continue;
+      if (new Date(event.start) > now ||
+        new Date(event.end) < now ||
+        !event.eventCode) continue;
 
-        if (!(event.hasQualSchedule ?? false)) {
-          // Try to fetch the schedule
-          const eventSchedule = (await getSchedule(season, event.eventCode,
-              token));
+      if (!(event.hasQualSchedule ?? false)) {
+        // Try to fetch the schedule
+        const eventSchedule = (await getSchedule(season, event.eventCode,
+            token));
 
-          if (eventSchedule["Schedule"] &&
-            eventSchedule["Schedule"].length > 0) {
-            // Yay, we have a schedule now
-            await updateSchedule(eventSchedule, season, eventKey, token);
-          } else {
-            functions.logger.info(`Still no schedule for ${event.eventCode}`);
-            return;
-          }
-        }
-
-        if (event.mode !== "automatic") continue;
-
-        try {
-          const url = `https://frc-api.firstinspires.org/v3.0/${season}/` +
-          `matches/${event.eventCode}?tournamentLevel=qual` +
-          `&start=${event.currentMatchNumber ?? 1}`;
-
-          const resultFetch = await fetch(url,
-              {
-                headers: {
-                  "Authorization": "Basic " + token,
-                  "Content-Type": "application/json",
-                  "Cache-Control": "no-cache",
-                },
-              }
-          );
-          if (!resultFetch.ok) throw new Error(resultFetch.statusText);
-
-          const results = await resultFetch.json() as ApiMatchResults;
-
-          const latestMatch = results["Matches"]
-              .filter((x: any) => x.actualStartTime != null)
-              .sort((x: any) => -1 * x.matchNumber)[0];
-
-          if (!latestMatch) continue;
-
-          if (latestMatch.matchNumber + 1 != event.currentMatchNumber) {
-            functions.logger.info("Updating current match for ", eventKey,
-                "to", latestMatch.matchNumber + 1);
-
-            await admin.database()
-                .ref(`/seasons/${season}/events/${eventKey}`)
-                .update({
-                  currentMatchNumber: latestMatch.matchNumber + 1,
-                });
-          }
-        } catch (e) {
-          functions.logger.error(e);
-          continue;
+        if (eventSchedule["Schedule"] &&
+          eventSchedule["Schedule"].length > 0) {
+          // Yay, we have a schedule now
+          await updateSchedule(eventSchedule, season, eventKey, token);
+        } else {
+          functions.logger.info(`Still no schedule for ${event.eventCode}`);
+          return;
         }
       }
-    } catch (e) {
-      functions.logger.error(e);
-      throw e;
+
+      if (event.mode !== "automatic") continue;
+
+      try {
+        const url = `https://frc-api.firstinspires.org/v3.0/${season}/` +
+        `matches/${event.eventCode}?tournamentLevel=qual` +
+        `&start=${event.currentMatchNumber ?? 1}`;
+
+        const resultFetch = await fetch(url,
+            {
+              headers: {
+                "Authorization": "Basic " + token,
+                "Content-Type": "application/json",
+                "Cache-Control": "no-cache",
+              },
+            }
+        );
+        if (!resultFetch.ok) throw new Error(resultFetch.statusText);
+
+        const results = await resultFetch.json() as ApiMatchResults;
+
+        const latestMatch = results["Matches"]
+            .filter((x: any) => x.actualStartTime != null)
+            .sort((x: any) => -1 * x.matchNumber)[0];
+
+        if (!latestMatch) continue;
+
+        if (latestMatch.matchNumber + 1 != event.currentMatchNumber) {
+          functions.logger.info("Updating current match for ", eventKey,
+              "to", latestMatch.matchNumber + 1);
+
+          await admin.database()
+              .ref(`/seasons/${season}/events/${eventKey}`)
+              .update({
+                currentMatchNumber: latestMatch.matchNumber + 1,
+              });
+        }
+      } catch (e) {
+        functions.logger.error(e);
+        continue;
+      }
     }
-  };
+  } catch (e) {
+    functions.logger.error(e);
+    throw e;
+  }
+};
 
 /**
  * Get the qualifications schedule for an event
