@@ -36,6 +36,19 @@ export default class App extends Component<{}, AppState> {
 
     initializeApp(firebaseConfig);
 
+    const db = getDatabase();
+
+    const seasonData = await get(ref(db, '/current_season'));
+    if (!seasonData || !seasonData.exists) {
+      throw new Error('Unable to get season...');
+    }
+
+    const season = Number.parseInt(seasonData.val(), 10);
+
+    this.setState({
+      season,
+    });
+
     const token = Cookies.get('queueing-event-key');
 
     if (token !== undefined) {
@@ -54,19 +67,6 @@ export default class App extends Component<{}, AppState> {
   async onLogin(token: string): Promise<void> {
     this.setState({
       isAuthenticated: true,
-    });
-
-    const db = getDatabase();
-
-    const seasonData = await get(ref(db, '/current_season'));
-    if (!seasonData || !seasonData.exists) {
-      throw new Error('Unable to get season...');
-    }
-
-    const season = Number.parseInt(seasonData.val(), 10);
-
-    this.setState({
-      season,
     });
 
     onValue(ref(db, `/seasons/${season}/events/${token}`), (snap) => {
