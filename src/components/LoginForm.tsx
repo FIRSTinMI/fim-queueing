@@ -5,7 +5,7 @@ import { Component, h } from 'preact';
 import styles from './LoginForm.scss';
 
 type LoginFormProps = {
-  onLogin: (token: string) => void;
+  onLogin: (token: string, season: number) => void;
   season: number;
 };
 
@@ -56,12 +56,12 @@ export default class LoginForm extends Component<LoginFormProps, LoginFormState>
 
   handleSuccessfulLogin(expiration: Date): void {
     const { eventToken } = this.state;
-    const { onLogin } = this.props;
+    const { onLogin, season } = this.props;
 
     Cookies.set('queueing-event-key', eventToken, {
       expires: expiration,
     });
-    onLogin(eventToken);
+    onLogin(eventToken, season);
   }
 
   handleFailedLogin(): void {

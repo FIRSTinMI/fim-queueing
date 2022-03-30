@@ -60,7 +60,7 @@ export default class App extends Component<{}, AppState> {
         isAuthenticated: true,
       });
 
-      this.onLogin(token);
+      this.onLogin(token, season);
     }
   }
 
@@ -68,8 +68,7 @@ export default class App extends Component<{}, AppState> {
      * This should only be called once
      * @param token Event key
      */
-  async onLogin(token: string): Promise<void> {
-    const { season } = this.state;
+  async onLogin(token: string, season: number): Promise<void> {
     this.setState({
       isAuthenticated: true,
     });
