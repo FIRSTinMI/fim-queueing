@@ -2,28 +2,25 @@
 
 ## About this project
 
-This project is intended for use in FIRST in Michigan field setups, running on the offical A/V server. Other usages are not supported, though may work with some changes. This expects a direct connection with the FMS server or a connection with the field network via a proxy.
+This project is intended for use in FIRST in Michigan field setups. Other usages are not supported, though may work with some changes. No connection to the AV server or field is required, only an internet connection. Any number of computers at a given event can be connected.
 
 The main goals of this project are as follows:
 
 1. A rewrite of the queueing display which uses more modern technologies and is easier to maintain.
-2. Proper version control, rather than making changes on one box and copy-pasting it to the others.
+2. Proper version control, rather than making changes on one box and copy-pasting it to the others. This includes a robust CI/CD pipeline for quick changes to the app.
 3. The least amount of bytes over the wire as possible. Local processing power is plentiful, a stable network connection is not a guarantee.
 
+# Documentation
+
+- [User Documentation](docs/user-info.md)
+- [Administrative Documentation](docs/admin-info.md)
 
 ## Breakdown
 
 ### Web app
 
-This Preact app is the main way that the queueing system interacts with the world. It will pull match and team data on the initial load, and occasionally poll for changes to the current match. A sample nginx config is provided which directs schedule-related requests to one directory and everything else to where the webapp lives, allowing PUT requests to the current match to support real(-ish) time updating.
+This Preact app is the main way that the queueing system interacts with the world. It creates a WebSocket connection to Firebase and, after login, gets notified of any changes to the event or matches. The mode can be switched away from "automatic" to "assisted" if the current match needs to be manually controlled.
 
-### Schedule generation
+### Firebase Functions
 
-This set of Python scripts allows for pulling all necessary event data from the FRC Events API. It should be run at the beginning of the event after the qualification schedule has been generated and posted. This is not currently completed and will be coming to the repo soon.
-
-## CLI Commands
-*   `npm install`: Installs dependencies
-*   `npm run dev`: Run a development, HMR server
-*   `npm run serve`: Run a production-like server
-*   `npm run build`: Production-ready build
-*   `npm run lint`: Pass TypeScript files using ESLint
+The application is backed by a function which runs every minute. This function looks for and generates match schedules for events, and watches match results to determine the current match on the field. Thanks to Realtime Database, any changes made by this function immediately become visible to any clients logged in to a given event.
