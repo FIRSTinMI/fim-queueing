@@ -29,6 +29,8 @@ exports.updateCurrentMatch = async () => {
 
       const event = events[eventKey];
 
+      functions.logger.info("Event", eventKey, event);
+
       if (new Date(event.start) > now ||
         new Date(event.end) < now ||
         !event.eventCode) continue;
