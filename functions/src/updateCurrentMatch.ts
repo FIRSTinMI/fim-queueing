@@ -46,7 +46,7 @@ exports.updateCurrentMatch = async () => {
           await updateSchedule(eventSchedule, season, eventKey, token);
         } else {
           functions.logger.info(`Still no schedule for ${event.eventCode}`);
-          return;
+          continue;
         }
       }
 
