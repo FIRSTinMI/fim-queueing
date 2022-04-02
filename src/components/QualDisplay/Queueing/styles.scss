@@ -6,8 +6,23 @@ $border-color: #222;
 }
 
 .menu {
+    position: absolute;
+    top: 0;
+    width: 100vw;
+    border: #222;
     padding: 10px 5%;
-    border-bottom: 5px solid $border-color;
+    background: #e5e5e5;
+    box-shadow: 0px 3px 10px 0px #000000;
+    transition: transform 0.3s ease-out;
+    transform: translateY(0);
+
+    &.hidden {
+        transform: translateY(calc(-100% - 20px));
+    }
+
+    &:hover, &:focus-within {
+        transform: translateY(0);
+    }
 
     label {
         padding-right: 10px;
@@ -38,8 +53,14 @@ $border-color: #222;
     height: 100vh;
 }
 
-.matches {
+.qualsDisplay {
     height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.matches {
     display: flex;
     //gap: 30px;
     flex-direction: column;

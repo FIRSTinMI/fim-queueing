@@ -1,15 +1,17 @@
 import { Component, h } from 'preact';
 import Cookies from 'js-cookie';
 import {
-  DatabaseReference, getDatabase, onValue, ref, update,
+  DatabaseReference, getDatabase, ref, update,
 } from 'firebase/database';
 
 import {
   Event, AppMode, Match, TeamAvatars,
-} from '../types';
-import MatchDisplay from './matchDisplay';
-import styles from './queueing.scss';
-import AnalyticsService from '../analyticsService';
+} from '../../../types';
+import MatchDisplay from '../MatchDisplay';
+import AnalyticsService from '../../../analyticsService';
+import Ranking from '../../Tickers/Ranking';
+import RankingList from '../../Tickers/RankingList';
+import styles from './styles.scss';
 
 type QueueingProps = {
   event: Event;
@@ -23,10 +25,14 @@ type QueueingState = {
   nextMatch: Match | null;
   queueingMatches: Match[];
   teamAvatars?: TeamAvatars;
+  showMenu: boolean;
+  showRankings: boolean;
 };
 
 export default class Queueing extends Component<QueueingProps, QueueingState> {
   private eventRef: DatabaseReference;
+
+  private mouseTimeout?: number;
 
   constructor(props: QueueingProps) {
     super(props);
@@ -36,6 +42,8 @@ export default class Queueing extends Component<QueueingProps, QueueingState> {
       nextMatch: null,
       queueingMatches: [],
       teamAvatars: undefined,
+      showMenu: false,
+      showRankings: false,
     };
 
     const token = Cookies.get('queueing-event-key');
@@ -53,6 +61,7 @@ export default class Queueing extends Component<QueueingProps, QueueingState> {
   componentDidMount(): void {
     if (typeof document === undefined) return;
     document.addEventListener('keydown', this.handleKeyPress.bind(this));
+    document.addEventListener('mousemove', this.handleMouseMove.bind(this));
 
     this.updateMatches();
   }
@@ -65,7 +74,9 @@ export default class Queueing extends Component<QueueingProps, QueueingState> {
   }
 
   componentWillUnmount(): void {
-    if (typeof document !== undefined) document.removeEventListener('keypress', this.handleKeyPress.bind(this));
+    if (typeof document === undefined) return;
+    document.removeEventListener('keypress', this.handleKeyPress.bind(this));
+    document.removeEventListener('mousemove', this.handleMouseMove.bind(this));
   }
 
   handleKeyPress(e: KeyboardEvent): void {
@@ -81,6 +92,22 @@ export default class Queueing extends Component<QueueingProps, QueueingState> {
         break;
       default:
         break;
+    }
+  }
+
+  handleMouseMove(): void {
+    const { showMenu } = this.state;
+    if (!showMenu) {
+      this.setState({
+        showMenu: true,
+      });
+
+      clearTimeout(this.mouseTimeout);
+      this.mouseTimeout = window.setTimeout(() => {
+        this.setState({
+          showMenu: false,
+        });
+      }, 2000);
     }
   }
 
@@ -170,12 +197,12 @@ export default class Queueing extends Component<QueueingProps, QueueingState> {
 
   render(): JSX.Element {
     const {
-      loadingState, currentMatch, nextMatch, queueingMatches, teamAvatars,
+      loadingState, currentMatch, nextMatch, queueingMatches, teamAvatars, showMenu, showRankings,
     } = this.state;
     const { event, matches, season } = this.props;
     return (
       <div>
-        <div className={styles.menu}>
+        <div className={[styles.menu, showMenu ? '' : styles.hidden].join(' ')}>
           <div className={styles.actions}>
             <div>
               <label htmlFor="modeSelect">
@@ -187,15 +214,18 @@ export default class Queueing extends Component<QueueingProps, QueueingState> {
                 </select>
               </label>
 
-              {event.mode === 'assisted' && <div className={styles.assistedInstruction}>Use the left/right arrow keys to change</div>}
+              {event.mode === 'assisted' && <div className={styles.assistedInstruction}>Use the left/right arrow keys to change current match</div>}
+
+              <label htmlFor="rankingDisplay">
+                Rankings:
+                {/* @ts-ignore */}
+                <input type="checkbox" checked={showRankings} onInput={(e): void => this.setState({ showRankings: e.target.checked })} id="rankingDisplay" />
+              </label>
             </div>
             <span>
               {event.name}
               {' '}
-              (
-              {season}
-              )
-              <div className={styles.scrollInstruction}>Scroll the page down to hide this menu</div>
+              ({season})
             </span>
             <button type="button" onClick={(): void => Queueing.onLogout()}>Log out</button>
           </div>
@@ -207,24 +237,31 @@ export default class Queueing extends Component<QueueingProps, QueueingState> {
           {loadingState === 'ready' && !matches?.length && <div className={styles.infoText}>Waiting for schedule to be posted...</div>}
           {loadingState === 'ready' && matches?.length
             && (
-            <div className={styles.matches}>
-              <div className={styles.topBar}>
-                {currentMatch && (
-                <div>
-                  <MatchDisplay halfWidth match={currentMatch} teamAvatars={teamAvatars} />
-                  <span className={styles.description}>On Field</span>
+            <div className={styles.qualsDisplay}>
+              <div className={styles.matches}>
+                <div className={styles.topBar}>
+                  {currentMatch && (
+                  <div>
+                    <MatchDisplay halfWidth match={currentMatch} teamAvatars={teamAvatars} />
+                    <span className={styles.description}>On Field</span>
+                  </div>
+                  )}
+                  {nextMatch && (
+                  <div>
+                    <MatchDisplay halfWidth match={nextMatch} teamAvatars={teamAvatars} />
+                    <span className={styles.description}>On Deck</span>
+                  </div>
+                  )}
                 </div>
-                )}
-                {nextMatch && (
-                <div>
-                  <MatchDisplay halfWidth match={nextMatch} teamAvatars={teamAvatars} />
-                  <span className={styles.description}>On Deck</span>
-                </div>
-                )}
+                {queueingMatches.map((x) => (
+                  <MatchDisplay match={x} key={x.matchNumber} teamAvatars={teamAvatars} />
+                ))}
               </div>
-              {queueingMatches.map((x) => (
-                <MatchDisplay match={x} key={x.matchNumber} teamAvatars={teamAvatars} />
-              ))}
+              {(showRankings ? (
+                <RankingList>
+                  {matches.map((x, i) => (<Ranking teamNumber={123} ranking={i} />))}
+                </RankingList>
+              ) : '')}
             </div>
             )}
         </div>
