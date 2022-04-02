@@ -5,11 +5,15 @@ import {
   Database,
   get, getDatabase, onValue, ref,
 } from 'firebase/database';
+import {
+  Analytics, getAnalytics, setUserProperties,
+} from 'firebase/analytics';
 
 import styles from './app.scss';
 import Queueing from './queueing';
 import LoginForm from './LoginForm';
 import { Event, Match } from '../types';
+import AnalyticsService from '../analyticsService';
 
 type AppState = {
   isAuthenticated: boolean;
@@ -20,6 +24,8 @@ type AppState = {
 
 export default class App extends Component<{}, AppState> {
   private db: Database;
+
+  private analytics: Analytics;
 
   constructor(props: {}) {
     super(props);
@@ -35,10 +41,12 @@ export default class App extends Component<{}, AppState> {
       databaseURL: process.env.PREACT_APP_RTDB_URL,
       projectId: process.env.PREACT_APP_FIRE_PROJ,
       appId: process.env.PREACT_APP_FIRE_APPID,
+      measurementId: process.env.PREACT_APP_FIRE_MEASUREID,
     };
 
     initializeApp(firebaseConfig);
     this.db = getDatabase();
+    this.analytics = getAnalytics();
   }
 
   async componentDidMount() {
@@ -84,6 +92,9 @@ export default class App extends Component<{}, AppState> {
         matches: snap.val() as Match[],
       });
     });
+
+    AnalyticsService.logEvent('login', { eventKey: token });
+    setUserProperties(this.analytics, { eventKey: token });
   }
 
   render(): JSX.Element {

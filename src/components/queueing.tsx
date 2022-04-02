@@ -9,6 +9,7 @@ import {
 } from '../types';
 import MatchDisplay from './matchDisplay';
 import styles from './queueing.scss';
+import AnalyticsService from '../analyticsService';
 
 type QueueingProps = {
   event: Event;
@@ -42,11 +43,11 @@ export default class Queueing extends Component<QueueingProps, QueueingState> {
 
     this.eventRef = ref(getDatabase(), `/seasons/${props.season}/events/${token}`);
 
-    onValue(ref(getDatabase(), `/seasons/${props.season}/avatars`), (snap) => {
-      this.setState({
-        teamAvatars: snap.val(),
-      });
-    });
+    // onValue(ref(getDatabase(), `/seasons/${props.season}/avatars`), (snap) => {
+    //   this.setState({
+    //     teamAvatars: snap.val(),
+    //   });
+    // });
   }
 
   componentDidMount(): void {
@@ -133,6 +134,8 @@ export default class Queueing extends Component<QueueingProps, QueueingState> {
         mode: 'automatic',
       });
     }
+
+    AnalyticsService.logEvent('modeSwitch', {});
   }
 
   private updateMatches(): void {
