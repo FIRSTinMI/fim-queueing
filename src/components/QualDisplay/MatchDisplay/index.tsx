@@ -1,6 +1,6 @@
 import { h, Fragment } from 'preact';
-import { Match, Team, TeamAvatars } from '../types';
-import styles from './matchDisplay.scss';
+import { Match, Team, TeamAvatars } from '../../../types';
+import styles from './styles.scss';
 
 type MatchDisplayProps = {
   match: Match | null;

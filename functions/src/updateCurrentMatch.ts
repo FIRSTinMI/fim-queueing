@@ -2,7 +2,9 @@ const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 const fetch = require("node-fetch");
 // eslint no-unused-vars:off   No idea why eslint thinks these aren't being used
-import {ApiAvatars, ApiMatchResults, ApiSchedule} from "./apiTypes";
+import {
+  ApiAvatars, ApiMatchResults, ApiRankings, ApiSchedule,
+} from "./apiTypes";
 
 exports.updateCurrentMatch = async () => {
   const season = (await admin.database().ref("/current_season").get())
@@ -46,6 +48,11 @@ exports.updateCurrentMatch = async () => {
           functions.logger.info(`Still no schedule for ${event.eventCode}`);
           continue;
         }
+      }
+
+      if ((event.options?.showRankings ?? false)) {
+        // Fetch the most up to date rankings
+        await updateRankings(season, event.eventCode, eventKey, token);
       }
 
       if (event.mode !== "automatic") continue;
@@ -105,7 +112,7 @@ exports.updateCurrentMatch = async () => {
  */
 async function getSchedule(season: number, eventCode: string, token: string):
   Promise<ApiSchedule> {
-  const url = `https://frc-api.firstinspires.org/v2.0/${season}/schedule/` +
+  const url = `https://frc-api.firstinspires.org/v3.0/${season}/schedule/` +
   eventCode + "?tournamentLevel=qual";
   functions.logger.info("Getting schedule:", url);
   const eventFetch = await fetch(url,
@@ -161,7 +168,7 @@ async function updateSchedule(schedule: ApiSchedule, season: number,
       // Magic string so we know that we already tried this team
       let avatar = "NONE";
       const avatarFetch = await fetch(
-          `https://frc-api.firstinspires.org/v2.0/${season}/avatars` +
+          `https://frc-api.firstinspires.org/v3.0/${season}/avatars` +
             `?teamNumber=${team}`,
           {
             headers: {
@@ -186,4 +193,39 @@ async function updateSchedule(schedule: ApiSchedule, season: number,
       functions.logger.warn(`Unable to fetch avatar for team ${team}`);
     }
   });
+}
+
+/**
+ * Get the most up to date rankings and update the DB
+ * @param {number} season Which season we're in
+ * @param {string} eventCode The FRC event code
+ * @param {string} eventKey The DB key for the event
+ * @param {string} token FRC API token
+ */
+async function updateRankings(season: number, eventCode: string,
+    eventKey: string, token: string): Promise<void> {
+  const rankingFetch = await fetch(
+      `https://frc-api.firstinspires.org/v3.0/${season}/rankings/` +
+        `${eventCode}`,
+      {
+        headers: {
+          "Authorization": "Basic " + token,
+          "Content-Type": "application/json",
+        },
+      }
+  );
+  if (!rankingFetch.ok) throw new Error(rankingFetch.statusText);
+
+  const rankingJson = await rankingFetch.json() as ApiRankings;
+
+  if ((rankingJson["Rankings"]?.length ?? 0) > 0) {
+    const rankings = rankingJson["Rankings"].map((x) => ({
+      rank: x.rank, teamNumber: x.teamNumber,
+    }));
+
+    admin
+        .database()
+        .ref(`/seasons/${season}/rankings/${eventKey}`)
+        .set(rankings);
+  }
 }

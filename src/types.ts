@@ -8,6 +8,10 @@ export type Event = {
   currentMatchNumber: number | null;
   hasQualSchedule: boolean;
   mode: AppMode;
+  options?: {
+    showRankings?: boolean;
+    showAvatars?: boolean; // TODO: to be implemented
+  }
 };
 
 export type Match = {

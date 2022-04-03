@@ -1,0 +1,31 @@
+.ticker {
+  background-color: #0c0e15;
+  width: 100%;
+  overflow: hidden;
+}
+
+.ticker-list {
+  display: flex;
+  flex: 0 0 100%;
+  width: fit-content;
+  animation: ticker 100s infinite linear;
+}
+
+@keyframes ticker {
+  0% {
+    transform: translateX(100vw);
+  }
+
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.tickerItem {
+  display: table-cell;
+  position: relative;
+  vertical-align: top;
+  color: #fff;
+}
+
+

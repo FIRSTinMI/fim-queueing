@@ -44,3 +44,22 @@ export type ApiMatchResults = {
       }[],
     }[];
   }
+
+export type ApiRankings = {
+  "Rankings": {
+    "rank": number;
+    "teamNumber": number;
+    "sortOrder1": number; // 2022: Ranking score
+    "sortOrder2": number; // 2022: Auto
+    "sortOrder3": number; // 2022: Endgame
+    "sortOrder4": number; // 2022: Teleop Cell CPanel
+    "sortOrder5": number; // 2022: Unused
+    "sortOrder6": number; // 2022: Unused
+    "wins": number;
+    "losses": number;
+    "ties": number;
+    "qualAverage": number; // Average score of all their qual matches
+    "dq": number;
+    "matchesPlayed": number;
+  }[]
+}

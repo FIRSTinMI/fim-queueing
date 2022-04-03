@@ -2,7 +2,7 @@ import { get, getDatabase, ref } from 'firebase/database';
 import Cookies from 'js-cookie';
 import { Component, h } from 'preact';
 
-import styles from './LoginForm.scss';
+import styles from './styles.scss';
 
 type LoginFormProps = {
   onLogin: (token: string, season: number) => void;

@@ -18,10 +18,22 @@
             "mode": {
               ".write": true,
               ".validate": "newData.val() =='assisted' || newData.val() == 'automatic'"
+            },
+            "options": {
+              "showRankings": {
+                ".write": true,
+                ".validate": "newData.isBoolean()"
+              }
             }
           }
         },
         "matches": {
+          "$eventKey": {
+            ".read": "root.child('seasons/'+$season+'/events/'+$eventKey).child('startMs').val() < now && root.child('seasons/'+$season+'/events/'+$eventKey).child('endMs').val() > now",
+            ".write": false
+          }
+        },
+        "rankings": {
           "$eventKey": {
             ".read": "root.child('seasons/'+$season+'/events/'+$eventKey).child('startMs').val() < now && root.child('seasons/'+$season+'/events/'+$eventKey).child('endMs').val() > now",
             ".write": false

@@ -9,11 +9,11 @@ import {
   Analytics, getAnalytics, setUserProperties,
 } from 'firebase/analytics';
 
-import styles from './app.scss';
-import Queueing from './queueing';
-import LoginForm from './LoginForm';
-import { Event, Match } from '../types';
-import AnalyticsService from '../analyticsService';
+import Queueing from '../QualDisplay/Queueing';
+import LoginForm from '../LoginForm';
+import { Event, Match } from '../../types';
+import AnalyticsService from '../../analyticsService';
+import styles from './styles.scss';
 
 type AppState = {
   isAuthenticated: boolean;

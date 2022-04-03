@@ -1,0 +1,29 @@
+.newsticker {
+  padding: 0.5rem 1rem;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  gap: .2em;
+  border-right: 2px solid white;
+}
+
+.newsticker:last-of-type {
+  border-right: none;
+}
+
+.newsWrapper {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  align-items: flex-start;
+}
+
+.ranking {
+  // font-size: 1.2em;
+  color: #cccccc;
+}
+
+.teamNumber {
+  // font-size: 0.8em;
+}
