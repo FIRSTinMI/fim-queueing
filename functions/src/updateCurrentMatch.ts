@@ -2,7 +2,9 @@ const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 const fetch = require("node-fetch");
 // eslint no-unused-vars:off   No idea why eslint thinks these aren't being used
-import {ApiAvatars, ApiMatchResults, ApiRankings, ApiSchedule} from "./apiTypes";
+import {
+  ApiAvatars, ApiMatchResults, ApiRankings, ApiSchedule,
+} from "./apiTypes";
 
 exports.updateCurrentMatch = async () => {
   const season = (await admin.database().ref("/current_season").get())
@@ -195,13 +197,13 @@ async function updateSchedule(schedule: ApiSchedule, season: number,
 
 /**
  * Get the most up to date rankings and update the DB
- * @param season Which season we're in
- * @param eventCode The FRC event code
- * @param eventKey The DB key for the event
- * @param token FRC API token
+ * @param {number} season Which season we're in
+ * @param {string} eventCode The FRC event code
+ * @param {string} eventKey The DB key for the event
+ * @param {string} token FRC API token
  */
-async function updateRankings(season: number, eventCode: string, 
-  eventKey: string, token: string): Promise<void> {
+async function updateRankings(season: number, eventCode: string,
+    eventKey: string, token: string): Promise<void> {
   const rankingFetch = await fetch(
       `https://frc-api.firstinspires.org/v3.0/${season}/rankings/` +
         `${eventCode}`,
@@ -217,13 +219,13 @@ async function updateRankings(season: number, eventCode: string,
   const rankingJson = await rankingFetch.json() as ApiRankings;
 
   if ((rankingJson["Rankings"]?.length ?? 0) > 0) {
-    const rankings = rankingJson["Rankings"].map(x => ({
-      rank: x.rank, teamNumber: x.teamNumber
+    const rankings = rankingJson["Rankings"].map((x) => ({
+      rank: x.rank, teamNumber: x.teamNumber,
     }));
 
     admin
-      .database()
-      .ref(`/seasons/${season}/rankings/${eventKey}`)
-      .set(rankings); 
+        .database()
+        .ref(`/seasons/${season}/rankings/${eventKey}`)
+        .set(rankings);
   }
 }
