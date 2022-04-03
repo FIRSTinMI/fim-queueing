@@ -1,7 +1,8 @@
 import { Component, h } from 'preact';
 import Cookies from 'js-cookie';
 import {
-  DatabaseReference, getDatabase, ref, update,
+  child,
+  DatabaseReference, getDatabase, off, onValue, ref, update,
 } from 'firebase/database';
 
 import {
@@ -26,13 +27,20 @@ type QueueingState = {
   queueingMatches: Match[];
   teamAvatars?: TeamAvatars;
   showMenu: boolean;
-  showRankings: boolean;
+  rankings: TeamRanking[];
+};
+
+type TeamRanking = {
+  rank: number;
+  teamNumber: number;
 };
 
 export default class Queueing extends Component<QueueingProps, QueueingState> {
   private eventRef: DatabaseReference;
 
   private mouseTimeout?: number;
+
+  private token: string;
 
   constructor(props: QueueingProps) {
     super(props);
@@ -43,13 +51,13 @@ export default class Queueing extends Component<QueueingProps, QueueingState> {
       queueingMatches: [],
       teamAvatars: undefined,
       showMenu: false,
-      showRankings: false,
+      rankings: [],
     };
 
-    const token = Cookies.get('queueing-event-key');
-    if (!token) throw new Error('Token was somehow empty.');
+    this.token = Cookies.get('queueing-event-key') as string;
+    if (!this.token) throw new Error('Token was somehow empty.');
 
-    this.eventRef = ref(getDatabase(), `/seasons/${props.season}/events/${token}`);
+    this.eventRef = ref(getDatabase(), `/seasons/${props.season}/events/${this.token}`);
 
     // onValue(ref(getDatabase(), `/seasons/${props.season}/avatars`), (snap) => {
     //   this.setState({
@@ -63,14 +71,27 @@ export default class Queueing extends Component<QueueingProps, QueueingState> {
     document.addEventListener('keydown', this.handleKeyPress.bind(this));
     document.addEventListener('mousemove', this.handleMouseMove.bind(this));
 
-    this.updateMatches();
+    this.componentDidUpdate({} as QueueingProps);
   }
 
   componentDidUpdate(prevProps: QueueingProps): void {
-    const { event, matches } = this.props;
+    const { event, matches, season } = this.props;
 
-    if (prevProps.event.currentMatchNumber !== event.currentMatchNumber
+    if (prevProps.event?.currentMatchNumber !== event.currentMatchNumber
             || prevProps.matches !== matches) this.updateMatches();
+
+    if (prevProps.event?.options?.showRankings !== event.options?.showRankings) {
+      const rankingsRef = ref(getDatabase(), `/seasons/${season}/rankings/${this.token}`);
+      if (event.options?.showRankings) {
+        onValue(rankingsRef, (snap) => {
+          this.setState({
+            rankings: (snap.val() as TeamRanking[]).sort((x) => x.rank),
+          });
+        });
+      } else {
+        off(rankingsRef);
+      }
+    }
   }
 
   componentWillUnmount(): void {
@@ -121,6 +142,12 @@ export default class Queueing extends Component<QueueingProps, QueueingState> {
   private getMatchByNumber(matchNumber: number): Match | null {
     const { matches } = this.props;
     return matches?.find((x) => x.matchNumber === matchNumber) ?? null;
+  }
+
+  private setShowRankings(value: boolean): void {
+    update(child(this.eventRef, 'options'), {
+      showRankings: value,
+    });
   }
 
   private decrementMatchNumber(): void {
@@ -197,7 +224,7 @@ export default class Queueing extends Component<QueueingProps, QueueingState> {
 
   render(): JSX.Element {
     const {
-      loadingState, currentMatch, nextMatch, queueingMatches, teamAvatars, showMenu, showRankings,
+      loadingState, currentMatch, nextMatch, queueingMatches, teamAvatars, showMenu, rankings,
     } = this.state;
     const { event, matches, season } = this.props;
     return (
@@ -219,7 +246,7 @@ export default class Queueing extends Component<QueueingProps, QueueingState> {
               <label htmlFor="rankingDisplay">
                 Rankings:
                 {/* @ts-ignore */}
-                <input type="checkbox" checked={showRankings} onInput={(e): void => this.setState({ showRankings: e.target.checked })} id="rankingDisplay" />
+                <input type="checkbox" checked={event.options?.showRankings ?? false} onInput={(e): void => this.setShowRankings(e.target.checked)} id="rankingDisplay" />
               </label>
             </div>
             <span>
@@ -257,9 +284,9 @@ export default class Queueing extends Component<QueueingProps, QueueingState> {
                   <MatchDisplay match={x} key={x.matchNumber} teamAvatars={teamAvatars} />
                 ))}
               </div>
-              {(showRankings ? (
+              {(event.options?.showRankings ?? false ? (
                 <RankingList>
-                  {matches.map((x, i) => (<Ranking teamNumber={123} ranking={i} />))}
+                  {rankings.map((x) => (<Ranking teamNumber={x.teamNumber} ranking={x.rank} />))}
                 </RankingList>
               ) : '')}
             </div>
