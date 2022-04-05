@@ -1,7 +1,7 @@
 import { Component, h } from 'preact';
 import Cookies from 'js-cookie';
 import {
-  DatabaseReference, getDatabase, onValue, ref, update,
+  DatabaseReference, getDatabase, child, ref, update,
 } from 'firebase/database';
 
 import {
@@ -96,6 +96,18 @@ export default class Queueing extends Component<QueueingProps, QueueingState> {
     return matches?.find((x) => x.matchNumber === matchNumber) ?? null;
   }
 
+  private setShowEventName(value: boolean): void {
+    update(child(this.eventRef, 'options'), {
+      showEventName: value,
+    });
+  }
+
+  private setShowRankings(value: boolean): void {
+    update(child(this.eventRef, 'options'), {
+      showRankings: value,
+    });
+  }
+
   private decrementMatchNumber(): void {
     const { event } = this.props;
 
@@ -187,7 +199,19 @@ export default class Queueing extends Component<QueueingProps, QueueingState> {
                 </select>
               </label>
 
-              {event.mode === 'assisted' && <div className={styles.assistedInstruction}>Use the left/right arrow keys to change</div>}
+              {event.mode === 'assisted' && <div className={styles.assistedInstruction}>Use the left/right arrow keys to change current match</div>}
+
+              <label htmlFor="rankingDisplay">
+                Rankings:
+                {/* @ts-ignore */}
+                <input type="checkbox" checked={event.options?.showRankings ?? false} onInput={(e): void => this.setShowRankings(e.target.checked)} id="rankingDisplay" />
+              </label>
+
+              <label htmlFor="eventNameDisplay">
+                Show event name:
+                {/* @ts-ignore */}
+                <input type="checkbox" checked={event.options?.showEventName ?? false} onInput={(e): void => this.setShowEventName(e.target.checked)} id="eventNameDisplay" />
+              </label>
             </div>
             <span>
               {event.name}
@@ -207,20 +231,25 @@ export default class Queueing extends Component<QueueingProps, QueueingState> {
           {loadingState === 'ready' && !matches?.length && <div className={styles.infoText}>Waiting for schedule to be posted...</div>}
           {loadingState === 'ready' && matches?.length
             && (
-            <div className={styles.matches}>
-              <div className={styles.topBar}>
-                {currentMatch && (
-                <div>
-                  <MatchDisplay halfWidth match={currentMatch} teamAvatars={teamAvatars} />
-                  <span className={styles.description}>On Field</span>
-                </div>
+            <div className={styles.qualsDisplay}>
+              <div className={styles.matches}>
+                {(event.options?.showEventName ?? false) && (
+                  <div className={styles.eventName}>{event.name}</div>
                 )}
-                {nextMatch && (
-                <div>
-                  <MatchDisplay halfWidth match={nextMatch} teamAvatars={teamAvatars} />
-                  <span className={styles.description}>On Deck</span>
+                <div className={styles.topBar}>
+                  {currentMatch && (
+                  <div>
+                    <MatchDisplay halfWidth match={currentMatch} teamAvatars={teamAvatars} />
+                    <span className={styles.description}>On Field</span>
+                  </div>
+                  )}
+                  {nextMatch && (
+                  <div>
+                    <MatchDisplay halfWidth match={nextMatch} teamAvatars={teamAvatars} />
+                    <span className={styles.description}>On Deck</span>
+                  </div>
+                  )}
                 </div>
-                )}
               </div>
               {queueingMatches.map((x) => (
                 <MatchDisplay match={x} key={x.matchNumber} teamAvatars={teamAvatars} />

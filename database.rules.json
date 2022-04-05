@@ -18,6 +18,16 @@
             "mode": {
               ".write": true,
               ".validate": "newData.val() =='assisted' || newData.val() == 'automatic'"
+            },
+            "options": {
+              "showRankings": {
+                ".write": true,
+                ".validate": "newData.isBoolean()"
+              },
+              "showEventName": {
+                ".write": true,
+                ".validate": "newData.isBoolean()"
+              }
             }
           }
         },
