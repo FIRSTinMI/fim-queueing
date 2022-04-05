@@ -81,7 +81,9 @@ export default class LoginForm extends Component<LoginFormProps, LoginFormState>
           <input type="password" maxLength={10} minLength={10} onInput={(e): void => this.setState({ eventToken: (e.target as HTMLInputElement).value })} />
           <button type="submit">Log in</button>
         </form>
-        { badToken && <div>Bad event token or event not eligible for queueing</div>}
+        { badToken && (
+          <div className={styles.badCode}>Bad event token or event not eligible for queueing</div>
+        )}
         <div className={styles.disclaimer}>
           This system is only for use by A/V volunteers at FIRST in Michigan events.
           If you have not been given explicit permission to use this system, please don&apos;t.
