@@ -1,7 +1,7 @@
 import { Component, h } from 'preact';
 import Cookies from 'js-cookie';
 import {
-  child, DatabaseReference, getDatabase, off, onValue, ref, update,
+  DatabaseReference, getDatabase, child, ref, update, onValue, off,
 } from 'firebase/database';
 
 import {
@@ -57,12 +57,6 @@ export default class Queueing extends Component<QueueingProps, QueueingState> {
     if (!this.token) throw new Error('Token was somehow empty.');
 
     this.eventRef = ref(getDatabase(), `/seasons/${props.season}/events/${this.token}`);
-
-    // onValue(ref(getDatabase(), `/seasons/${props.season}/avatars`), (snap) => {
-    //   this.setState({
-    //     teamAvatars: snap.val(),
-    //   });
-    // });
   }
 
   componentDidMount(): void {
@@ -276,6 +270,12 @@ export default class Queueing extends Component<QueueingProps, QueueingState> {
           {loadingState === 'ready' && matches?.length
             && (
             <div className={styles.qualsDisplay}>
+              {event.mode === 'assisted' && (
+                <div className={styles.touchMatchControlButtons}>
+                  <button type="button" onClick={() => this.decrementMatchNumber()}>Prev</button>
+                  <button type="button" onClick={() => this.incrementMatchNumber()}>Next</button>
+                </div>
+              )}
               <div className={styles.matches}>
                 {(event.options?.showEventName ?? false) && (
                   <div className={styles.eventName}>{event.name}</div>
