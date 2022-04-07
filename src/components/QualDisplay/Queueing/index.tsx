@@ -85,7 +85,7 @@ export default class Queueing extends Component<QueueingProps, QueueingState> {
       if (event.options?.showRankings) {
         onValue(rankingsRef, (snap) => {
           this.setState({
-            rankings: (snap.val() as TeamRanking[]).sort((x) => x.rank),
+            rankings: (snap.val() as TeamRanking[]).sort((a, b) => a.rank - b.rank),
           });
         });
       } else {
