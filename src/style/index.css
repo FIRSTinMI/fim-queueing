@@ -7,12 +7,9 @@ html, body {
 	font-weight: 400;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
+	background: #eee;
 }
 
 * {
 	box-sizing: border-box;
-}
-
-#preact_root {
-	/* height: 100%; */
 }

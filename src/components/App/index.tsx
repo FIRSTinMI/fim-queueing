@@ -20,6 +20,8 @@ type AppState = {
   event?: Event;
   matches?: Match[];
   season?: number;
+  connectionStatus?: 'online' | 'offline';
+  lastConnectedDate?: Date;
 };
 
 export default class App extends Component<{}, AppState> {
@@ -50,6 +52,18 @@ export default class App extends Component<{}, AppState> {
   }
 
   async componentDidMount() {
+    // Give things a chance to load before we warn about network connectivity
+    window.setTimeout(() => {
+      onValue(ref(this.db, '.info/connected'), (snap) => {
+        const isConnected = snap.val();
+        console.log('connection', isConnected);
+        this.setState((prevState) => ({
+          connectionStatus: isConnected ? 'online' : 'offline',
+          lastConnectedDate: prevState.connectionStatus && !isConnected ? new Date() : undefined,
+        }));
+      });
+    }, 2000);
+
     const seasonData = await get(ref(this.db, '/current_season'));
     if (!seasonData || !seasonData.exists) {
       throw new Error('Unable to get season...');
@@ -99,16 +113,15 @@ export default class App extends Component<{}, AppState> {
 
   render(): JSX.Element {
     const {
-      isAuthenticated, event, season, matches,
+      isAuthenticated, event, season, matches, connectionStatus, lastConnectedDate,
     } = this.state;
     return (
       <div id="preact_root" className={styles.app}>
-        <div>
-          { isAuthenticated && event == null && <div className={styles.infoText}>Loading...</div>}
-          { event != null && isAuthenticated
-            && <Queueing event={event} matches={matches} season={season ?? 9999} /> }
-          { !isAuthenticated && <LoginForm season={season ?? 9999} onLogin={this.onLogin} /> }
-        </div>
+        { connectionStatus === 'offline' && <div className={styles.warningBar}>Check network connection. {lastConnectedDate && `Last connected ${lastConnectedDate?.toLocaleString([], { timeStyle: 'short' })}`}</div>}
+        { isAuthenticated && event == null && <div className={styles.infoText}>Loading...</div>}
+        { event != null && isAuthenticated
+          && <Queueing event={event} matches={matches} season={season ?? 9999} /> }
+        { !isAuthenticated && <LoginForm season={season ?? 9999} onLogin={this.onLogin} /> }
       </div>
     );
   }
