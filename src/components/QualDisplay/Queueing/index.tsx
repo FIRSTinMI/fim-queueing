@@ -295,7 +295,12 @@ export default class Queueing extends Component<QueueingProps, QueueingState> {
                   )}
                 </div>
                 {queueingMatches.map((x) => (
-                  <MatchDisplay className={styles.queueingMatches} match={x} key={x.matchNumber} teamAvatars={teamAvatars} />
+                  <MatchDisplay
+                    className={styles.queueingMatches}
+                    match={x}
+                    key={x.matchNumber}
+                    teamAvatars={teamAvatars}
+                  />
                 ))}
               </div>
               {(event.options?.showRankings ?? false ? (
