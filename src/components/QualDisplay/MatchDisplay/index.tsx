@@ -8,6 +8,7 @@ type MatchDisplayProps = {
   // eslint-disable-next-line react/no-unused-prop-types
   teamAvatars: TeamAvatars | undefined;
   halfWidth?: boolean;
+  className?: string;
 };
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getAvatarForTeam(avatars: TeamAvatars | undefined, teamNumber: number | undefined)
@@ -34,15 +35,15 @@ function TeamDisplay({ team }: TeamDisplayProps): JSX.Element {
   );
 }
 
-function MatchDisplay({ halfWidth, match }: MatchDisplayProps): JSX.Element {
+function MatchDisplay({ halfWidth, match, className }: MatchDisplayProps): JSX.Element {
   return (
-    <div className={`${styles.matchDisplay} ${halfWidth === true ? styles.halfWidth : ''}`}>
+    <div className={`${styles.matchDisplay} ${halfWidth === true ? styles.halfWidth : ''} ${className ?? ''}`}>
       {/*
         Just show a blank entry if the match doesn't exist.
         Either we're in a test match or at the end of the schedule
       */}
       {match && (
-      <Fragment>
+      <>
         <span className={styles.matchNumber}>{match.matchNumber}</span>
         <span className={styles.red}>
           {[1, 2, 3].map((n) => <TeamDisplay key={`${match?.matchNumber}r${n}`} team={match?.teams.find((x) => x.station === `Red${n}`)} />)}
@@ -50,7 +51,7 @@ function MatchDisplay({ halfWidth, match }: MatchDisplayProps): JSX.Element {
         <span className={styles.blue}>
           {[1, 2, 3].map((n) => <TeamDisplay key={`${match?.matchNumber}b${n}`} team={match?.teams.find((x) => x.station === `Blue${n}`)} />)}
         </span>
-      </Fragment>
+      </>
       )}
     </div>
   );
@@ -58,6 +59,7 @@ function MatchDisplay({ halfWidth, match }: MatchDisplayProps): JSX.Element {
 
 MatchDisplay.defaultProps = {
   halfWidth: false,
+  className: '',
 };
 
 export default MatchDisplay;

@@ -1,13 +1,21 @@
 $text-color: #111;
 
 .app {
-    min-height: 100vh;
+    height: 100vh;
     font-size: 5vh;
-    background: #eee;
     color: $text-color;
+    display: flex;
+    flex-direction: column;
 }
 
 .infoText {
     padding-top: 2em;
     text-align: center;
+}
+
+.warningBar {
+    background-color: darken(orange, 20%);
+    color: white;
+    text-align: center;
+    width: 100%;
 }

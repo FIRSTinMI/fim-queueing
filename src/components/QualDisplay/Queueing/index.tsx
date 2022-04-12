@@ -1,4 +1,4 @@
-import { Component, h } from 'preact';
+import { Component, h, Fragment } from 'preact';
 import Cookies from 'js-cookie';
 import {
   DatabaseReference, getDatabase, child, ref, update, onValue, off,
@@ -227,7 +227,7 @@ export default class Queueing extends Component<QueueingProps, QueueingState> {
     } = this.state;
     const { event, matches, season } = this.props;
     return (
-      <div>
+      <>
         <div className={[styles.menu, showMenu ? '' : styles.hidden].join(' ')}>
           <div className={styles.actions}>
             <div>
@@ -295,7 +295,12 @@ export default class Queueing extends Component<QueueingProps, QueueingState> {
                   )}
                 </div>
                 {queueingMatches.map((x) => (
-                  <MatchDisplay match={x} key={x.matchNumber} teamAvatars={teamAvatars} />
+                  <MatchDisplay
+                    className={styles.queueingMatches}
+                    match={x}
+                    key={x.matchNumber}
+                    teamAvatars={teamAvatars}
+                  />
                 ))}
               </div>
               {(event.options?.showRankings ?? false ? (
@@ -306,7 +311,7 @@ export default class Queueing extends Component<QueueingProps, QueueingState> {
             </div>
             )}
         </div>
-      </div>
+      </>
     );
   }
 }

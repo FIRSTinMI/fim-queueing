@@ -57,11 +57,11 @@ $border-color: #222;
 }
 
 .fullHeight {
-    height: 100vh;
+    height: 100%;
 }
 
 .qualsDisplay {
-    height: 100vh;
+    height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -87,7 +87,10 @@ $border-color: #222;
     justify-content: space-around;
     height: 100%;
 
-    &>:not(.topBar) {height: 100%; padding: 0 2vw; }
+    &>.queueingMatches {
+        height: 100%;
+        padding: 0 2vw;
+    }
     &>:not(:last-child) { border-bottom: 5px solid $border-color; }
 
     .topBar {
