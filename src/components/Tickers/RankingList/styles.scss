@@ -5,10 +5,12 @@
 }
 
 .ticker-list {
-  display: flex;
+  display: inline-flex;
   flex: 0 0 100%;
   width: fit-content;
-  animation: ticker 100s infinite linear;
+  animation-name: ticker;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
 }
 
 @keyframes ticker {
