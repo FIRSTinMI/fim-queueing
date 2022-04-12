@@ -10,7 +10,7 @@ export type Event = {
   mode: AppMode;
   options?: {
     showRankings?: boolean;
-    showAvatars?: boolean; // TODO: to be implemented
+    showEventName?: boolean;
   }
 };
 

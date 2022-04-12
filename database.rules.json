@@ -23,6 +23,10 @@
               "showRankings": {
                 ".write": true,
                 ".validate": "newData.isBoolean()"
+              },
+              "showEventName": {
+                ".write": true,
+                ".validate": "newData.isBoolean()"
               }
             }
           }

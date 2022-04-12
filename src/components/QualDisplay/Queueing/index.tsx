@@ -1,8 +1,7 @@
 import { Component, h } from 'preact';
 import Cookies from 'js-cookie';
 import {
-  child,
-  DatabaseReference, getDatabase, off, onValue, ref, update,
+  DatabaseReference, getDatabase, child, ref, update, onValue, off,
 } from 'firebase/database';
 
 import {
@@ -58,12 +57,6 @@ export default class Queueing extends Component<QueueingProps, QueueingState> {
     if (!this.token) throw new Error('Token was somehow empty.');
 
     this.eventRef = ref(getDatabase(), `/seasons/${props.season}/events/${this.token}`);
-
-    // onValue(ref(getDatabase(), `/seasons/${props.season}/avatars`), (snap) => {
-    //   this.setState({
-    //     teamAvatars: snap.val(),
-    //   });
-    // });
   }
 
   componentDidMount(): void {
@@ -142,6 +135,12 @@ export default class Queueing extends Component<QueueingProps, QueueingState> {
   private getMatchByNumber(matchNumber: number): Match | null {
     const { matches } = this.props;
     return matches?.find((x) => x.matchNumber === matchNumber) ?? null;
+  }
+
+  private setShowEventName(value: boolean): void {
+    update(child(this.eventRef, 'options'), {
+      showEventName: value,
+    });
   }
 
   private setShowRankings(value: boolean): void {
@@ -248,6 +247,12 @@ export default class Queueing extends Component<QueueingProps, QueueingState> {
                 {/* @ts-ignore */}
                 <input type="checkbox" checked={event.options?.showRankings ?? false} onInput={(e): void => this.setShowRankings(e.target.checked)} id="rankingDisplay" />
               </label>
+
+              <label htmlFor="eventNameDisplay">
+                Show event name:
+                {/* @ts-ignore */}
+                <input type="checkbox" checked={event.options?.showEventName ?? false} onInput={(e): void => this.setShowEventName(e.target.checked)} id="eventNameDisplay" />
+              </label>
             </div>
             <span>
               {event.name}
@@ -265,7 +270,16 @@ export default class Queueing extends Component<QueueingProps, QueueingState> {
           {loadingState === 'ready' && matches?.length
             && (
             <div className={styles.qualsDisplay}>
+              {event.mode === 'assisted' && (
+                <div className={styles.touchMatchControlButtons}>
+                  <button type="button" onClick={() => this.decrementMatchNumber()}>Prev</button>
+                  <button type="button" onClick={() => this.incrementMatchNumber()}>Next</button>
+                </div>
+              )}
               <div className={styles.matches}>
+                {(event.options?.showEventName ?? false) && (
+                  <div className={styles.eventName}>{event.name}</div>
+                )}
                 <div className={styles.topBar}>
                   {currentMatch && (
                   <div>
