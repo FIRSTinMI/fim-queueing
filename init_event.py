@@ -39,7 +39,11 @@ if (not req.ok):
 events = req.json()["Events"]
 
 existing_event_codes = db.reference('/seasons/'+sys.argv[3]+'/events').get()
-existing_event_codes = [ x['eventCode'] for x in existing_event_codes.values() ]
+if existing_event_codes is None:
+    existing_event_codes = []
+else:
+    existing_event_codes = existing_event_codes.values()
+existing_event_codes = [ x['eventCode'] for x in existing_event_codes ]
 epoch = datetime.utcfromtimestamp(0)
 
 for event in events:
