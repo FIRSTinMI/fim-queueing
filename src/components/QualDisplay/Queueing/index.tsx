@@ -1,12 +1,11 @@
 import { Component, h, Fragment } from 'preact';
-import { route } from 'preact-router';
 import Cookies from 'js-cookie';
 import {
   DatabaseReference, getDatabase, child, ref, update, onValue, off,
 } from 'firebase/database';
 
 import {
-  Event, AppMode, Match, TeamAvatars, TeamRanking
+  Event, AppMode, Match, TeamAvatars, TeamRanking,
 } from '../../../types';
 import MatchDisplay from '../MatchDisplay';
 import AnalyticsService from '../../../analyticsService';
@@ -27,7 +26,6 @@ type QueueingState = {
   nextMatch: Match | null;
   queueingMatches: Match[];
   teamAvatars?: TeamAvatars;
-  showMenu: boolean;
   rankings: TeamRanking[];
 };
 
@@ -46,7 +44,6 @@ export default class Queueing extends Component<QueueingProps, QueueingState> {
       nextMatch: null,
       queueingMatches: [],
       teamAvatars: undefined,
-      showMenu: false,
       rankings: [],
     };
 
@@ -60,7 +57,6 @@ export default class Queueing extends Component<QueueingProps, QueueingState> {
     if (typeof document === undefined) return;
 
     document.addEventListener('keydown', this.handleKeyPress);
-    document.addEventListener('mousemove', this.handleMouseMove);
 
     this.componentDidUpdate({} as QueueingProps);
   }
@@ -88,7 +84,6 @@ export default class Queueing extends Component<QueueingProps, QueueingState> {
   componentWillUnmount(): void {
     if (typeof document === undefined) return;
     document.removeEventListener('keydown', this.handleKeyPress);
-    document.removeEventListener('mousemove', this.handleMouseMove);
   }
 
   handleKeyPress = (e: KeyboardEvent): void => {
@@ -106,50 +101,6 @@ export default class Queueing extends Component<QueueingProps, QueueingState> {
         break;
     }
   };
-
-  handleMouseMove = (): void => {
-    const { showMenu } = this.state;
-    if (!showMenu) {
-      this.setState({
-        showMenu: true,
-      });
-
-      clearTimeout(this.mouseTimeout);
-      this.mouseTimeout = window.setTimeout(() => {
-        this.setState({
-          showMenu: false,
-        });
-      }, 2000);
-    }
-  };
-
-  menuOptions = () => {
-    const { event } = this.props;
-    return (<>
-      <label htmlFor="modeSelect">
-        Mode:
-        {/* @ts-ignore */}
-        <select value={event.mode} onInput={(e): void => this.swapMode(e.target.value)} id="modeSelect">
-          <option value="automatic">Automatic</option>
-          <option value="assisted">Assisted</option>
-        </select>
-      </label>
-
-      {event.mode === 'assisted' && <div className={styles.assistedInstruction}>Use the left/right arrow keys to change current match</div>}
-
-      <label htmlFor="rankingDisplay">
-        Rankings:
-        {/* @ts-ignore */}
-        <input type="checkbox" checked={event.options?.showRankings ?? false} onInput={(e): void => this.setShowRankings(e.target.checked)} id="rankingDisplay" />
-      </label>
-
-      <label htmlFor="eventNameDisplay">
-        Show event name:
-        {/* @ts-ignore */}
-        <input type="checkbox" checked={event.options?.showEventName ?? false} onInput={(e): void => this.setShowEventName(e.target.checked)} id="eventNameDisplay" />
-      </label>
-    </>);
-  }
 
   static onLogout(): void {
     // eslint-disable-next-line no-alert --  I don't care enough to implement a real modal
@@ -174,6 +125,36 @@ export default class Queueing extends Component<QueueingProps, QueueingState> {
       showRankings: value,
     });
   }
+
+  menuOptions = () => {
+    const { event } = this.props;
+    return (
+      <>
+        <label htmlFor="modeSelect">
+          Mode:
+          {/* @ts-ignore */}
+          <select value={event.mode} onInput={(e): void => this.swapMode(e.target.value)} id="modeSelect">
+            <option value="automatic">Automatic</option>
+            <option value="assisted">Assisted</option>
+          </select>
+        </label>
+
+        {event.mode === 'assisted' && <div className={styles.assistedInstruction}>Use the left/right arrow keys to change current match</div>}
+
+        <label htmlFor="rankingDisplay">
+          Rankings:
+          {/* @ts-ignore */}
+          <input type="checkbox" checked={event.options?.showRankings ?? false} onInput={(e): void => this.setShowRankings(e.target.checked)} id="rankingDisplay" />
+        </label>
+
+        <label htmlFor="eventNameDisplay">
+          Show event name:
+          {/* @ts-ignore */}
+          <input type="checkbox" checked={event.options?.showEventName ?? false} onInput={(e): void => this.setShowEventName(e.target.checked)} id="eventNameDisplay" />
+        </label>
+      </>
+    );
+  };
 
   private decrementMatchNumber(): void {
     const { event } = this.props;
@@ -249,12 +230,12 @@ export default class Queueing extends Component<QueueingProps, QueueingState> {
 
   render(): JSX.Element {
     const {
-      loadingState, currentMatch, nextMatch, queueingMatches, teamAvatars, showMenu, rankings,
+      loadingState, currentMatch, nextMatch, queueingMatches, teamAvatars, rankings,
     } = this.state;
     const { event, qualMatches, season } = this.props;
     return (
       <>
-        <MenuBar event={event} season={season} options={this.menuOptions()}></MenuBar>
+        <MenuBar event={event} season={season} options={this.menuOptions()} />
         <div className={styles.fullHeight}>
           {loadingState === 'loading' && <div className={styles.infoText}>Loading matches...</div>}
           {loadingState === 'error' && <div className={styles.infoText}>Failed to fetch matches</div>}

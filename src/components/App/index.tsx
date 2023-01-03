@@ -115,11 +115,9 @@ export default class App extends Component<{}, AppState> {
     AnalyticsService.logEvent('login', { eventKey: token });
     setUserProperties(this.analytics, { eventKey: token });
     const lastLocation = Cookies.get('queueing-last-route');
-    console.log("Attempting to send to last location:", lastLocation);
-    if (lastLocation != undefined) {
+    if (lastLocation !== undefined) {
       this.pendingRedirect = lastLocation;
     }
-    
   }
 
   /**
@@ -128,20 +126,19 @@ export default class App extends Component<{}, AppState> {
    * @returns void
    */
   handleRoute = async (e: any) => {
-    console.log("pendingRedirect", this.pendingRedirect, typeof this.pendingRedirect)
     if (this.pendingRedirect !== undefined) {
-      const a = this.pendingRedirect;
-      window.setTimeout(() => route(a, false), 0); // Weird race condition things...
+      // Weird race condition things...
+      window.setTimeout(() => route(this.pendingRedirect!, false), 0);
       this.pendingRedirect = undefined;
       return;
     }
-    
+
     const cookieExpirationDate = new Date();
     cookieExpirationDate.setDate(cookieExpirationDate.getDate() + 3);
     Cookies.set('queueing-last-route', e.url, {
       expires: cookieExpirationDate,
     });
-  }
+  };
 
   render(): JSX.Element {
     const {
@@ -154,8 +151,8 @@ export default class App extends Component<{}, AppState> {
         { event != null && isAuthenticated && (
           <Router onChange={this.handleRoute}>
             <Route default component={ScreenChooser} event={event} season={season ?? 9999} />
-            <QualQueueing path="/qual/queueing" event={event} qualMatches={matches} season={season ?? 9999} />
-            <TeamRankings path="/rankings" event={event} season={season ?? 9999} />
+            <Route component={QualQueueing} path="/qual/queueing" event={event} qualMatches={matches} season={season ?? 9999} />
+            <Route component={TeamRankings} path="/rankings" event={event} season={season ?? 9999} />
           </Router>
         ) }
         { !isAuthenticated && <LoginForm season={season ?? 9999} onLogin={this.onLogin} /> }

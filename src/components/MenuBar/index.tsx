@@ -1,15 +1,15 @@
 import { h, Fragment } from 'preact';
 import { route } from 'preact-router';
 import Cookies from 'js-cookie';
+import { useEffect, useState } from 'preact/hooks';
 import { Event } from '../../types';
 import styles from './styles.scss';
-import { useEffect, useState } from 'preact/hooks';
 
 type MenuBarProps = {
   event: Event,
   season: number,
-  alwaysShow: boolean,
-  options: JSX.Element
+  alwaysShow?: boolean,
+  options?: JSX.Element
 };
 
 function onLogout(): void {
@@ -20,7 +20,9 @@ function onLogout(): void {
 }
 
 const MenuBar = (props: MenuBarProps) => {
-  const { event, season, alwaysShow, options } = props;
+  const {
+    event, season, alwaysShow, options,
+  } = props;
 
   const [showMenu, setShowMenu] = useState(false);
 
@@ -38,37 +40,37 @@ const MenuBar = (props: MenuBarProps) => {
 
   if (!alwaysShow) {
     useEffect(() => {
-      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener('mousemove', handleMouseMove);
       return () => {
-        document.removeEventListener("mousemove", handleMouseMove);
-      }
+        document.removeEventListener('mousemove', handleMouseMove);
+      };
     }, []);
   }
 
   if (event === undefined || season === undefined) return (<></>);
   return (
     <div className={[styles.menu, showMenu ? '' : styles.hidden, alwaysShow ? styles.alwaysShow : ''].join(' ')}>
-          <div className={styles.eventName}>
-            {event.name}
-            {' '}
-            ({season})
-          </div>
-          <div className={styles.actions}>
-            <div>
-              {options}
-            </div>
-            <div className={styles.buttons}>
-              <button type="button" onClick={(): boolean => route('/', false)}>Back to home</button>
-              <button type="button" onClick={(): void => onLogout()}>Log out</button>
-            </div>
-          </div>
+      <div className={styles.eventName}>
+        {event.name}
+        {' '}
+        ({season})
+      </div>
+      <div className={styles.actions}>
+        <div>
+          {options}
         </div>
+        <div className={styles.buttons}>
+          <button type="button" onClick={(): boolean => route('/', false)}>Back to home</button>
+          <button type="button" onClick={(): void => onLogout()}>Log out</button>
+        </div>
+      </div>
+    </div>
   );
 };
 
 MenuBar.defaultProps = {
   options: (<></>),
-  alwaysShow: false
-}
+  alwaysShow: false,
+};
 
 export default MenuBar;
