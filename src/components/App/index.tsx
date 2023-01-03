@@ -8,12 +8,15 @@ import {
 import {
   Analytics, getAnalytics, setUserProperties,
 } from 'firebase/analytics';
+import { Router, Route, route } from 'preact-router';
 
-import Queueing from '../QualDisplay/Queueing';
+import QualQueueing from '../QualDisplay/Queueing';
 import LoginForm from '../LoginForm';
 import { Event, Match } from '../../types';
 import AnalyticsService from '../../analyticsService';
 import styles from './styles.scss';
+import ScreenChooser from '../ScreenChooser';
+import TeamRankings from '../RankingDisplay/TeamRankings';
 
 type AppState = {
   isAuthenticated: boolean;
@@ -28,6 +31,8 @@ export default class App extends Component<{}, AppState> {
   private db: Database;
 
   private analytics: Analytics;
+
+  private pendingRedirect?: string = undefined;
 
   constructor(props: {}) {
     super(props);
@@ -109,6 +114,33 @@ export default class App extends Component<{}, AppState> {
 
     AnalyticsService.logEvent('login', { eventKey: token });
     setUserProperties(this.analytics, { eventKey: token });
+    const lastLocation = Cookies.get('queueing-last-route');
+    console.log("Attempting to send to last location:", lastLocation);
+    if (lastLocation != undefined) {
+      this.pendingRedirect = lastLocation;
+    }
+    
+  }
+
+  /**
+   * Save the user's latest route to a cookie so we can automatically redirect them back next time
+   * @param e Route change event
+   * @returns void
+   */
+  handleRoute = async (e: any) => {
+    console.log("pendingRedirect", this.pendingRedirect, typeof this.pendingRedirect)
+    if (this.pendingRedirect !== undefined) {
+      const a = this.pendingRedirect;
+      window.setTimeout(() => route(a, false), 0); // Weird race condition things...
+      this.pendingRedirect = undefined;
+      return;
+    }
+    
+    const cookieExpirationDate = new Date();
+    cookieExpirationDate.setDate(cookieExpirationDate.getDate() + 3);
+    Cookies.set('queueing-last-route', e.url, {
+      expires: cookieExpirationDate,
+    });
   }
 
   render(): JSX.Element {
@@ -117,10 +149,15 @@ export default class App extends Component<{}, AppState> {
     } = this.state;
     return (
       <div id="preact_root" className={styles.app}>
-        { connectionStatus === 'offline' && <div className={styles.warningBar}>Check network connection. {lastConnectedDate && `Last connected ${lastConnectedDate?.toLocaleString([], { timeStyle: 'short' })}`}</div>}
-        { isAuthenticated && event == null && <div className={styles.infoText}>Loading...</div>}
-        { event != null && isAuthenticated
-          && <Queueing event={event} matches={matches} season={season ?? 9999} /> }
+        { connectionStatus === 'offline' && <div className={styles.warningBar}>Check network connection. {lastConnectedDate && `Last connected ${lastConnectedDate?.toLocaleString([], { timeStyle: 'short' })}`}</div> }
+        { isAuthenticated && event == null && <div className={styles.infoText}>Loading...</div> }
+        { event != null && isAuthenticated && (
+          <Router onChange={this.handleRoute}>
+            <Route default component={ScreenChooser} event={event} season={season ?? 9999} />
+            <QualQueueing path="/qual/queueing" event={event} qualMatches={matches} season={season ?? 9999} />
+            <TeamRankings path="/rankings" event={event} season={season ?? 9999} />
+          </Router>
+        ) }
         { !isAuthenticated && <LoginForm season={season ?? 9999} onLogin={this.onLogin} /> }
       </div>
     );

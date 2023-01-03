@@ -33,3 +33,8 @@ export type Team = {
 export type TeamAvatars = {
   [id: number]: string;
 };
+
+export type TeamRanking = {
+  rank: number;
+  teamNumber: number;
+};
