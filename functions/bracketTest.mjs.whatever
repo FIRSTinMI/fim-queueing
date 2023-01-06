@@ -1,0 +1,72 @@
+import fetch from 'node-fetch';
+import fs from 'fs';
+
+const token = Buffer.from(process.env.TOKEN)
+      .toString("base64");
+
+console.log("Making request");
+
+// const alliancesFetch = await fetch(`https://frc-api.firstinspires.org/v3.0/${2022}/alliances/${"MISAL"}`,
+//     {
+//       headers: {
+//         "Authorization": "Basic " + token,
+//         "Content-Type": "application/json",
+//         "Cache-Control": "no-cache",
+//       },
+//     }
+// );
+// if (!alliancesFetch.ok) throw new Error(alliancesFetch.statusText);
+// const alliances = await alliancesFetch.json();
+// const alliances = JSON.parse(fs.readFileSync('./sample_alliances.json'));
+// if (alliances["count"] !== 8) {
+//   throw new Error("Only playoffs with 8 alliances are currently supported");
+// }
+
+const matchesFetch = await fetch(`https://frc-api.firstinspires.org/v3.0/${2022}/matches/${"MIGUL"}?tournamentLevel=playoff`,
+    {
+      headers: {
+        "Authorization": "Basic " + token,
+        "Content-Type": "application/json",
+        "Cache-Control": "no-cache",
+      },
+    }
+);
+if (!matchesFetch.ok) throw new Error(matchesFetch.statusText);
+const matches = (await matchesFetch.json())["Matches"];
+// const matches = JSON.parse(fs.readFileSync('./testPlayoffs.json'))["matches"];
+
+// TODO: Bad! Very very bad. Why is this data structure so terrible on the FMS side
+const bracketLookup = {
+  "quarterfinals": {
+    "qf1": [1, 5, 9],
+    "qf2": [2, 6, 10],
+    "qf3": [3, 7, 11],
+    "qf4": [4, 8, 12]
+  },
+  "semifinals": {
+    "sf1": [13, 15, 17],
+    "sf2": [14, 16, 18]
+  },
+  "finals": {
+    "f1": [19, 20, 21]
+  }
+}
+
+for (let key in bracketLookup) {
+  console.log("- " + key);
+  for (let match in bracketLookup[key]) {
+    const results = bracketLookup[key][match].map(matchNum => {
+      const m = matches.find(x => x.matchNumber === matchNum);
+      if (m === undefined) return '-';
+      return m.scoreRedFinal > m.scoreBlueFinal ? 'R' : 'B'; // TODO: Tie?
+    });
+    const winner = results.filter(x => x === 'R').length >= 2 ? 'R' : 'B';
+    console.log(`-- ${match}: ${results.join()} => ${winner}`);
+  }
+}
+
+/**
+ * Start with all the matches we have results for, fill the bracket in
+ * For matches we don't, look at most one level back
+ * See if any alliances have two (or more) wins for that match, fill them in
+ */

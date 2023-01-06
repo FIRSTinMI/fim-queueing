@@ -4,6 +4,5 @@ node_modules
 /web
 .env
 .firebase/hosting.*.cache
-functions/firebase-debug.log
-functions/ui-debug.log
+functions/*-debug.log
 size-plugin.json

@@ -1,0 +1,158 @@
+$color-theme: #488bf4;
+$color-heading: #363636;
+$color-content: black;
+$color-background: #f0f2f2;
+$color-border: #c0c0c8;
+.bracket {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  white-space: nowrap;
+  font-size: 2vh;
+  .round {
+    display: inline-block;
+    vertical-align: middle;
+    .winners {
+      & > div {
+        display: inline-block;
+        vertical-align: middle;
+        &.matchups {
+          .matchup {
+            &:last-child {
+              margin-bottom: 0 !important;
+            }
+            .matchName {
+              font-size: 2em;
+            }
+            .participants {
+              border-radius: 0.25em;
+              overflow: hidden;
+              .participant {
+                box-sizing: border-box;
+                color: $color-content;
+                border-left: 0.25rem solid $color-content;
+                background: white;
+                width: 14em;
+                height: 4em;
+                box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.12);
+                &.red {
+                  border-color: #f00;
+                }
+                &.blue {
+                  border-color: #00f;
+                }
+                &:not(:last-child) {
+                  border-bottom: thin solid $color-background;
+                }
+                span {
+                  margin: 0 1.25em;
+                  //line-height: 3;
+                  height: 100%;
+                  font-size: 1.5em;
+                  display: flex;
+                  align-items: center;
+
+                  .checks {
+                    justify-self: flex-end;
+                    margin-left: auto;
+                    margin-right: 0;
+
+                    img {
+                      height: 30%;
+                    }
+
+                    img:not(:first-of-type) {
+                      margin-left: -0.25em;
+                    }
+                  }
+                }
+                
+              }
+            }
+          }
+        }
+        &.connector {
+          .line,
+          .merger {
+            box-sizing: border-box;
+            width: 2em;
+            display: inline-block;
+            vertical-align: top;
+          }
+          .line {
+            border-bottom: thin solid $color-border;
+            height: 4em;
+          }
+          .merger {
+            position: relative;
+            height: 8em;
+            &:before,
+            &:after {
+              content: "";
+              display: block;
+              box-sizing: border-box;
+              width: 100%;
+              height: 50%;
+              border: 0 solid;
+              border-color: $color-border;
+            }
+            &:before {
+              border-right-width: thin;
+              border-top-width: thin;
+            }
+            &:after {
+              border-right-width: thin;
+              border-bottom-width: thin;
+            }
+          }
+        }
+      }
+    }
+    &.quarterfinals {
+      .winners {
+        &:not(:last-child) {
+          margin-bottom: 2em;
+        }
+        .matchups {
+          .matchup {
+            &:not(:last-child) {
+              margin-bottom: 2em;
+            }
+          }
+        }
+      }
+    }
+    &.semifinals {
+      .winners {
+        .matchups {
+          .matchup {
+            &:not(:last-child) {
+              margin-bottom: 10em;
+            }
+          }
+        }
+        .connector {
+          .merger {
+            height: 16em;
+          }
+          .line {
+            height: 8em;
+          }
+        }
+      }
+    }
+    &.finals {
+      .winners {
+        .connector {
+          .merger {
+            height: 3em;
+          }
+          .line {
+            height: 1.5em;
+          }
+        }
+      }
+    }
+  }
+}
