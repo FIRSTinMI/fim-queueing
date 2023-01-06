@@ -1,6 +1,6 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
-const fetch = require("node-fetch");
+import fetch from "node-fetch";
 // eslint no-unused-vars:off   No idea why eslint thinks these aren't being used
 import {
   ApiAvatars, ApiMatchResults, ApiRankings, ApiSchedule,
