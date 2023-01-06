@@ -1,0 +1,60 @@
+.menu {
+    position: absolute;
+    z-index: 100;
+    top: 0;
+    width: 100vw;
+    border: #222;
+    padding: 10px 5%;
+    background: #e5e5e5;
+    box-shadow: 0px 3px 10px 0px #000000;
+    transition: transform 0.3s ease-out;
+    transform: translateY(0);
+
+    &:not(.alwaysShow).hidden {
+        transform: translateY(calc(-100% - 20px));
+    }
+
+    &.alwaysShow {
+      position: unset;
+    }
+
+    &:hover, &:focus-within {
+        transform: translateY(0);
+    }
+
+    @media (pointer: coarse) {
+        // Always show on touch screens. Yes, !important is bad.
+        transform: translateY(0) !important;
+        position: unset !important;
+        margin-bottom: 1em;
+    }
+
+    .eventName {
+        text-align: center;
+    }
+
+    label {
+        padding-right: 10px;
+        font-size: 0.5em;
+    }
+
+    .actions {
+        display: flex;
+        justify-content: space-between;
+
+        span {
+            text-overflow: ellipsis;
+            text-align: center;
+        }
+
+        .scrollInstruction {
+            font-size: 0.5em;
+        }
+
+        .buttons button {
+            display: block;
+            width: 100%;
+            margin-block: .5em;
+        }
+    }
+}

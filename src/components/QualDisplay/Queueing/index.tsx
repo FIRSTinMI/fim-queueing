@@ -5,17 +5,18 @@ import {
 } from 'firebase/database';
 
 import {
-  Event, AppMode, Match, TeamAvatars,
+  Event, AppMode, Match, TeamAvatars, TeamRanking,
 } from '../../../types';
 import MatchDisplay from '../MatchDisplay';
 import AnalyticsService from '../../../analyticsService';
 import Ranking from '../../Tickers/Ranking';
 import RankingList from '../../Tickers/RankingList';
 import styles from './styles.scss';
+import MenuBar from '../../MenuBar';
 
 type QueueingProps = {
   event: Event;
-  matches?: Match[];
+  qualMatches?: Match[];
   season: number;
 };
 
@@ -25,13 +26,7 @@ type QueueingState = {
   nextMatch: Match | null;
   queueingMatches: Match[];
   teamAvatars?: TeamAvatars;
-  showMenu: boolean;
   rankings: TeamRanking[];
-};
-
-type TeamRanking = {
-  rank: number;
-  teamNumber: number;
 };
 
 export default class Queueing extends Component<QueueingProps, QueueingState> {
@@ -49,7 +44,6 @@ export default class Queueing extends Component<QueueingProps, QueueingState> {
       nextMatch: null,
       queueingMatches: [],
       teamAvatars: undefined,
-      showMenu: false,
       rankings: [],
     };
 
@@ -61,17 +55,17 @@ export default class Queueing extends Component<QueueingProps, QueueingState> {
 
   componentDidMount(): void {
     if (typeof document === undefined) return;
-    document.addEventListener('keydown', this.handleKeyPress.bind(this));
-    document.addEventListener('mousemove', this.handleMouseMove.bind(this));
+
+    document.addEventListener('keydown', this.handleKeyPress);
 
     this.componentDidUpdate({} as QueueingProps);
   }
 
   componentDidUpdate(prevProps: QueueingProps): void {
-    const { event, matches, season } = this.props;
+    const { event, qualMatches, season } = this.props;
 
     if (prevProps.event?.currentMatchNumber !== event.currentMatchNumber
-            || prevProps.matches !== matches) this.updateMatches();
+            || prevProps.qualMatches !== qualMatches) this.updateMatches();
 
     if (prevProps.event?.options?.showRankings !== event.options?.showRankings) {
       const rankingsRef = ref(getDatabase(), `/seasons/${season}/rankings/${this.token}`);
@@ -89,11 +83,10 @@ export default class Queueing extends Component<QueueingProps, QueueingState> {
 
   componentWillUnmount(): void {
     if (typeof document === undefined) return;
-    document.removeEventListener('keypress', this.handleKeyPress.bind(this));
-    document.removeEventListener('mousemove', this.handleMouseMove.bind(this));
+    document.removeEventListener('keydown', this.handleKeyPress);
   }
 
-  handleKeyPress(e: KeyboardEvent): void {
+  handleKeyPress = (e: KeyboardEvent): void => {
     switch (e.code) {
       case 'KeyA':
         this.swapMode();
@@ -107,23 +100,7 @@ export default class Queueing extends Component<QueueingProps, QueueingState> {
       default:
         break;
     }
-  }
-
-  handleMouseMove(): void {
-    const { showMenu } = this.state;
-    if (!showMenu) {
-      this.setState({
-        showMenu: true,
-      });
-
-      clearTimeout(this.mouseTimeout);
-      this.mouseTimeout = window.setTimeout(() => {
-        this.setState({
-          showMenu: false,
-        });
-      }, 2000);
-    }
-  }
+  };
 
   static onLogout(): void {
     // eslint-disable-next-line no-alert --  I don't care enough to implement a real modal
@@ -133,8 +110,8 @@ export default class Queueing extends Component<QueueingProps, QueueingState> {
   }
 
   private getMatchByNumber(matchNumber: number): Match | null {
-    const { matches } = this.props;
-    return matches?.find((x) => x.matchNumber === matchNumber) ?? null;
+    const { qualMatches } = this.props;
+    return qualMatches?.find((x) => x.matchNumber === matchNumber) ?? null;
   }
 
   private setShowEventName(value: boolean): void {
@@ -148,6 +125,36 @@ export default class Queueing extends Component<QueueingProps, QueueingState> {
       showRankings: value,
     });
   }
+
+  menuOptions = () => {
+    const { event } = this.props;
+    return (
+      <>
+        <label htmlFor="modeSelect">
+          Mode:
+          {/* @ts-ignore */}
+          <select value={event.mode} onInput={(e): void => this.swapMode(e.target.value)} id="modeSelect">
+            <option value="automatic">Automatic</option>
+            <option value="assisted">Assisted</option>
+          </select>
+        </label>
+
+        {event.mode === 'assisted' && <div className={styles.assistedInstruction}>Use the left/right arrow keys to change current match</div>}
+
+        <label htmlFor="rankingDisplay">
+          Rankings:
+          {/* @ts-ignore */}
+          <input type="checkbox" checked={event.options?.showRankings ?? false} onInput={(e): void => this.setShowRankings(e.target.checked)} id="rankingDisplay" />
+        </label>
+
+        <label htmlFor="eventNameDisplay">
+          Show event name:
+          {/* @ts-ignore */}
+          <input type="checkbox" checked={event.options?.showEventName ?? false} onInput={(e): void => this.setShowEventName(e.target.checked)} id="eventNameDisplay" />
+        </label>
+      </>
+    );
+  };
 
   private decrementMatchNumber(): void {
     const { event } = this.props;
@@ -223,51 +230,18 @@ export default class Queueing extends Component<QueueingProps, QueueingState> {
 
   render(): JSX.Element {
     const {
-      loadingState, currentMatch, nextMatch, queueingMatches, teamAvatars, showMenu, rankings,
+      loadingState, currentMatch, nextMatch, queueingMatches, teamAvatars, rankings,
     } = this.state;
-    const { event, matches, season } = this.props;
+    const { event, qualMatches, season } = this.props;
     return (
       <>
-        <div className={[styles.menu, showMenu ? '' : styles.hidden].join(' ')}>
-          <div className={styles.actions}>
-            <div>
-              <label htmlFor="modeSelect">
-                Mode:
-                {/* @ts-ignore */}
-                <select value={event.mode} onInput={(e): void => this.swapMode(e.target.value)} id="modeSelect">
-                  <option value="automatic">Automatic</option>
-                  <option value="assisted">Assisted</option>
-                </select>
-              </label>
-
-              {event.mode === 'assisted' && <div className={styles.assistedInstruction}>Use the left/right arrow keys to change current match</div>}
-
-              <label htmlFor="rankingDisplay">
-                Rankings:
-                {/* @ts-ignore */}
-                <input type="checkbox" checked={event.options?.showRankings ?? false} onInput={(e): void => this.setShowRankings(e.target.checked)} id="rankingDisplay" />
-              </label>
-
-              <label htmlFor="eventNameDisplay">
-                Show event name:
-                {/* @ts-ignore */}
-                <input type="checkbox" checked={event.options?.showEventName ?? false} onInput={(e): void => this.setShowEventName(e.target.checked)} id="eventNameDisplay" />
-              </label>
-            </div>
-            <span>
-              {event.name}
-              {' '}
-              ({season})
-            </span>
-            <button type="button" onClick={(): void => Queueing.onLogout()}>Log out</button>
-          </div>
-        </div>
+        <MenuBar event={event} season={season} options={this.menuOptions()} />
         <div className={styles.fullHeight}>
           {loadingState === 'loading' && <div className={styles.infoText}>Loading matches...</div>}
           {loadingState === 'error' && <div className={styles.infoText}>Failed to fetch matches</div>}
           {loadingState === 'noAutomatic' && <div className={styles.infoText}>Unable to run in automatic mode. Press the &apos;a&apos; key to switch modes.</div>}
-          {loadingState === 'ready' && !matches?.length && <div className={styles.infoText}>Waiting for schedule to be posted...</div>}
-          {loadingState === 'ready' && matches?.length
+          {loadingState === 'ready' && !qualMatches?.length && <div className={styles.infoText}>Waiting for schedule to be posted...</div>}
+          {loadingState === 'ready' && qualMatches?.length
             && (
             <div className={styles.qualsDisplay}>
               {event.mode === 'assisted' && (
@@ -317,5 +291,5 @@ export default class Queueing extends Component<QueueingProps, QueueingState> {
 }
 
 Queueing.defaultProps = {
-  matches: undefined,
+  qualMatches: undefined,
 };
