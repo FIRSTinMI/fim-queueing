@@ -23,10 +23,8 @@ type Event = {
 }
 
 exports.updateCurrentMatch = async () => {
-  // TODO: Uncomment this and remove 2022!
-  // const season = (await admin.database().ref("/current_season").get())
-  //     .val();
-  const season = 2022;
+  const season = (await admin.database().ref("/current_season").get())
+      .val();
 
   const token = Buffer.from(process.env.FRC_API_TOKEN as string)
       .toString("base64");
