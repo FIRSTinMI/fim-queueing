@@ -2,7 +2,13 @@ $color-theme: #488bf4;
 $color-heading: #363636;
 $color-content: black;
 $color-background: #f0f2f2;
-$color-border: #c0c0c8;
+$color-border: #363636;
+
+.infoText {
+  padding-top: 2em;
+  text-align: center;
+}
+
 .bracket {
   display: flex;
   justify-content: center;
@@ -31,9 +37,11 @@ $color-border: #c0c0c8;
               .participant {
                 box-sizing: border-box;
                 color: $color-content;
-                border-left: 0.25rem solid $color-content;
+                border-left: 0.5rem solid $color-content;
                 background: white;
-                width: 14em;
+                // Note: When I try to remove this width, it displays incorrectly on first render, then fixes
+                // itself on rerenders? Wasn't quite able to track down why
+                min-width: 14em;
                 height: 4em;
                 box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.12);
                 &.red {
@@ -47,7 +55,6 @@ $color-border: #c0c0c8;
                 }
                 span {
                   margin: 0 1.25em;
-                  //line-height: 3;
                   height: 100%;
                   font-size: 1.5em;
                   display: flex;
@@ -57,13 +64,15 @@ $color-border: #c0c0c8;
                     justify-self: flex-end;
                     margin-left: auto;
                     margin-right: 0;
+                    padding-left: .75em;
+                    padding-right: .01em;
 
                     img {
                       height: 30%;
                     }
 
                     img:not(:first-of-type) {
-                      margin-left: -0.25em;
+                      margin-left: -0.10em;
                     }
                   }
                 }

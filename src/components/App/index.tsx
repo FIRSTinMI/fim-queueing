@@ -154,7 +154,7 @@ export default class App extends Component<{}, AppState> {
             <Route default component={ScreenChooser} event={event} season={season ?? 9999} />
             <Route component={QualQueueing} path="/qual/queueing" event={event} qualMatches={matches} season={season ?? 9999} />
             <Route component={TeamRankings} path="/rankings" event={event} season={season ?? 9999} />
-            <Route component={PlayoffBracket} path="/playoff/bracket" event={event} playoffMatches={matches} season={season ?? 9999} />
+            <Route component={PlayoffBracket} path="/playoff/bracket" event={event} season={season ?? 9999} />
           </Router>
         ) }
         { !isAuthenticated && <LoginForm season={season ?? 9999} onLogin={this.onLogin} /> }

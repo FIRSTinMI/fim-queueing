@@ -63,3 +63,17 @@ export type ApiRankings = {
     "matchesPlayed": number;
   }[]
 }
+
+export type ApiAlliances = {
+  "Alliances": {
+    number: number,
+    captain: number,
+    round1: number,
+    round2: number,
+    round3?: number,
+    backup?: number,
+    backupReplaced: number,
+    name: string
+  }[],
+  count: number
+}

@@ -1,12 +1,18 @@
 import { h, Fragment } from 'preact';
-import { Event } from '../../types';
+import { useEffect, useState } from 'preact/hooks';
+import {
+  getDatabase, off, onValue, ref,
+} from 'firebase/database';
+import Cookies from 'js-cookie';
+import {
+  Alliance, Bracket, Event, PlayoffMatchup,
+} from '../../types';
 import MenuBar from '../MenuBar';
 import styles from './styles.scss';
 
 type PlayoffBracketProps = {
   event: Event,
   season: number,
-  playoffMatches: any,
 };
 
 type MatchupSide = {
@@ -15,100 +21,41 @@ type MatchupSide = {
   wins: number
 };
 
-type Matchup = {
-  name: string,
-  red: MatchupSide | null,
-  blue: MatchupSide | null
-};
+function toPairs(arr: PlayoffMatchup[]): PlayoffMatchup[][] {
+  return arr.reduce<PlayoffMatchup[][]>((result, _, index, array) => {
+    if (index % 2 === 0) result.push(array.slice(index, index + 2));
+    return result;
+  }, []);
+}
 
+// FIXME: On Safari, sometimes this will not display properly on first render. The matchup box
+// won't be big enough and the check marks will be cut off. This does not occur 100% of the time.
 const PlayoffBracket = ({ event, season }: PlayoffBracketProps) => {
-  const bracket = {
-    qf: [
-      [
-        {
-          name: 'QF1',
-          red: {
-            alliance: 1,
-            teams: '1, 2, 3',
-            wins: 1,
-          },
-          blue: {
-            alliance: 8,
-            teams: '4, 5, 6',
-            wins: 2,
-          },
-        },
-        {
-          name: 'QF2',
-          red: {
-            alliance: 2,
-            teams: '1, 2, 3',
-            wins: 0,
-          },
-          blue: {
-            alliance: 7,
-            teams: '4, 5, 6',
-            wins: 1,
-          },
-        },
-      ],
-      [
-        {
-          name: 'QF1',
-          red: {
-            alliance: 1,
-            teams: '1, 2, 3',
-            wins: 1,
-          },
-          blue: {
-            alliance: 8,
-            teams: '4, 5, 6',
-            wins: 2,
-          },
-        },
-        {
-          name: 'QF2',
-          red: {
-            alliance: 2,
-            teams: '1, 2, 3',
-            wins: 0,
-          },
-          blue: {
-            alliance: 7,
-            teams: '4, 5, 6',
-            wins: 1,
-          },
-        },
-      ],
-    ],
-    sf: [
-      [
-        {
-          name: 'SF1',
-          red: {
-            alliance: 8,
-            teams: '1, 2, 3',
-            wins: 0,
-          },
-          blue: null,
-        },
-        {
-          name: 'SF2',
-          red: {
-            alliance: 8,
-            teams: '1, 2, 3',
-            wins: 0,
-          },
-          blue: null,
-        },
-      ],
-    ],
-    f: {
-      name: 'Finals',
-      red: null,
-      blue: null,
-    },
-  };
+  const [alliances, setAlliances] = useState<Alliance[] | undefined>(undefined);
+  const [bracket, setBracket] = useState<Bracket | undefined>(undefined);
+
+  useEffect(() => {
+    const token = Cookies.get('queueing-event-key') as string;
+    if (!token) throw new Error('Token was somehow empty.');
+
+    console.log('running effect for', token, getDatabase());
+    const alliancesRef = ref(getDatabase(), `/seasons/${season}/alliances/${token}`);
+    onValue(alliancesRef, (snap) => {
+      console.log('alliances', snap.val());
+      setAlliances(snap.val() as Alliance[]);
+    });
+
+    const bracketRef = ref(getDatabase(), `/seasons/${season}/bracket/${token}`);
+    onValue(bracketRef, (snap) => {
+      console.log('bracket', snap.val());
+      setBracket(snap.val() as Bracket);
+    });
+
+    return () => {
+      off(alliancesRef);
+      off(bracketRef);
+    };
+  }, [season, event.eventCode]);
 
   const MatchupSide = ({ color, side }: { color: 'red' | 'blue', side: MatchupSide | null }) => (
     <div className={[styles.participant, styles[color], side && side.wins >= 2 ? styles.winner : ''].join(' ')}>
@@ -124,59 +71,72 @@ const PlayoffBracket = ({ event, season }: PlayoffBracketProps) => {
     </div>
   );
 
-  const Matchup = ({ match: { name, red, blue } }: { match: Matchup }) => (
+  function getTeamsInAlliance(num: number): string {
+    const alliance = alliances?.find((x) => x.number === num);
+    if (!alliance) return '';
+    return `${alliance.captain}, ${alliance.round1}, ${alliance.round2}`;
+  }
+
+  const Matchup = ({
+    match: {
+      name, redAlliance, blueAlliance, wins,
+    },
+  }: { match: PlayoffMatchup }) => (
     <div className={styles.matchup}>
       <span className={styles.matchName}>{name}</span>
       <div className={styles.participants}>
-        <MatchupSide color="red" side={red} />
-        <MatchupSide color="blue" side={blue} />
+        <MatchupSide color="red" side={redAlliance ? { alliance: redAlliance, teams: getTeamsInAlliance(redAlliance), wins: wins.red } : null} />
+        <MatchupSide color="blue" side={blueAlliance ? { alliance: blueAlliance, teams: getTeamsInAlliance(blueAlliance), wins: wins.blue } : null} />
       </div>
     </div>
   );
   return (
     <div>
       <MenuBar event={event} season={season} />
-      <div className={styles.bracket}>
-        <section className={[styles.round, styles.quarterfinals].join(' ')}>
-          {bracket.qf.map(([match1, match2]) => (
-            <>
-              <div className={styles.winners}>
-                <div className={styles.matchups}>
-                  <Matchup match={match1} />
-                  <Matchup match={match2} />
+      {(!bracket || !alliances) && <div className={styles.infoText}>Waiting for alliances...</div>}
+      {bracket && alliances && (
+        <div className={styles.bracket}>
+          <section className={[styles.round, styles.quarterfinals].join(' ')}>
+            {toPairs(bracket.qf).map(([match1, match2]) => (
+              <>
+                <div className={styles.winners}>
+                  <div className={styles.matchups}>
+                    <Matchup match={match1} />
+                    <Matchup match={match2} />
+                  </div>
+                  <div className={styles.connector}>
+                    <div className={styles.merger} />
+                    <div className={styles.line} />
+                  </div>
                 </div>
-                <div className={styles.connector}>
-                  <div className={styles.merger} />
-                  <div className={styles.line} />
+              </>
+            ))}
+          </section>
+          <section className={[styles.round, styles.semifinals].join(' ')}>
+            {toPairs(bracket.sf).map(([match1, match2]) => (
+              <>
+                <div className={styles.winners}>
+                  <div className={styles.matchups}>
+                    <Matchup match={match1} />
+                    <Matchup match={match2} />
+                  </div>
+                  <div className={styles.connector}>
+                    <div className={styles.merger} />
+                    <div className={styles.line} />
+                  </div>
                 </div>
+              </>
+            ))}
+          </section>
+          <section className={[styles.round, styles.finals].join(' ')}>
+            <div className={styles.winners}>
+              <div className={styles.matchups}>
+                <Matchup match={bracket.f[0]} />
               </div>
-            </>
-          ))}
-        </section>
-        <section className={[styles.round, styles.semifinals].join(' ')}>
-          {bracket.sf.map(([match1, match2]) => (
-            <>
-              <div className={styles.winners}>
-                <div className={styles.matchups}>
-                  <Matchup match={match1} />
-                  <Matchup match={match2} />
-                </div>
-                <div className={styles.connector}>
-                  <div className={styles.merger} />
-                  <div className={styles.line} />
-                </div>
-              </div>
-            </>
-          ))}
-        </section>
-        <section className={[styles.round, styles.finals].join(' ')}>
-          <div className={styles.winners}>
-            <div className={styles.matchups}>
-              <Matchup match={bracket.f} />
             </div>
-          </div>
-        </section>
-      </div>
+          </section>
+        </div>
+      )}
     </div>
   );
 };
