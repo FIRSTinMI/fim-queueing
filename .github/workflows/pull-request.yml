@@ -41,4 +41,4 @@ jobs:
         run: npm run build --prefix=functions
       
       - name: Lint
-        run: npm run lint --prefix=functions
+        run: npx eslint 'functions/src/**/*.{js,ts}' -c functions/.eslintrc.js 
