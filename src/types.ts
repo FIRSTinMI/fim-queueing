@@ -37,6 +37,13 @@ export type TeamAvatars = {
 export type TeamRanking = {
   rank: number;
   teamNumber: number;
+  rankingPoints: number;
+  wins: number;
+  ties: number;
+  losses: number;
+  sortOrder2: number;
+  sortOrder3: number;
+  sortOrder4: number;
 };
 
 export type Alliance = {

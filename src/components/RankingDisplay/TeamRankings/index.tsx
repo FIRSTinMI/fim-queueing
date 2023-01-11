@@ -41,12 +41,19 @@ const TeamRankings = (props: TeamRankingsProps) => {
       <MenuBar event={event} season={season} />
       <div className={styles.teamRankings}>
         <div className={styles.betaBar}>
-          β - This page is currently a work in progress. More data will be added soon!
+          β -
+          This display is currently a work in progress. Utilize <u>frc.events</u> for official data.
         </div>
         <table>
           <thead>
             <th>Rank</th>
             <th>Team #</th>
+            <th>RP</th>
+            {/* Game specific: 2023 */}
+            <th>Match</th>
+            <th>Charge</th>
+            <th>Auto</th>
+            {/* End game specific */}
             <th>W-T-L</th>
           </thead>
           <tbody ref={tableRef}>
@@ -54,7 +61,13 @@ const TeamRankings = (props: TeamRankingsProps) => {
               <tr key={ranking.rank}>
                 <td>{ranking.rank}</td>
                 <td>{ranking.teamNumber}</td>
-                <td>0-0-0</td>
+                <td>{ranking.rankingPoints}</td>
+                {/* Game specific: 2023 */}
+                <td>{ranking.sortOrder2}</td>
+                <td>{ranking.sortOrder3}</td>
+                <td>{ranking.sortOrder4}</td>
+                {/* End game specific */}
+                <td>{`${ranking.wins ?? 0}-${ranking.ties ?? 0}-${ranking.losses ?? 0}`}</td>
               </tr>
             ))}
           </tbody>

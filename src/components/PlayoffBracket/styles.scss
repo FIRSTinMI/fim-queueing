@@ -37,7 +37,7 @@ $color-border: #363636;
               .participant {
                 box-sizing: border-box;
                 color: $color-content;
-                border-left: 0.5rem solid $color-content;
+                //border-left: 0.5rem solid $color-content;
                 background: white;
                 // Note: When I try to remove this width, it displays incorrectly on first render, then fixes
                 // itself on rerenders? Wasn't quite able to track down why
@@ -45,10 +45,12 @@ $color-border: #363636;
                 height: 4em;
                 box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.12);
                 &.red {
-                  border-color: #f00;
+                  //border-color: #f00;
+                  box-shadow: 0.5rem 0 0 0 #f00 inset;
                 }
                 &.blue {
-                  border-color: #00f;
+                  //border-color: #00f;
+                  box-shadow: 0.5rem 0 0 0 #00f inset;
                 }
                 &:not(:last-child) {
                   border-bottom: thin solid $color-background;

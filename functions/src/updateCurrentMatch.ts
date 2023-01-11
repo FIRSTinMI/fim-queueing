@@ -133,6 +133,9 @@ async function updateRankings(season: number, eventCode: string,
       ties: x.ties,
       losses: x.losses,
       rankingPoints: x.sortOrder1,
+      sortOrder2: x.sortOrder2,
+      sortOrder3: x.sortOrder3,
+      sortOrder4: x.sortOrder4,
     }));
 
     admin
