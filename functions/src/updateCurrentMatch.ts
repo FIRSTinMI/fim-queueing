@@ -73,7 +73,8 @@ exports.updateCurrentMatch = async () => {
         await setCurrentQualMatch(season, event, eventKey, token);
       }
 
-      if (event.state === "QualsInProgress" || event.state === "AwaitingAlliances") {
+      if (event.state === "QualsInProgress" ||
+        event.state === "AwaitingAlliances") {
         // Running this for a bit after qualifications end because rankings
         // don't always immediately update
         await updateRankings(season, event.eventCode, eventKey, token);
