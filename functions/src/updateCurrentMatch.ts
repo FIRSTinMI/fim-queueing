@@ -57,7 +57,7 @@ exports.updateCurrentMatch = async () => {
       if (event.state === "AwaitingQualSchedule") {
         // Try to fetch the schedule
         const eventSchedule = (await getSchedule(season, event.eventCode,
-            token, ));
+            token));
 
         if (eventSchedule["Schedule"] &&
           eventSchedule["Schedule"].length > 0) {
