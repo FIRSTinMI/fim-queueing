@@ -17,6 +17,7 @@ import AnalyticsService from '../../analyticsService';
 import styles from './styles.scss';
 import ScreenChooser from '../ScreenChooser';
 import TeamRankings from '../RankingDisplay/TeamRankings';
+import PlayoffBracket from '../PlayoffBracket';
 
 type AppState = {
   isAuthenticated: boolean;
@@ -153,6 +154,7 @@ export default class App extends Component<{}, AppState> {
             <Route default component={ScreenChooser} event={event} season={season ?? 9999} />
             <Route component={QualQueueing} path="/qual/queueing" event={event} qualMatches={matches} season={season ?? 9999} />
             <Route component={TeamRankings} path="/rankings" event={event} season={season ?? 9999} />
+            <Route component={PlayoffBracket} path="/playoff/bracket" event={event} season={season ?? 9999} />
           </Router>
         ) }
         { !isAuthenticated && <LoginForm season={season ?? 9999} onLogin={this.onLogin} /> }

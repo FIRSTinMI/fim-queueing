@@ -37,4 +37,34 @@ export type TeamAvatars = {
 export type TeamRanking = {
   rank: number;
   teamNumber: number;
+  rankingPoints: number;
+  wins: number;
+  ties: number;
+  losses: number;
+  sortOrder2: number;
+  sortOrder3: number;
+  sortOrder4: number;
+};
+
+export type Alliance = {
+  number: number,
+  captain: number,
+  round1: number,
+  round2: number,
+  round3?: number,
+  backup?: number,
+  backupReplaced: number,
+  name: string
+};
+
+export type TournamentLevel = 'qf' | 'sf' | 'f';
+export type PlayoffMatchup = {
+  name: string
+  number: number,
+  redAlliance: number | null,
+  blueAlliance: number | null,
+  wins: { red: number, blue: number },
+};
+export type Bracket = {
+  [level in TournamentLevel]: PlayoffMatchup[]
 };

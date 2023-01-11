@@ -2,6 +2,7 @@ import { h } from 'preact';
 import { Link } from 'preact-router';
 import { Event } from '../../types';
 import MenuBar from '../MenuBar';
+import styles from './styles.scss';
 
 type ScreenChooserProps = {
   event: Event,
@@ -11,11 +12,12 @@ type ScreenChooserProps = {
 export default function ScreenChooser(props: ScreenChooserProps) {
   const { event, season } = props;
   return (
-    <div>
+    <div className={styles.screenChooser}>
       <MenuBar event={event} season={season} alwaysShow />
       <ul>
         <li><Link href="/qual/queueing">Qualification Queueing</Link></li>
         <li><Link href="/rankings">Rankings</Link></li>
+        <li><Link href="/playoff/bracket">Playoff Bracket</Link></li>
       </ul>
     </div>
   );
