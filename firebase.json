@@ -18,7 +18,7 @@
   },
   "functions": {
     "predeploy": [
-      "npm --prefix \"$RESOURCE_DIR\" run lint",
+      "npx eslint 'functions/src/**/*.{js,ts}' -c functions/.eslintrc.js",
       "npm --prefix \"$RESOURCE_DIR\" run build"
     ],
     "source": "functions"
