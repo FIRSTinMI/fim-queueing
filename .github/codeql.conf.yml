@@ -1,0 +1,9 @@
+name: "fim-queueing CodeQL Config"
+
+query-filters:
+- exclude:
+    # Danger! This rule has been disabled because this project makes a lot of external
+    # HTTP requests utilizing data which is stored in the database. Ensure that those
+    # such requests only use database data which have security rules preventing regular
+    # users from updating.
+    id: js/request-forgery
