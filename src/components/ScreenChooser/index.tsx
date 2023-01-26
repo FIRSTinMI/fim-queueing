@@ -1,16 +1,12 @@
 import { h } from 'preact';
 import { Link } from 'preact-router';
-import { Event } from '../../types';
+import { useContext } from 'preact/hooks';
+import AppContext from '../../appContext';
 import MenuBar from '../MenuBar';
 import styles from './styles.scss';
 
-type ScreenChooserProps = {
-  event: Event,
-  season: number
-};
-
-export default function ScreenChooser(props: ScreenChooserProps) {
-  const { event, season } = props;
+export default function ScreenChooser() {
+  const { event, season } = useContext(AppContext);
   return (
     <div className={styles.screenChooser}>
       <MenuBar event={event} season={season} alwaysShow />

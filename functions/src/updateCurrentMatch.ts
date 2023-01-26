@@ -1,6 +1,6 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
-const fetch = require("node-fetch");
+const {get} = require("./helpers/frcEventsApiClient");
 
 const {getSchedule, updateQualSchedule} = require("./helpers/schedule");
 import {
@@ -26,9 +26,6 @@ exports.updateCurrentMatch = async () => {
   const season = (await admin.database().ref("/current_season").get())
       .val();
 
-  const token = Buffer.from(process.env.FRC_API_TOKEN as string)
-      .toString("base64");
-
   const eventsSnap = await admin
       .database()
       .ref(`/seasons/${season}/events`)
@@ -46,6 +43,7 @@ exports.updateCurrentMatch = async () => {
       }
 
       const event: Event = events[eventKey];
+      const startingState = event.state;
 
       if (event.state === "Pending" || event.state === undefined) {
         if (new Date(event.start) <= now &&
@@ -56,13 +54,11 @@ exports.updateCurrentMatch = async () => {
 
       if (event.state === "AwaitingQualSchedule") {
         // Try to fetch the schedule
-        const eventSchedule = (await getSchedule(season, event.eventCode,
-            token));
+        const eventSchedule = (await getSchedule(season, event.eventCode));
 
         if (eventSchedule["Schedule"] &&
           eventSchedule["Schedule"].length > 0) {
-          // Yay, we have a schedule now
-          await updateQualSchedule(eventSchedule, season, eventKey, token);
+          await updateQualSchedule(eventSchedule, season, eventKey);
           event.state = "QualsInProgress";
         } else {
           functions.logger.info(`Still no schedule for ${event.eventCode}`);
@@ -70,25 +66,25 @@ exports.updateCurrentMatch = async () => {
       }
 
       if (event.state === "QualsInProgress" && event.mode === "automatic") {
-        await setCurrentQualMatch(season, event, eventKey, token);
+        await setCurrentQualMatch(season, event, eventKey);
       }
 
       if (event.state === "QualsInProgress" ||
         event.state === "AwaitingAlliances") {
         // Running this for a bit after qualifications end because rankings
         // don't always immediately update
-        await updateRankings(season, event.eventCode, eventKey, token);
+        await updateRankings(season, event.eventCode, eventKey);
       }
 
       if (event.state === "AwaitingAlliances") {
-        await populateAlliances(season, event, eventKey, token);
+        await populateAlliances(season, event, eventKey);
       }
 
       if (event.state === "PlayoffsInProgress") {
-        await updatePlayoffBracket(season, event, eventKey, token);
+        await updatePlayoffBracket(season, event, eventKey);
       }
 
-      if (event.state !== undefined) {
+      if (event.state !== undefined && event.state !== startingState) {
         await admin.database()
             .ref(`/seasons/${season}/events/${eventKey}`)
             .update({
@@ -107,23 +103,11 @@ exports.updateCurrentMatch = async () => {
  * @param {number} season Which season we"re in
  * @param {string} eventCode The FRC event code
  * @param {string} eventKey The DB key for the event
- * @param {string} token FRC API token
  */
 async function updateRankings(season: number, eventCode: string,
-    eventKey: string, token: string): Promise<void> {
-  const rankingFetch = await fetch(
-      `https://frc-api.firstinspires.org/v3.0/${season}/rankings/` +
-        `${eventCode}`,
-      {
-        headers: {
-          "Authorization": "Basic " + token,
-          "Content-Type": "application/json",
-        },
-      }
-  );
-  if (!rankingFetch.ok) throw new Error(rankingFetch.statusText);
-
-  const rankingJson = await rankingFetch.json() as ApiRankings;
+    eventKey: string): Promise<void> {
+  const rankingJson =
+    await get(`/${season}/rankings/${eventCode}`) as ApiRankings;
 
   if ((rankingJson["Rankings"]?.length ?? 0) > 0) {
     const rankings = rankingJson["Rankings"].map((x) => ({
@@ -151,28 +135,14 @@ async function updateRankings(season: number, eventCode: string,
  * @param {number} season The season of the event
  * @param {Event} event The full event object from RTDB
  * @param {string} eventKey The key to access the event
- * @param {string} token The FRC Events API token
  * @return {void}
  */
 async function setCurrentQualMatch(season: number, event: Event,
-    eventKey: string, token: string) {
+    eventKey: string) {
   try {
-    const url = `https://frc-api.firstinspires.org/v3.0/${season}/` +
-    `matches/${event.eventCode}?tournamentLevel=qual` +
-    `&start=${event.currentMatchNumber ?? 1}`;
-
-    const resultFetch = await fetch(url,
-        {
-          headers: {
-            "Authorization": "Basic " + token,
-            "Content-Type": "application/json",
-            "Cache-Control": "no-cache",
-          },
-        }
-    );
-    if (!resultFetch.ok) throw new Error(resultFetch.statusText);
-
-    const results = await resultFetch.json() as ApiMatchResults;
+    const results = await get(`/${season}/matches/${event.eventCode}` +
+        "?tournamentLevel=qual" +
+        `&start=${event.currentMatchNumber ?? 1}`) as ApiMatchResults;
 
     const latestMatch = results["Matches"]
         .filter((x: any) => x.actualStartTime != null)
@@ -200,30 +170,17 @@ async function setCurrentQualMatch(season: number, event: Event,
 }
 
 /**
- * a
- * @param {number} season a
- * @param {Event} event a
- * @param {string} eventKey a
- * @param {string} token a
+ * Attempt to fetch and populate alliances for an event
+ * @param {number} season The season of the event
+ * @param {Event} event The full event object from RTDB
+ * @param {string} eventKey The key to access the event
  */
-async function populateAlliances(season: number, event: Event, eventKey: string,
-    token: string) {
+async function populateAlliances(season: number, event: Event,
+    eventKey: string) {
   let alliances: ApiAlliances | undefined;
   try {
-    const url = `https://frc-api.firstinspires.org/v3.0/${2022}/alliances/` +
-    `${event.eventCode}`;
-    const resultFetch = await fetch(url,
-        {
-          headers: {
-            "Authorization": "Basic " + token,
-            "Content-Type": "application/json",
-            "Cache-Control": "no-cache",
-          },
-        }
-    );
-    if (!resultFetch.ok) throw new Error(resultFetch.statusText);
-
-    alliances = await resultFetch.json() as ApiAlliances;
+    const {eventCode} = event;
+    alliances = await get(`${season}/alliances/${eventCode}`) as ApiAlliances;
   } catch (e) {
     // The FRC API seems to just error out sometimes fetching alliances...
     functions.logger.warn("Error while fetching alliances", e);
@@ -239,30 +196,24 @@ async function populateAlliances(season: number, event: Event, eventKey: string,
 }
 
 /**
- * a
- * @param {number} season a
- * @param {Event} event a
- * @param {string} eventKey a
- * @param {string} token a
+ * Update the playoff bracket utilizing match results
+ * @param {number} season The season of the event
+ * @param {Event} event The full event object from RTDB
+ * @param {string} eventKey The key to access the event
  */
 async function updatePlayoffBracket(season: number, event: Event,
-    eventKey: string, token: string) {
-  const url = `https://frc-api.firstinspires.org/v3.0/${season}/` +
-  `matches/${event.eventCode}?tournamentLevel=playoff`;
-  const resultFetch = await fetch(url,
-      {
-        headers: {
-          "Authorization": "Basic " + token,
-          "Content-Type": "application/json",
-          "Cache-Control": "no-cache",
-        },
-      }
-  );
-  if (!resultFetch.ok) throw new Error(resultFetch.statusText);
+    eventKey: string) {
+  const {eventCode} = event;
+  const matches = await get(`${season}/matches/${eventCode}` +
+    "?tournamentLevel=playoff") as ApiMatchResults;
 
-  const matches = await resultFetch.json() as ApiMatchResults;
-
-  const bracketMatchMap: {[level: string]: {[match: number]: number[]}} = {
+  type PlayoffLevel = "qf" | "sf" | "f";
+  /**
+   * A mapping of which number matches go with each position in the bracket.
+   * The results of this map should be equivalent to the friendly name of the
+   * match as returned by the API, but more machine readable.
+   */
+  const bracketMatchMap: Record<PlayoffLevel, {[match: number]: number[]}> = {
     qf: {
       1: [1, 5, 9],
       2: [2, 6, 10],
@@ -280,11 +231,11 @@ async function updatePlayoffBracket(season: number, event: Event,
 
   /**
    * Get the number of wins for each alliance in a matchup
-   * @param {"qf" | "sf" | "f"} level The tournament level
+   * @param {PlayoffLevel} level The tournament level
    * @param {number} matchNum The match number
    * @return {{red: number, blue: number}} Wins for each alliance
    */
-  function getWins(level: "qf" | "sf" | "f", matchNum: number)
+  function getWins(level: PlayoffLevel, matchNum: number)
       : {red: number, blue: number} {
     const mapping = bracketMatchMap[level][matchNum];
     if (!mapping) throw new Error(`Unable to find match ${level}${matchNum}`);
@@ -302,12 +253,17 @@ async function updatePlayoffBracket(season: number, event: Event,
   }
 
   /**
-   * a
-   * @param {string} level a
-   * @param {number} matchNum a
-   * @return {number | null} a
+   * Get the overall winner for a matchup.
+   * E.g.: "qf", 1 will return the best-of-three winner from matches 1, 5, and 9
+   *
+   * Note: This function utilizes the bracketMapping defined below, it
+   * expects that the earlier tournament levels have been populated to
+   * properly fill in the later levels in the bracket.
+   * @param {PlayoffLevel} level Which level of the playoffs to search
+   * @param {number} matchNum The matchup number
+   * @return {number | null} The alliance number that won
    */
-  function winnerFrom(level: "qf" | "sf" | "f", matchNum: number)
+  function winnerFrom(level: PlayoffLevel, matchNum: number)
       : number | null {
     const mapping = bracketMapping[level]
         .find((x: any) => x.number === matchNum);
@@ -319,12 +275,10 @@ async function updatePlayoffBracket(season: number, event: Event,
     return null;
   }
 
-  const bracketMapping: {
-    [level: string]: {
+  const bracketMapping: Record<PlayoffLevel, {
       name: string, number: number, redAlliance: number | null,
       blueAlliance: number | null, wins: {red: number, blue: number}
-    }[]
-  } = {};
+    }[]> = {qf: [], sf: [], f: []};
   bracketMapping.qf = [
     {
       name: "QF1",

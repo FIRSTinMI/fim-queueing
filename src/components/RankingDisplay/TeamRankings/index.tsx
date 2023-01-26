@@ -1,25 +1,19 @@
 import {
   createRef, h, RefObject, Fragment,
 } from 'preact';
-import { useEffect, useState } from 'preact/hooks';
+import { useContext, useEffect, useState } from 'preact/hooks';
 import {
   getDatabase, ref, onValue, off,
 } from 'firebase/database';
-import Cookies from 'js-cookie';
-import { Event, TeamRanking } from '../../../types';
+import { TeamRanking } from '../../../types';
 import MenuBar from '../../MenuBar';
 import styles from './styles.scss';
+import AppContext from '../../../appContext';
 
-type TeamRankingsProps = {
-  event: Event,
-  season: number
-};
-
-const TeamRankings = (props: TeamRankingsProps) => {
-  const { event, season } = props;
+const TeamRankings = () => {
+  const { event, season, token } = useContext(AppContext);
   const [rankings, setRankings] = useState<TeamRanking[]>([]);
   useEffect(() => {
-    const token = Cookies.get('queueing-event-key') as string;
     if (!token) throw new Error('Token was somehow empty.');
 
     const rankingsRef = ref(getDatabase(), `/seasons/${season}/rankings/${token}`);
@@ -46,15 +40,17 @@ const TeamRankings = (props: TeamRankingsProps) => {
         </div>
         <table>
           <thead>
-            <th>Rank</th>
-            <th>Team #</th>
-            <th>RP</th>
-            {/* Game specific: 2023 */}
-            <th>Match</th>
-            <th>Charge</th>
-            <th>Auto</th>
-            {/* End game specific */}
-            <th>W-T-L</th>
+            <tr>
+              <th>Rank</th>
+              <th>Team #</th>
+              <th>RP</th>
+              {/* Game specific: 2023 */}
+              <th>Match</th>
+              <th>Charge</th>
+              <th>Auto</th>
+              {/* End game specific */}
+              <th>W-T-L</th>
+            </tr>
           </thead>
           <tbody ref={tableRef}>
             {rankings.map((ranking) => (
