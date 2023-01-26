@@ -1,6 +1,6 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
-const fetch = require("node-fetch");
+const {get} = require("./frcEventsApiClient");
 import {
   ApiAvatars, ApiSchedule,
 } from "../apiTypes";
@@ -9,27 +9,14 @@ import {
  * Get the qualifications schedule for an event
  * @param {number} season The year
  * @param {string} eventCode The FRC event code
- * @param {string} token FRC API token (base-64 encoded)
  * @param {string} level The tournament level to fetch the schedule for
  * @return {Promise<ApiSchedule>} The schedule ("Schedule" will be empty if
  *  schedule not posted)
  */
 exports.getSchedule = async function(season: number, eventCode: string,
-    token: string, level: string = "qual"): Promise<ApiSchedule> {
-  const url = `https://frc-api.firstinspires.org/v3.0/${season}/schedule/` +
-  `${eventCode}?tournamentLevel=${level}`;
-  functions.logger.info("Getting schedule:", url);
-  const eventFetch = await fetch(url,
-      {
-        headers: {
-          "Authorization": "Basic " + token,
-          "Content-Type": "application/json",
-        },
-      }
-  );
-  if (!eventFetch.ok) throw new Error(eventFetch.statusText);
-
-  return await eventFetch.json() as ApiSchedule;
+    level: string = "qual"): Promise<ApiSchedule> {
+  return await get(`/${season}/schedule/${eventCode}`+
+    `?tournamentLevel=${level}`) as ApiSchedule;
 };
 
 /**
@@ -71,19 +58,8 @@ exports.updateQualSchedule = async function(schedule: ApiSchedule,
     try {
       // Magic string so we know that we already tried this team
       let avatar = "NONE";
-      const avatarFetch = await fetch(
-          `https://frc-api.firstinspires.org/v3.0/${season}/avatars` +
-            `?teamNumber=${team}`,
-          {
-            headers: {
-              "Authorization": "Basic " + token,
-              "Content-Type": "application/json",
-            },
-          }
-      );
-      if (!avatarFetch.ok) throw new Error(avatarFetch.statusText);
-
-      const avatarJson = await avatarFetch.json() as ApiAvatars;
+      const avatarJson =
+        await get(`/${season}/avatars?teamNumber=${team}`) as ApiAvatars;
 
       if ((avatarJson["teams"]?.length ?? 0) > 0 &&
             avatarJson["teams"][0]["encodedAvatar"]) {

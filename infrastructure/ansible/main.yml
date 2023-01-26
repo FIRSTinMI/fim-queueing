@@ -1,0 +1,21 @@
+# Initialize all the infrastructure necessary for fim-queueing. Note that this playbook will not actually create
+# VM instances, it'll just take a new instance and get it running
+
+- name: Get fim-job-runner IP
+  hosts: localhost
+  tasks:
+    - name: Fetch public IP from gcloud CLI
+      command: "gcloud compute instances describe fim-job-runner --format='get(networkInterfaces[0].accessConfigs[0].natIP)' --zone us-central1-a"
+      register: job_runner_ip
+      check_mode: no # This is a safe operation, always run it
+    - name: Add fim-job-runner to hosts
+      add_host:
+        hostname: '{{ job_runner_ip.stdout  }}'
+        groups: job_runner
+
+- name: Configure job-runner
+  hosts: job_runner
+  become: yes
+  become_method: sudo
+  roles:
+    - job-runner

@@ -29,7 +29,7 @@ function numberToOrdinal(num: number) {
 function Ranking(props: RankingProps): JSX.Element {
   const { teamNumber, ranking } = props;
   return (
-    <div className={[styles.newsticker].join(' ')}>
+    <div className={styles.newsticker}>
       <span className={styles.ranking}>{numberToOrdinal(ranking)}</span>
       <span className={styles.teamNumber}>{teamNumber}</span>
     </div>

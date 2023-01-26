@@ -1,0 +1,3 @@
+healthCheckEnabled: false
+healthCheckUrl: ""
+intervalSec: 10

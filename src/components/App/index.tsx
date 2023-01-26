@@ -1,49 +1,63 @@
-import { Component, h } from 'preact';
+import { h } from 'preact';
 import Cookies from 'js-cookie';
 import { initializeApp } from 'firebase/app';
 import {
   Database,
-  get, getDatabase, onValue, ref,
+  DataSnapshot,
+  get, getDatabase, off, onValue, ref,
 } from 'firebase/database';
 import {
   Analytics, getAnalytics, setUserProperties,
 } from 'firebase/analytics';
-import { Router, Route, route } from 'preact-router';
+import { Router, Route } from 'preact-router';
+import { useEffect, useState } from 'preact/hooks';
 
 import QualQueueing from '../QualDisplay/Queueing';
 import LoginForm from '../LoginForm';
-import { Event, Match } from '../../types';
+import { Event } from '../../types';
 import AnalyticsService from '../../analyticsService';
 import styles from './styles.scss';
 import ScreenChooser from '../ScreenChooser';
 import TeamRankings from '../RankingDisplay/TeamRankings';
 import PlayoffBracket from '../PlayoffBracket';
+import AppContext, { AppContextType } from '../../AppContext';
 
-type AppState = {
-  isAuthenticated: boolean;
-  event?: Event;
-  matches?: Match[];
-  season?: number;
-  connectionStatus?: 'online' | 'offline';
-  lastConnectedDate?: Date;
-};
+const App = () => {
+  const [db, setDb] = useState<Database>();
+  const [analytics, setAnalytics] = useState<Analytics>();
+  const [connection, setConnection] = useState<{
+    connectionStatus?: 'online' | 'offline', lastConnectedDate?: Date
+  }>();
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [appContext, setAppContext] = useState<AppContextType>({});
 
-export default class App extends Component<{}, AppState> {
-  private db: Database;
+  const onLogin = (token?: string) => {
+    if (appContext === undefined) throw new Error('appContext was undefined');
+    if (db === undefined) throw new Error('aaa db was undefined');
 
-  private analytics: Analytics;
+    setIsAuthenticated(true);
 
-  private pendingRedirect?: string = undefined;
+    onValue(ref(db, `/seasons/${appContext.season}/events/${token}`), (snap) => {
+      setAppContext({
+        event: snap.val() as Event,
+        token,
+        ...appContext,
+      });
+    });
 
-  constructor(props: {}) {
-    super(props);
-    this.state = {
-      isAuthenticated: false,
-    };
-    console.log('Initializing');
+    AnalyticsService.logEvent('login', { eventKey: token });
+    if (analytics !== undefined) {
+      setUserProperties(analytics, { eventKey: token });
+    }
+  };
 
-    this.onLogin = this.onLogin.bind(this);
+  useEffect(() => {
+    if (appContext.token === undefined) return;
+    onLogin(appContext.token);
+  }, [appContext.token]);
 
+  useEffect(() => {
+    console.log('Running initialization...');
     const firebaseConfig = {
       apiKey: process.env.PREACT_APP_FIRE_KEY,
       databaseURL: process.env.PREACT_APP_RTDB_URL,
@@ -53,112 +67,80 @@ export default class App extends Component<{}, AppState> {
     };
 
     initializeApp(firebaseConfig);
-    this.db = getDatabase();
-    this.analytics = getAnalytics();
-  }
+    const newDb = getDatabase();
+    setDb(newDb);
+    const newAnalytics = getAnalytics();
+    setAnalytics(newAnalytics);
 
-  async componentDidMount() {
-    // Give things a chance to load before we warn about network connectivity
-    window.setTimeout(() => {
-      onValue(ref(this.db, '.info/connected'), (snap) => {
-        const isConnected = snap.val();
-        console.log('connection', isConnected);
-        this.setState((prevState) => ({
-          connectionStatus: isConnected ? 'online' : 'offline',
-          lastConnectedDate: prevState.connectionStatus && !isConnected ? new Date() : undefined,
-        }));
+    // Give things a chance to load before we warn about network connectivity, up to two seconds
+    const connRef = ref(newDb, '.info/connected');
+    let connTimeoutRunning = true;
+    const connTimeout = window.setTimeout(() => {
+      connTimeoutRunning = false;
+      setConnection({
+        connectionStatus: 'offline',
+        lastConnectedDate: new Date(),
       });
     }, 2000);
 
-    const seasonData = await get(ref(this.db, '/current_season'));
-    if (!seasonData || !seasonData.exists) {
-      throw new Error('Unable to get season...');
-    }
-
-    const season = Number.parseInt(seasonData.val(), 10);
-
-    this.setState({
-      season,
-    });
-
-    const token = Cookies.get('queueing-event-key');
-
-    if (token !== undefined) {
-      this.setState({
-        isAuthenticated: true,
-      });
-
-      this.onLogin(token, season);
-    }
-  }
-
-  /**
-     * This should only be called once
-     * @param token Event key
-     */
-  async onLogin(token: string, season: number): Promise<void> {
-    this.setState({
-      isAuthenticated: true,
-    });
-
-    onValue(ref(this.db, `/seasons/${season}/events/${token}`), (snap) => {
-      this.setState({
-        event: snap.val() as Event,
+    if (newDb === undefined) throw new Error('This is bad');
+    onValue(connRef, (snap) => {
+      const isConnected = snap.val();
+      if (isConnected) {
+        clearTimeout(connTimeout);
+        connTimeoutRunning = false;
+      }
+      if (connTimeoutRunning) return;
+      console.log('connection', isConnected);
+      setConnection({
+        connectionStatus: isConnected ? 'online' : 'offline',
+        lastConnectedDate: connection?.connectionStatus && !isConnected ? new Date() : undefined,
       });
     });
 
-    onValue(ref(this.db, `/seasons/${season}/matches/${token}`), (snap) => {
-      this.setState({
-        matches: snap.val() as Match[],
+    // console.log(await installations.getId(installations.getInstallations()));
+    get(ref(newDb, '/current_season')).then((seasonData: DataSnapshot) => {
+      if (!seasonData || !seasonData.exists) {
+        throw new Error('Unable to get season...');
+      }
+
+      const season = Number.parseInt(seasonData.val(), 10);
+      const token = Cookies.get('queueing-event-key');
+
+      setAppContext({
+        season,
+        token,
+        ...appContext,
       });
     });
 
-    AnalyticsService.logEvent('login', { eventKey: token });
-    setUserProperties(this.analytics, { eventKey: token });
-    const lastLocation = Cookies.get('queueing-last-route');
-    if (lastLocation !== undefined) {
-      this.pendingRedirect = lastLocation;
-    }
-  }
+    return () => { off(connRef); };
+  }, []);
 
-  /**
-   * Save the user's latest route to a cookie so we can automatically redirect them back next time
-   * @param e Route change event
-   * @returns void
-   */
-  handleRoute = async (e: any) => {
-    if (this.pendingRedirect !== undefined) {
-      // Weird race condition things...
-      window.setTimeout(() => route(this.pendingRedirect!, false), 0);
-      this.pendingRedirect = undefined;
-      return;
-    }
-
-    const cookieExpirationDate = new Date();
-    cookieExpirationDate.setDate(cookieExpirationDate.getDate() + 3);
-    Cookies.set('queueing-last-route', e.url, {
-      expires: cookieExpirationDate,
-    });
-  };
-
-  render(): JSX.Element {
-    const {
-      isAuthenticated, event, season, matches, connectionStatus, lastConnectedDate,
-    } = this.state;
-    return (
-      <div id="preact_root" className={styles.app}>
-        { connectionStatus === 'offline' && <div className={styles.warningBar}>Check network connection. {lastConnectedDate && `Last connected ${lastConnectedDate?.toLocaleString([], { timeStyle: 'short' })}`}</div> }
-        { isAuthenticated && event == null && <div className={styles.infoText}>Loading...</div> }
-        { event != null && isAuthenticated && (
-          <Router onChange={this.handleRoute}>
-            <Route default component={ScreenChooser} event={event} season={season ?? 9999} />
-            <Route component={QualQueueing} path="/qual/queueing" event={event} qualMatches={matches} season={season ?? 9999} />
-            <Route component={TeamRankings} path="/rankings" event={event} season={season ?? 9999} />
-            <Route component={PlayoffBracket} path="/playoff/bracket" event={event} season={season ?? 9999} />
-          </Router>
-        ) }
-        { !isAuthenticated && <LoginForm season={season ?? 9999} onLogin={this.onLogin} /> }
-      </div>
+  let appContent: JSX.Element;
+  if (!appContext || (!isAuthenticated && connection?.connectionStatus === undefined)
+      || (isAuthenticated && appContext.event === undefined)) {
+    appContent = (<div className={styles.infoText}>Loading...</div>);
+  } else if (isAuthenticated && appContext.event !== undefined) {
+    appContent = (
+      <Router>
+        <Route default component={ScreenChooser} />
+        <Route component={QualQueueing} path="/qual/queueing" />
+        <Route component={TeamRankings} path="/rankings" />
+        <Route component={PlayoffBracket} path="/playoff/bracket" />
+      </Router>
     );
+  } else {
+    appContent = (<LoginForm onLogin={onLogin} />);
   }
-}
+  return (
+    <div id="preact_root" className={styles.app}>
+      <AppContext.Provider value={appContext ?? {}}>
+        { connection?.connectionStatus === 'offline' && <div className={styles.warningBar}>Check network connection. {connection.lastConnectedDate && `Last connected ${connection.lastConnectedDate?.toLocaleString([], { timeStyle: 'short' })}`}</div> }
+        { appContent }
+      </AppContext.Provider>
+    </div>
+  );
+};
+
+export default App;

@@ -1,0 +1,16 @@
+# Set up a fim-job-runner machine
+
+- name: Copy .service file to instance
+  template: 
+    src: fim-updateCurrentMatch.service.j2
+    dest: /etc/systemd/system/fim-updateCurrentMatch.service
+
+- name: Copy .timer file to instance
+  template:
+    src: fim-updateCurrentMatch.timer.j2
+    dest: /etc/systemd/system/fim-updateCurrentMatch.timer
+
+- name: Ensure timer is started
+  service:
+    name: fim-updateCurrentMatch.timer
+    enabled: true

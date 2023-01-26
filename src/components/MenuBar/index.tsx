@@ -6,8 +6,8 @@ import { Event } from '../../types';
 import styles from './styles.scss';
 
 type MenuBarProps = {
-  event: Event,
-  season: number,
+  event: Event | undefined,
+  season: number | undefined,
   alwaysShow?: boolean,
   options?: JSX.Element
 };

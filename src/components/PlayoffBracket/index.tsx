@@ -1,19 +1,14 @@
 import { h, Fragment } from 'preact';
-import { useEffect, useState } from 'preact/hooks';
+import { useContext, useEffect, useState } from 'preact/hooks';
 import {
   getDatabase, off, onValue, ref,
 } from 'firebase/database';
-import Cookies from 'js-cookie';
 import {
-  Alliance, Bracket, Event, PlayoffMatchup,
+  Alliance, Bracket, PlayoffMatchup,
 } from '../../types';
 import MenuBar from '../MenuBar';
 import styles from './styles.scss';
-
-type PlayoffBracketProps = {
-  event: Event,
-  season: number,
-};
+import AppContext from '../../AppContext';
 
 type MatchupSide = {
   alliance: number,
@@ -30,13 +25,13 @@ function toPairs(arr: PlayoffMatchup[]): PlayoffMatchup[][] {
 
 // FIXME: On Safari, sometimes this will not display properly on first render. The matchup box
 // won't be big enough and the check marks will be cut off. This does not occur 100% of the time.
-const PlayoffBracket = ({ event, season }: PlayoffBracketProps) => {
+const PlayoffBracket = () => {
+  const { event, season, token } = useContext(AppContext);
   const [alliances, setAlliances] = useState<Alliance[] | undefined>(undefined);
   const [bracket, setBracket] = useState<Bracket | undefined>(undefined);
 
   useEffect(() => {
-    const token = Cookies.get('queueing-event-key') as string;
-    if (!token) throw new Error('Token was somehow empty.');
+    if (!token) return () => {};
 
     console.log('running effect for', token, getDatabase());
     const alliancesRef = ref(getDatabase(), `/seasons/${season}/alliances/${token}`);
@@ -55,7 +50,7 @@ const PlayoffBracket = ({ event, season }: PlayoffBracketProps) => {
       off(alliancesRef);
       off(bracketRef);
     };
-  }, [season, event.eventCode]);
+  }, [season, event?.eventCode, token]);
 
   const MatchupSide = ({ color, side }: { color: 'red' | 'blue', side: MatchupSide | null }) => (
     <div className={[styles.participant, styles[color], side && side.wins >= 2 ? styles.winner : ''].join(' ')}>
