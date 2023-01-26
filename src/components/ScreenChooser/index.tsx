@@ -1,7 +1,7 @@
 import { h } from 'preact';
 import { Link } from 'preact-router';
 import { useContext } from 'preact/hooks';
-import AppContext from '../../appContext';
+import AppContext from '../../AppContext';
 import MenuBar from '../MenuBar';
 import styles from './styles.scss';
 

@@ -8,7 +8,7 @@ import {
 import { TeamRanking } from '../../../types';
 import MenuBar from '../../MenuBar';
 import styles from './styles.scss';
-import AppContext from '../../../appContext';
+import AppContext from '../../../AppContext';
 
 const TeamRankings = () => {
   const { event, season, token } = useContext(AppContext);

@@ -20,7 +20,7 @@ import styles from './styles.scss';
 import ScreenChooser from '../ScreenChooser';
 import TeamRankings from '../RankingDisplay/TeamRankings';
 import PlayoffBracket from '../PlayoffBracket';
-import AppContext, { AppContextType } from '../../appContext';
+import AppContext, { AppContextType } from '../../AppContext';
 
 const App = () => {
   const [db, setDb] = useState<Database>();

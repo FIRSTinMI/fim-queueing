@@ -13,7 +13,7 @@ import Ranking from '../../Tickers/Ranking';
 import RankingList from '../../Tickers/RankingList';
 import styles from './styles.scss';
 import MenuBar from '../../MenuBar';
-import AppContext from '../../../appContext';
+import AppContext from '../../../AppContext';
 
 type LoadingState = 'loading' | 'ready' | 'error' | 'noAutomatic';
 

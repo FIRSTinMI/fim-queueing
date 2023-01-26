@@ -5,7 +5,6 @@ import styles from './styles.scss';
 type MatchDisplayProps = {
   match: Match | null;
   // Temp disable till I figure out what to do with avatars
-  // eslint-disable-next-line react/no-unused-prop-types
   // teamAvatars: TeamAvatars | undefined;
   halfWidth?: boolean;
   className?: string;

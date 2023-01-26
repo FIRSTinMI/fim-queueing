@@ -2,7 +2,7 @@ import { get, getDatabase, ref } from 'firebase/database';
 import Cookies from 'js-cookie';
 import { h } from 'preact';
 import { useContext, useState } from 'preact/hooks';
-import AppContext from '../../appContext';
+import AppContext from '../../AppContext';
 
 import styles from './styles.scss';
 

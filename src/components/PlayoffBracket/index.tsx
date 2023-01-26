@@ -8,7 +8,7 @@ import {
 } from '../../types';
 import MenuBar from '../MenuBar';
 import styles from './styles.scss';
-import AppContext from '../../appContext';
+import AppContext from '../../AppContext';
 
 type MatchupSide = {
   alliance: number,
