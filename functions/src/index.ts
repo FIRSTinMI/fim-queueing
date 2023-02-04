@@ -9,7 +9,7 @@ functions.logger.info("Initialized Firebase app");
 exports.updateCurrentMatch = functions.pubsub.schedule("every 1 minutes")
     .onRun(async () => {
       initializeFrcEventsClient(process.env.FRC_API_TOKEN as string);
-      return await updateCurrentMatch()
+      return await updateCurrentMatch();
     });
 
 if (process.env.IS_LOCAL) {
