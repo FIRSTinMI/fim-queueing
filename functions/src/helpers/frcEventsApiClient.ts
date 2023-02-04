@@ -13,10 +13,6 @@ let baseUrl: string;
 const initializeFrcEventsClient =
   (apiKey: string, apiBaseUrl: string = "https://frc-api.firstinspires.org/v3.0")
   : void => {
-    if (authHeaderValue !== undefined || baseUrl !== undefined) {
-      throw new Error("frc.events API client has already been initialized");
-    }
-
     if (apiKey === null || apiKey === "") {
       throw new Error("frc.events API key is required");
     }
