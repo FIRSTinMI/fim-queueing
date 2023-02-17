@@ -10,7 +10,7 @@ import {
 import {
   Router, Route, RouterOnChangeArgs, route as navigateToRoute,
 } from 'preact-router';
-import { useEffect, useState } from 'preact/hooks';
+import { useEffect, useRef, useState } from 'preact/hooks';
 import { HubConnection, HubConnectionState } from '@microsoft/signalr';
 
 import styles from './styles.scss';
@@ -27,7 +27,7 @@ import PlayoffQueueing from '../PlayoffQueueing/Queueing';
 
 const App = () => {
   const [db, setDb] = useState<Database>();
-  const [hub, setHub] = useState<HubConnection | undefined>();
+  const hub = useRef<HubConnection | undefined>(undefined);
   const [connection, setConnection] = useState<{
     connectionStatus?: 'online' | 'offline', lastConnectedDate?: Date
   }>();
@@ -36,7 +36,7 @@ const App = () => {
   const [identifyTO, setIdentifyTO] = useState<ReturnType<typeof setTimeout> | null>(null);
 
   const sendCurrentStatus = async () => {
-    if (hub?.state !== HubConnectionState.Connected) {
+    if (hub.current?.state !== HubConnectionState.Connected) {
       console.log('Not connected to SignalR, not sending state');
       return;
     }
@@ -50,7 +50,7 @@ const App = () => {
       InstallationId: await getId(getInstallations(getApp())),
     };
 
-    hub?.invoke('UpdateInfo', info);
+    hub.current?.invoke('UpdateInfo', info);
   };
 
   const onLogin = (token?: string) => {
@@ -145,7 +145,7 @@ const App = () => {
     import(/* webpackChunkName: "signalr" */ '@microsoft/signalr').then(async (signalR) => {
       const cn = new signalR.HubConnectionBuilder()
         .withUrl(`${process.env.PREACT_APP_SIGNALR_SERVER}/DisplayHub`).withAutomaticReconnect().build();
-      setHub(cn);
+      hub.current = cn;
       cn.on('SendRefresh', async () => {
         // Clear caches and reload
         if ('caches' in window) {
@@ -202,8 +202,8 @@ const App = () => {
   }, [hub, appContext, appContext.event?.eventCode]);
 
   const onNewRoute = (route: RouterOnChangeArgs) => {
-    if (hub?.state !== HubConnectionState.Connected) return;
-    hub?.invoke('UpdateRoute', route.url);
+    if (hub.current?.state !== HubConnectionState.Connected) return;
+    hub.current?.invoke('UpdateRoute', route.url);
   };
 
   // Change what's rendered based on global application state
@@ -227,7 +227,7 @@ const App = () => {
 
   return (
     <div id="preact_root" className={styles.app}>
-      {identifyTO !== null && <div className={styles.identify}>{hub?.connectionId}</div>}
+      {identifyTO !== null && <div className={styles.identify}>{hub.current?.connectionId}</div>}
       <AppContext.Provider value={appContext ?? {}}>
         { connection?.connectionStatus === 'offline' && (
           <div className={styles.warningBar}>
