@@ -2,8 +2,9 @@ import { h, Fragment } from 'preact';
 import { route } from 'preact-router';
 import Cookies from 'js-cookie';
 import { useEffect, useState } from 'preact/hooks';
-import { Event } from '../../types';
+
 import styles from './styles.scss';
+import { Event } from '../../types';
 
 type MenuBarProps = {
   event: Event | undefined,
@@ -19,6 +20,11 @@ function onLogout(): void {
   window.location.reload();
 }
 
+/**
+ * A reusable menu bar component with a dynamic area for options.
+ * Always displays on mobile devices, and slides down upon mouse movement for
+ * desktop.
+ */
 const MenuBar = (props: MenuBarProps) => {
   const {
     event, season, alwaysShow, options,
@@ -49,7 +55,11 @@ const MenuBar = (props: MenuBarProps) => {
 
   if (event === undefined || season === undefined) return (<></>);
   return (
-    <div className={[styles.menu, showMenu ? '' : styles.hidden, alwaysShow ? styles.alwaysShow : ''].join(' ')}>
+    <div className={[
+      styles.menu,
+      showMenu ? '' : styles.hidden, alwaysShow ? styles.alwaysShow : '',
+    ].join(' ')}
+    >
       <div className={styles.eventName}>
         {event.name}
         {' '}
@@ -60,8 +70,18 @@ const MenuBar = (props: MenuBarProps) => {
           {options}
         </div>
         <div className={styles.buttons}>
-          <button type="button" onClick={(): boolean => route('/', false)}>Back to home</button>
-          <button type="button" onClick={(): void => onLogout()}>Log out</button>
+          <button
+            type="button"
+            onClick={(): boolean => route('/', false)}
+          >
+            Back to home
+          </button>
+          <button
+            type="button"
+            onClick={(): void => onLogout()}
+          >
+            Log out
+          </button>
         </div>
       </div>
     </div>

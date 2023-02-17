@@ -14,6 +14,7 @@ export default function ScreenChooser() {
         <li><Link href="/qual/queueing">Qualification Queueing</Link></li>
         <li><Link href="/rankings">Rankings</Link></li>
         <li><Link href="/playoff/bracket">Playoff Bracket</Link></li>
+        <li><Link href="/playoff/queueing">Playoff Queueing</Link></li>
       </ul>
     </div>
   );

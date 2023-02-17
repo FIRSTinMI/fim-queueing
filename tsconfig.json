@@ -55,7 +55,11 @@
         // "emitDecoratorMetadata": true,         /* Enables experimental support for emitting type metadata for decorators. */
 
         /* Advanced Options */
-        "skipLibCheck": true                      /* Skip type checking of declaration files. */
+        "skipLibCheck": true,                      /* Skip type checking of declaration files. */
+        "paths": {
+          "react": ["./node_modules/preact/compat/"],
+          "react-dom": ["./node_modules/preact/compat/"]
+        }
     },
-    "include": ["src/**/*", "tests/**/*"]
+    "include": ["src/**/*", "tests/**/*", "shared/**/*"]
 }

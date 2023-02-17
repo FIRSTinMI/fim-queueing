@@ -1,0 +1,55 @@
+// TODO: This file is full of a lot of magic ratios to
+// keep the text taking up as much space as possible on
+// all screen sizes. It makes me sad.
+
+.matchDisplay {
+    width: 100%;
+    display: grid; 
+    grid-template-columns: auto 3fr; 
+    grid-template-rows: 1fr 1fr; 
+    gap: 0 2vw;
+    grid-template-areas: 
+      "matchNumber ."
+      "matchNumber .";
+
+    .matchNumber { grid-area: matchNumber; }
+
+    align-items: center;
+
+    text-align: center;
+    // We want to account for both very wide&short and tall&narrow screens
+    font-size: min(7vh,9vw);
+
+    .red { 
+        color: red;
+
+        .avatar>img {
+            background-color: red;
+        }
+    }
+    .blue { 
+        color: blue;
+
+        .avatar>img {
+            background-color: blue;
+        }
+    }
+
+    .teamNums {
+      text-align: left;
+      display: grid;
+      grid-template-columns: auto 1fr 1fr 1fr;
+      gap: 3vw;
+      justify-content: space-between;
+      & > * {
+          font-weight: 700;
+      }
+    }
+
+    &.halfWidth {
+        font-size: min(5vh, 4vw);
+        @media only screen and (max-width: 1200px) {
+            font-size: min(4vh, 4vw);
+        }
+    }
+}
