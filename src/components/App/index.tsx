@@ -36,7 +36,10 @@ const App = () => {
   const [identifyTO, setIdentifyTO] = useState<ReturnType<typeof setTimeout> | null>(null);
 
   const sendCurrentStatus = async () => {
-    if (hub?.state !== HubConnectionState.Connected) return;
+    if (hub?.state !== HubConnectionState.Connected) {
+      console.log('Not connected to SignalR, not sending state');
+      return;
+    }
 
     console.log('Sending state to SignalR server', appContext);
 
@@ -187,7 +190,10 @@ const App = () => {
         sendCurrentStatus();
       });
       await cn.start();
-      sendCurrentStatus();
+      setTimeout(() => {
+        // This is really hacky, I'm not sure why I need to do this
+        sendCurrentStatus();
+      }, 2000);
     }).catch(((err) => console.error('Failed to load SignalR bundle', err)));
   }, []);
 
