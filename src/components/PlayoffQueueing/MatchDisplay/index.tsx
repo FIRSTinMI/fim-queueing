@@ -26,7 +26,14 @@ function MatchDisplay({ halfWidth, match, className }: MatchDisplayProps): JSX.E
     return (
       <div className={`${styles.matchDisplay} ${halfWidth === true ? styles.halfWidth : ''} ${className ?? ''}`}>
         {/* <span className={styles.matchNumber} /> */}
-        <div style={{ gridRow: '1 / span 2', gridColumn: '1 / -1', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{
+          gridRow: '1 / span 2',
+          gridColumn: '1 / -1',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+        >
           {match.customDisplayText}
         </div>
       </div>
@@ -86,9 +93,7 @@ function MatchDisplay({ halfWidth, match, className }: MatchDisplayProps): JSX.E
       <>
         <span className={styles.matchNumber}>{match?.num === 'F' ? 'F' : `M${match?.num}`}</span>
         {redContent}
-        {/* <span className={styles.blue}> */}
-          {blueContent}
-        {/* </span> */}
+        {blueContent}
       </>
     </div>
   );
