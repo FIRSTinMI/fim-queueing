@@ -33,6 +33,8 @@ const App = () => {
   }>();
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [appContext, setAppContext] = useState<AppContextType>({});
+  // Used to make sure sendCurrentStatus always has the latest
+  const appContextRef = useRef<AppContextType>();
   const [identifyTO, setIdentifyTO] = useState<ReturnType<typeof setTimeout> | null>(null);
 
   const sendCurrentStatus = async () => {
@@ -44,14 +46,18 @@ const App = () => {
     console.log('Sending state to SignalR server', appContext);
 
     const info = {
-      EventKey: appContext.token,
-      EventCode: appContext.event?.eventCode,
+      EventKey: appContextRef.current?.token,
+      EventCode: appContextRef.current?.event?.eventCode,
       Route: window?.location?.pathname,
       InstallationId: await getId(getInstallations(getApp())),
     };
 
     hub.current?.invoke('UpdateInfo', info);
   };
+
+  useEffect(() => {
+    appContextRef.current = appContext;
+  }, [appContext]);
 
   const onLogin = (token?: string) => {
     if (appContext === undefined) throw new Error('appContext was undefined');
