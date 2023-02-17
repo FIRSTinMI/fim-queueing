@@ -8,7 +8,6 @@ import {
   AppMode, Match, TeamRanking,
 } from '../../../types';
 import MatchDisplay from '../MatchDisplay';
-import AnalyticsService from '../../../analyticsService';
 import Ranking from '../../Tickers/Ranking';
 import RankingList from '../../Tickers/RankingList';
 import styles from './styles.scss';
@@ -107,8 +106,6 @@ const Queueing = () => {
     update(eventRef, {
       mode: appMode,
     });
-
-    AnalyticsService.logEvent('modeSwitch', {});
   };
 
   const handleKeyPress = (e: KeyboardEvent): void => {

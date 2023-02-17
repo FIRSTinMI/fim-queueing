@@ -1,0 +1,74 @@
+div.wrapper {
+  background-color: white;
+  border-radius: 0.25em;
+  border: 1px solid black;
+  font-size: 17px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: stretch;
+  height: 100%;
+}
+
+p.topText {
+  color: black;
+  font-weight: 700;
+
+  flex: 0 0 none;
+  text-align: center;
+  margin-bottom: 0.2rem;
+  min-height: 0;
+  margin-top: 0;
+  //border-bottom: 1px solid black;
+}
+
+div.styledMatch {
+  display: grid;
+  grid-template-columns: 100%;
+  grid-template-rows: 50% 50%;
+  flex-direction: column;
+  flex: 1 1 auto;
+  justify-content: space-between;
+}
+
+div.score {
+  justify-self: flex-end;
+  margin-left: auto;
+  margin-right: 0;
+  padding-left: 0.75em;
+  padding-right: 0.5em;
+
+  // Check marks
+  img {
+    height: 18px;
+  }
+  img:not(:first-of-type) {
+    margin-left: -3px;
+  }
+}
+
+div.side {
+  display: flex;
+  height: 100%;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0 0 1rem;
+
+  @mixin sideColors($name, $color) {
+    &.#{$name} {
+      box-shadow: inset 0.5rem 0 0 0 $color;
+      background-color: scale-color($color: $color, $lightness: 85%);
+    }
+  }
+  @include sideColors("red", #f00);
+  @include sideColors("blue", #00f);
+}
+
+div.line {
+  display: none;
+  height: 1px;
+
+  border-width: 1px;
+  border-style: solid;
+}
+

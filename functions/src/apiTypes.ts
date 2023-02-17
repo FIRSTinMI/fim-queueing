@@ -1,3 +1,5 @@
+import {DriverStation} from "../../shared/DbTypes";
+
 export type ApiSchedule = {
   "Schedule": {
     "field": string;
@@ -11,7 +13,7 @@ export type ApiSchedule = {
       "surrogate": boolean;
     }[]
   }[]
-}
+};
 
 export type ApiAvatars = {
   "teams": {
@@ -22,28 +24,30 @@ export type ApiAvatars = {
   "teamCountPage": number,
   "pageCurrent": number,
   "pageTotal": number
-}
+};
+
+export type ApiMatch = {
+  "actualStartTime": string;
+  "tournamentLevel": string;
+  "postResultTime": string;
+  "description": string;
+  "matchNumber": number;
+  "scoreRedFinal": number;
+  "scoreRedFoul": number;
+  "scoreRedAuto": number;
+  "scoreBlueFinal": number;
+  "scoreBlueFoul": number;
+  "scoreBlueAuto": number;
+  "teams": {
+      "teamNumber": number;
+      "station": DriverStation;
+      "dq": boolean;
+    }[],
+};
 
 export type ApiMatchResults = {
-  "Matches": {
-    "actualStartTime": string;
-    "tournamentLevel": string;
-    "postResultTime": string;
-    "description": string;
-    "matchNumber": number;
-    "scoreRedFinal": number;
-    "scoreRedFoul": number;
-    "scoreRedAuto": number;
-    "scoreBlueFinal": number;
-    "scoreBlueFoul": number;
-    "scoreBlueAuto": number;
-    "teams": {
-        "teamNumber": number;
-        "station": string;
-        "dq": boolean;
-      }[],
-    }[];
-  }
+  "Matches": ApiMatch[];
+};
 
 export type ApiRankings = {
   "Rankings": {
@@ -62,7 +66,7 @@ export type ApiRankings = {
     "dq": number;
     "matchesPlayed": number;
   }[]
-}
+};
 
 export type ApiAlliances = {
   "Alliances": {
@@ -76,4 +80,4 @@ export type ApiAlliances = {
     name: string
   }[],
   count: number
-}
+};

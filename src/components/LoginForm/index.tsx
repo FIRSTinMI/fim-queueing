@@ -1,15 +1,18 @@
+import { h } from 'preact';
 import { get, getDatabase, ref } from 'firebase/database';
 import Cookies from 'js-cookie';
-import { h } from 'preact';
 import { useContext, useState } from 'preact/hooks';
-import AppContext from '../../AppContext';
 
 import styles from './styles.scss';
+import AppContext from '../../AppContext';
 
 type LoginFormProps = {
   onLogin: (token: string) => void;
 };
 
+/**
+ * Form displayed to the user when they do not already have an event token.
+ */
 const LoginForm = ({ onLogin }: LoginFormProps) => {
   const appContext = useContext(AppContext);
   const [eventToken, setEventToken] = useState('');
@@ -56,10 +59,17 @@ const LoginForm = ({ onLogin }: LoginFormProps) => {
 
   return (
     <div>
-      {/* @ts-ignore */}
-      <form onSubmit={(e): void => { handleSubmit(e); }} className={styles.loginForm}>
+      <form
+        onSubmit={(e: Event): void => { handleSubmit(e); }}
+        className={styles.loginForm}
+      >
         <div>Enter your 10-character event key:</div>
-        <input type="password" maxLength={10} minLength={10} onInput={(e): void => setEventToken((e.target as HTMLInputElement).value)} />
+        <input
+          type="password"
+          maxLength={10}
+          minLength={10}
+          onInput={(e): void => setEventToken((e.target as HTMLInputElement).value)}
+        />
         <button type="submit">Log in</button>
       </form>
       { badToken && (

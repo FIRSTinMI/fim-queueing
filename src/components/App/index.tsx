@@ -1,35 +1,54 @@
 import { h } from 'preact';
 import Cookies from 'js-cookie';
-import { initializeApp } from 'firebase/app';
+import { getApp, initializeApp } from 'firebase/app';
 import {
-  Database,
-  DataSnapshot,
-  get, getDatabase, off, onValue, ref,
+  Database, DataSnapshot, get, getDatabase, off, onValue, ref,
 } from 'firebase/database';
 import {
-  Analytics, getAnalytics, setUserProperties,
-} from 'firebase/analytics';
-import { Router, Route } from 'preact-router';
+  getId, getInstallations,
+} from 'firebase/installations';
+import {
+  Router, Route, RouterOnChangeArgs, route as navigateToRoute,
+} from 'preact-router';
 import { useEffect, useState } from 'preact/hooks';
+import { HubConnection, HubConnectionState } from '@microsoft/signalr';
 
+import styles from './styles.scss';
 import QualQueueing from '../QualDisplay/Queueing';
 import LoginForm from '../LoginForm';
 import { Event } from '../../types';
-import AnalyticsService from '../../analyticsService';
-import styles from './styles.scss';
 import ScreenChooser from '../ScreenChooser';
 import TeamRankings from '../RankingDisplay/TeamRankings';
 import PlayoffBracket from '../PlayoffBracket';
 import AppContext, { AppContextType } from '../../AppContext';
+import PlayoffQueueing from '../PlayoffQueueing/Queueing';
+
+// TODO: Figure out why the event details sometimes aren't getting sent over to SignalR
 
 const App = () => {
   const [db, setDb] = useState<Database>();
-  const [analytics, setAnalytics] = useState<Analytics>();
+  const [hub, setHub] = useState<HubConnection | undefined>();
   const [connection, setConnection] = useState<{
     connectionStatus?: 'online' | 'offline', lastConnectedDate?: Date
   }>();
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [appContext, setAppContext] = useState<AppContextType>({});
+  const [identifyTO, setIdentifyTO] = useState<ReturnType<typeof setTimeout> | null>(null);
+
+  const sendCurrentStatus = async () => {
+    if (hub?.state !== HubConnectionState.Connected) return;
+
+    console.log('Sending state to SignalR server', appContext);
+
+    const info = {
+      EventKey: appContext.token,
+      EventCode: appContext.event?.eventCode,
+      Route: window?.location?.pathname,
+      InstallationId: await getId(getInstallations(getApp())),
+    };
+
+    hub?.invoke('UpdateInfo', info);
+  };
 
   const onLogin = (token?: string) => {
     if (appContext === undefined) throw new Error('appContext was undefined');
@@ -39,23 +58,22 @@ const App = () => {
 
     onValue(ref(db, `/seasons/${appContext.season}/events/${token}`), (snap) => {
       setAppContext({
+        ...appContext,
         event: snap.val() as Event,
         token,
-        ...appContext,
       });
-    });
 
-    AnalyticsService.logEvent('login', { eventKey: token });
-    if (analytics !== undefined) {
-      setUserProperties(analytics, { eventKey: token });
-    }
+      sendCurrentStatus();
+    });
   };
 
+  // Login if a token is available
   useEffect(() => {
     if (appContext.token === undefined) return;
     onLogin(appContext.token);
   }, [appContext.token]);
 
+  // Initialize app
   useEffect(() => {
     console.log('Running initialization...');
     const firebaseConfig = {
@@ -69,8 +87,6 @@ const App = () => {
     initializeApp(firebaseConfig);
     const newDb = getDatabase();
     setDb(newDb);
-    const newAnalytics = getAnalytics();
-    setAnalytics(newAnalytics);
 
     // Give things a chance to load before we warn about network connectivity, up to two seconds
     const connRef = ref(newDb, '.info/connected');
@@ -98,7 +114,6 @@ const App = () => {
       });
     });
 
-    // console.log(await installations.getId(installations.getInstallations()));
     get(ref(newDb, '/current_season')).then((seasonData: DataSnapshot) => {
       if (!seasonData || !seasonData.exists) {
         throw new Error('Unable to get season...');
@@ -108,35 +123,113 @@ const App = () => {
       const token = Cookies.get('queueing-event-key');
 
       setAppContext({
+        ...appContext,
         season,
         token,
-        ...appContext,
       });
     });
 
     return () => { off(connRef); };
   }, []);
 
+  /**
+   * We're intentionally loading in SignalR totally separately. While it's important for visibility,
+   * this loading slowly or failing to load should not cause any negative impacts on the app at all.
+   * Plus, using SignalR allows me to remove Google Analytics entirely.
+   */
+  useEffect(() => {
+    if (!process.env.PREACT_APP_SIGNALR_SERVER) return;
+    import(/* webpackChunkName: "signalr" */ '@microsoft/signalr').then(async (signalR) => {
+      const cn = new signalR.HubConnectionBuilder()
+        .withUrl(`${process.env.PREACT_APP_SIGNALR_SERVER}/DisplayHub`).withAutomaticReconnect().build();
+      setHub(cn);
+      cn.on('SendRefresh', async () => {
+        // Clear caches and reload
+        if ('caches' in window) {
+          caches.keys().then((names) => {
+            names.forEach(async (name) => {
+              await caches.delete(name);
+            });
+          });
+        }
+        window?.location?.reload();
+      });
+      cn.on('SendNewRoute', (route) => {
+        // Navigate within the SPA
+        navigateToRoute(route);
+      });
+      cn.on('Identify', () => {
+        // Display the connection ID
+        if (identifyTO !== null) clearTimeout(identifyTO);
+
+        setIdentifyTO(setTimeout(() => {
+          setIdentifyTO(null);
+        }, 15000));
+      });
+      cn.on('OverrideEventKey', async (eventToken) => {
+        try {
+          // TODO: Show error if unable to determine season
+          const event = await get(ref(getDatabase(), `/seasons/${appContext.season}/events/${eventToken}`));
+          if (!event) {
+            throw new Error('Unable to get event');
+          }
+
+          const end = new Date(event.child('end').val().replace(' ', 'T'));
+          Cookies.set('queueing-event-key', eventToken, {
+            expires: end,
+          });
+          onLogin(eventToken);
+        } catch (err) {
+          console.error(err);
+        }
+      });
+      cn.onreconnected(() => {
+        sendCurrentStatus();
+      });
+      await cn.start();
+      sendCurrentStatus();
+    }).catch(((err) => console.error('Failed to load SignalR bundle', err)));
+  }, []);
+
+  useEffect(() => {
+    sendCurrentStatus();
+  }, [hub, appContext, appContext.event?.eventCode]);
+
+  const onNewRoute = (route: RouterOnChangeArgs) => {
+    if (hub?.state !== HubConnectionState.Connected) return;
+    hub?.invoke('UpdateRoute', route.url);
+  };
+
+  // Change what's rendered based on global application state
   let appContent: JSX.Element;
   if (!appContext || (!isAuthenticated && connection?.connectionStatus === undefined)
       || (isAuthenticated && appContext.event === undefined)) {
     appContent = (<div className={styles.infoText}>Loading...</div>);
   } else if (isAuthenticated && appContext.event !== undefined) {
     appContent = (
-      <Router>
+      <Router onChange={onNewRoute}>
         <Route default component={ScreenChooser} />
         <Route component={QualQueueing} path="/qual/queueing" />
         <Route component={TeamRankings} path="/rankings" />
         <Route component={PlayoffBracket} path="/playoff/bracket" />
+        <Route component={PlayoffQueueing} path="/playoff/queueing" />
       </Router>
     );
   } else {
     appContent = (<LoginForm onLogin={onLogin} />);
   }
+
   return (
     <div id="preact_root" className={styles.app}>
+      {identifyTO !== null && <div className={styles.identify}>{hub?.connectionId}</div>}
       <AppContext.Provider value={appContext ?? {}}>
-        { connection?.connectionStatus === 'offline' && <div className={styles.warningBar}>Check network connection. {connection.lastConnectedDate && `Last connected ${connection.lastConnectedDate?.toLocaleString([], { timeStyle: 'short' })}`}</div> }
+        { connection?.connectionStatus === 'offline' && (
+          <div className={styles.warningBar}>
+            Check network connection.
+            {connection.lastConnectedDate
+              && ` Last connected ${connection.lastConnectedDate?.toLocaleString([], { timeStyle: 'short' })}`}
+          </div>
+        ) }
         { appContent }
       </AppContext.Provider>
     </div>

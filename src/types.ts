@@ -1,3 +1,5 @@
+// TODO: Move any relevant portions of this file to `shared`
+
 export type AppMode = 'automatic' | 'assisted';
 
 export type Event = {
