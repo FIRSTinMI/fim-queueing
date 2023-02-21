@@ -22,6 +22,7 @@ import TeamRankings from '../RankingDisplay/TeamRankings';
 import PlayoffBracket from '../PlayoffBracket';
 import AppContext, { AppContextType } from '../../AppContext';
 import PlayoffQueueing from '../PlayoffQueueing/Queueing';
+import LiveStream from '../LiveStream';
 
 // TODO: Figure out why the event details sometimes aren't getting sent over to SignalR
 
@@ -196,10 +197,10 @@ const App = () => {
         sendCurrentStatus();
       });
       await cn.start();
-      setTimeout(() => {
-        // This is really hacky, I'm not sure why I need to do this
-        sendCurrentStatus();
-      }, 2000);
+      // setTimeout(() => {
+      //   // This is really hacky, I'm not sure why I need to do this
+      //   sendCurrentStatus();
+      // }, 2000);
     }).catch(((err) => console.error('Failed to load SignalR bundle', err)));
   }, []);
 
@@ -225,6 +226,7 @@ const App = () => {
         <Route component={TeamRankings} path="/rankings" />
         <Route component={PlayoffBracket} path="/playoff/bracket" />
         <Route component={PlayoffQueueing} path="/playoff/queueing" />
+        <Route component={LiveStream} path="/stream" />
       </Router>
     );
   } else {
