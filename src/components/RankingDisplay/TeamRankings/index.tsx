@@ -10,6 +10,8 @@ import MenuBar from '../../MenuBar';
 import styles from './styles.scss';
 import AppContext from '../../../AppContext';
 
+const numFmt = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
 const TeamRankings = () => {
   const { event, season, token } = useContext(AppContext);
   const [rankings, setRankings] = useState<TeamRanking[]>([]);
@@ -27,7 +29,7 @@ const TeamRankings = () => {
   const tableRef: RefObject<HTMLTableSectionElement> = createRef();
   useEffect(() => {
     if (!tableRef.current) return;
-    tableRef.current.style.animationDuration = `${(tableRef.current.clientHeight / 75)}s`;
+    tableRef.current.style.animationDuration = `${(tableRef.current.clientHeight / 50)}s`;
   }, [tableRef]);
 
   return (
@@ -35,8 +37,7 @@ const TeamRankings = () => {
       <MenuBar event={event} season={season} />
       <div className={styles.teamRankings}>
         <div className={styles.betaBar}>
-          β -
-          This display is currently a work in progress. Utilize <u>frc.events</u> for official data.
+          β - Utilize <u>frc.events</u> for official data.
         </div>
         <table>
           <thead>
@@ -49,7 +50,13 @@ const TeamRankings = () => {
               <th>Charge</th>
               <th>Auto</th>
               {/* End game specific */}
-              <th>W-T-L</th>
+              <th className={styles.wtlCell}>
+                <span>W</span>
+                <span>-</span>
+                <span>T</span>
+                <span>-</span>
+                <span>L</span>
+              </th>
             </tr>
           </thead>
           <tbody ref={tableRef}>
@@ -57,13 +64,19 @@ const TeamRankings = () => {
               <tr key={ranking.rank}>
                 <td>{ranking.rank}</td>
                 <td>{ranking.teamNumber}</td>
-                <td>{ranking.rankingPoints}</td>
+                <td>{numFmt.format(ranking.rankingPoints)}</td>
                 {/* Game specific: 2023 */}
-                <td>{ranking.sortOrder2}</td>
-                <td>{ranking.sortOrder3}</td>
-                <td>{ranking.sortOrder4}</td>
+                <td>{numFmt.format(ranking.sortOrder2)}</td>
+                <td>{numFmt.format(ranking.sortOrder3)}</td>
+                <td>{numFmt.format(ranking.sortOrder4)}</td>
                 {/* End game specific */}
-                <td>{`${ranking.wins ?? 0}-${ranking.ties ?? 0}-${ranking.losses ?? 0}`}</td>
+                <td className={styles.wtlCell}>
+                  <span>{ranking.wins ?? 0}</span>
+                  <span>-</span>
+                  <span>{ranking.ties ?? 0}</span>
+                  <span>-</span>
+                  <span>{ranking.losses ?? 0}</span>
+                </td>
               </tr>
             ))}
           </tbody>

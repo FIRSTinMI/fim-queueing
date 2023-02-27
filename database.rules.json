@@ -5,6 +5,9 @@
     "current_season": {
       ".read": true
     },
+    "features": {
+      ".read": true
+    },
     "seasons": {
       "$season": {
         "events": {

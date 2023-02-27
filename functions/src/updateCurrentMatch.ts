@@ -8,6 +8,7 @@ const {
 } = require("./helpers/playoffs");
 import {ApiMatchResults, ApiRankings} from "./apiTypes";
 import {Event} from "../../shared/DbTypes";
+import {clearContext, getContext} from "./helpers/frcEventsApiClient";
 
 exports.updateCurrentMatch = async () => {
   const season = (await admin.database().ref("/current_season").get())
@@ -30,6 +31,11 @@ exports.updateCurrentMatch = async () => {
       }
 
       const event: Event = events[eventKey];
+
+      clearContext(event.eventCode, {
+        lastModifiedMs: event.lastModifiedMs ?? null,
+      });
+
       const startingState = event.state;
 
       if (event.state === "Pending" || event.state === undefined) {
@@ -71,12 +77,16 @@ exports.updateCurrentMatch = async () => {
         await updatePlayoffBracket(season, event, eventKey);
       }
 
-      if (event.state !== undefined && event.state !== startingState) {
+      const apiContext = getContext(event.eventCode);
+      if ((event.state !== undefined && event.state !== startingState) ||
+          (apiContext.lastModifiedMs &&
+            event.lastModifiedMs !== apiContext.lastModifiedMs)) {
         await admin.database()
             .ref(`/seasons/${season}/events/${eventKey}`)
             .update({
               state: event.state,
-            });
+              lastModifiedMs: apiContext.lastModifiedMs,
+            } as Partial<Event>);
       }
     }));
   } catch (e) {
@@ -94,7 +104,7 @@ exports.updateCurrentMatch = async () => {
 async function updateRankings(season: number, eventCode: string,
     eventKey: string): Promise<void> {
   const rankingJson =
-    await get(`/${season}/rankings/${eventCode}`) as ApiRankings;
+    await get(`/${season}/rankings/${eventCode}`, eventCode) as ApiRankings;
 
   if ((rankingJson["Rankings"]?.length ?? 0) > 0) {
     const rankings = rankingJson["Rankings"].map((x) => ({
@@ -129,7 +139,8 @@ async function setCurrentQualMatch(season: number, event: Event,
   try {
     const results = await get(`/${season}/matches/${event.eventCode}` +
         "?tournamentLevel=qual" +
-        `&start=${event.currentMatchNumber ?? 1}`) as ApiMatchResults;
+        `&start=${event.currentMatchNumber ?? 1}`,
+    event.eventCode) as ApiMatchResults;
 
     const latestMatch = results["Matches"]
         .filter((x: any) => x.actualStartTime != null)

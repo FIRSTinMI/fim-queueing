@@ -1,4 +1,4 @@
-import { h } from 'preact';
+import { h, Fragment } from 'preact';
 import Cookies from 'js-cookie';
 import { getApp, initializeApp } from 'firebase/app';
 import {
@@ -23,6 +23,7 @@ import PlayoffBracket from '../PlayoffBracket';
 import AppContext, { AppContextType } from '../../AppContext';
 import PlayoffQueueing from '../PlayoffQueueing/Queueing';
 import LiveStream from '../LiveStream';
+import StaleDataBanner from '../StaleDataBanner';
 
 // TODO: Figure out why the event details sometimes aren't getting sent over to SignalR
 
@@ -33,7 +34,13 @@ const App = () => {
     connectionStatus?: 'online' | 'offline', lastConnectedDate?: Date
   }>();
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+
   const [appContext, setAppContext] = useState<AppContextType>({});
+  const [acFeatures, setFeatures] = useState<any>();
+  const [acSeason, setSeason] = useState<any>();
+  const [acEvent, setEvent] = useState<any>();
+  const [acToken, setToken] = useState<any>();
+
   // Used to make sure sendCurrentStatus always has the latest
   const appContextRef = useRef<AppContextType>();
   const [identifyTO, setIdentifyTO] = useState<ReturnType<typeof setTimeout> | null>(null);
@@ -44,7 +51,7 @@ const App = () => {
       return;
     }
 
-    console.log('Sending state to SignalR server', appContext);
+    console.log('Sending state to SignalR server', appContextRef.current);
 
     const info = {
       EventKey: appContextRef.current?.token,
@@ -60,6 +67,22 @@ const App = () => {
     appContextRef.current = appContext;
   }, [appContext]);
 
+  useEffect(() => {
+    const newCtx = {
+      features: acFeatures,
+      event: acEvent,
+      season: acSeason,
+      token: acToken,
+    };
+    console.log('updating context', newCtx);
+    setAppContext(newCtx);
+    appContextRef.current = appContext;
+  }, [acFeatures, acEvent, acSeason, acToken]);
+
+  useEffect(() => {
+    sendCurrentStatus();
+  }, [hub.current, appContext, appContext.event?.eventCode]);
+
   const onLogin = (token?: string) => {
     if (appContext === undefined) throw new Error('appContext was undefined');
     if (db === undefined) throw new Error('aaa db was undefined');
@@ -67,11 +90,8 @@ const App = () => {
     setIsAuthenticated(true);
 
     onValue(ref(db, `/seasons/${appContext.season}/events/${token}`), (snap) => {
-      setAppContext({
-        ...appContext,
-        event: snap.val() as Event,
-        token,
-      });
+      setEvent(snap.val() as Event);
+      setToken(token);
 
       sendCurrentStatus();
     });
@@ -132,11 +152,8 @@ const App = () => {
       const season = Number.parseInt(seasonData.val(), 10);
       const token = Cookies.get('queueing-event-key');
 
-      setAppContext({
-        ...appContext,
-        season,
-        token,
-      });
+      setSeason(season);
+      setToken(token);
     });
 
     return () => { off(connRef); };
@@ -166,7 +183,11 @@ const App = () => {
       });
       cn.on('SendNewRoute', (route) => {
         // Navigate within the SPA
-        navigateToRoute(route);
+        if (route[0] === '/') {
+          navigateToRoute(route);
+        } else {
+          window.location = route;
+        }
       });
       cn.on('Identify', () => {
         // Display the connection ID
@@ -197,6 +218,7 @@ const App = () => {
         sendCurrentStatus();
       });
       await cn.start();
+      sendCurrentStatus();
       // setTimeout(() => {
       //   // This is really hacky, I'm not sure why I need to do this
       //   sendCurrentStatus();
@@ -205,8 +227,20 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    sendCurrentStatus();
-  }, [hub, appContext, appContext.event?.eventCode]);
+    if (!db) {
+      return () => {};
+    }
+    const featuresRef = ref(db!, '/features');
+    onValue(featuresRef, (snap: DataSnapshot) => {
+      if (!snap || !snap.exists()) {
+        console.error('Unable to get features');
+      }
+
+      setFeatures(snap.val());
+    });
+
+    return () => off(featuresRef);
+  }, [db]);
 
   const onNewRoute = (route: RouterOnChangeArgs) => {
     if (hub.current?.state !== HubConnectionState.Connected) return;
@@ -220,14 +254,17 @@ const App = () => {
     appContent = (<div className={styles.infoText}>Loading...</div>);
   } else if (isAuthenticated && appContext.event !== undefined) {
     appContent = (
-      <Router onChange={onNewRoute}>
-        <Route default component={ScreenChooser} />
-        <Route component={QualQueueing} path="/qual/queueing" />
-        <Route component={TeamRankings} path="/rankings" />
-        <Route component={PlayoffBracket} path="/playoff/bracket" />
-        <Route component={PlayoffQueueing} path="/playoff/queueing" />
-        <Route component={LiveStream} path="/stream" />
-      </Router>
+      <>
+        <StaleDataBanner />
+        <Router onChange={onNewRoute}>
+          <Route default component={ScreenChooser} />
+          <Route component={QualQueueing} path="/qual/queueing" />
+          <Route component={TeamRankings} path="/rankings" />
+          <Route component={PlayoffBracket} path="/playoff/bracket" />
+          <Route component={PlayoffQueueing} path="/playoff/queueing" />
+          <Route component={LiveStream} path="/stream" />
+        </Router>
+      </>
     );
   } else {
     appContent = (<LoginForm onLogin={onLogin} />);

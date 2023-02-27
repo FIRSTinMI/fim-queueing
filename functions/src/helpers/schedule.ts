@@ -1,8 +1,8 @@
-const functions = require("firebase-functions");
+// const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 const {get} = require("./frcEventsApiClient");
 import {
-  ApiAvatars, ApiSchedule,
+  /* ApiAvatars, */ ApiSchedule,
 } from "../apiTypes";
 
 /**
@@ -16,7 +16,7 @@ import {
 exports.getSchedule = async function(season: number, eventCode: string,
     level: string = "qual"): Promise<ApiSchedule> {
   return await get(`/${season}/schedule/${eventCode}`+
-    `?tournamentLevel=${level}`) as ApiSchedule;
+    `?tournamentLevel=${level}`, eventCode) as ApiSchedule;
 };
 
 /**
@@ -48,29 +48,29 @@ exports.updateQualSchedule = async function(schedule: ApiSchedule,
   teamsAtEvent = teamsAtEvent.filter(
       (val, idx, self) => self.indexOf(val) === idx);
 
-  const teamsWithAvatars = Object.keys(await admin.database()
-      .ref(`/seasons/${season}/avatars`).get());
+  // const teamsWithAvatars = Object.keys(await admin.database()
+  //     .ref(`/seasons/${season}/avatars`).get());
 
-  const teamsThatNeedAvatars = teamsAtEvent.filter(
-      (x) => !teamsWithAvatars.includes(x));
+  // const teamsThatNeedAvatars = teamsAtEvent.filter(
+  //     (x) => !teamsWithAvatars.includes(x));
 
-  teamsThatNeedAvatars.forEach(async (team) => {
-    try {
-      // Magic string so we know that we already tried this team
-      let avatar = "NONE";
-      const avatarJson =
-        await get(`/${season}/avatars?teamNumber=${team}`) as ApiAvatars;
+  // teamsThatNeedAvatars.forEach(async (team) => {
+  //   try {
+  //     // Magic string so we know that we already tried this team
+  //     let avatar = "NONE";
+  //     const avatarJson =
+  //       await get(`/${season}/avatars?teamNumber=${team}`) as ApiAvatars;
 
-      if ((avatarJson["teams"]?.length ?? 0) > 0 &&
-            avatarJson["teams"][0]["encodedAvatar"]) {
-        avatar = avatarJson["teams"][0]["encodedAvatar"];
-      }
+  //     if ((avatarJson["teams"]?.length ?? 0) > 0 &&
+  //           avatarJson["teams"][0]["encodedAvatar"]) {
+  //       avatar = avatarJson["teams"][0]["encodedAvatar"];
+  //     }
 
-      admin.database().ref(`/seasons/${season}/avatars/${team}`).set(
-          avatar
-      );
-    } catch (e) {
-      functions.logger.warn(`Unable to fetch avatar for team ${team}`);
-    }
-  });
+  //     admin.database().ref(`/seasons/${season}/avatars/${team}`).set(
+  //         avatar
+  //     );
+  //   } catch (e) {
+  //     functions.logger.warn(`Unable to fetch avatar for team ${team}`);
+  //   }
+  // });
 };

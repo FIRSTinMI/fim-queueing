@@ -18,7 +18,8 @@ exports.populateAlliances = async function(season: number, event: Event,
   let alliances: ApiAlliances | undefined;
   try {
     const {eventCode} = event;
-    alliances = await get(`/${season}/alliances/${eventCode}`) as ApiAlliances;
+    alliances =
+      await get(`/${season}/alliances/${eventCode}`, eventCode) as ApiAlliances;
   } catch (e) {
     // The FRC API seems to just error out sometimes fetching alliances...
     functions.logger.warn(
@@ -48,7 +49,7 @@ exports.updatePlayoffBracket = async function(season: number, event: Event,
   const {eventCode} = event;
   // TODO: Update this hardcoded season which is being used for testing
   const matches = await get(`/${season}/matches/${eventCode}` +
-    "?tournamentLevel=playoff") as ApiMatchResults;
+    "?tournamentLevel=playoff", eventCode) as ApiMatchResults;
 
   const playoffMatchInfo: Partial<
       Record<BracketMatchNumber, PlayoffMatch>> = {};

@@ -39,7 +39,7 @@
     tbody {
       height: 100%;
       animation-name: ticker;
-      animation-duration: 10s;
+      animation-duration: 20s;
       animation-iteration-count: infinite;
       animation-timing-function: linear;
       transform-style: preserve-3d;
@@ -47,6 +47,18 @@
 
     td {
       padding-inline: 15px;
+    }
+
+    tr:nth-child(even) {
+      background-color: #0001
+    }
+
+    .wtlCell {
+      display: grid; grid-template-columns: 2fr 1fr 2fr 1fr 2fr;
+
+      span {
+        margin: 0 auto;
+      }
     }
   }
   

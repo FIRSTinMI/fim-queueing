@@ -10,6 +10,7 @@ export type Event = {
   currentMatchNumber: number | null;
   hasQualSchedule: boolean;
   streamEmbedLink?: string;
+  lastModifiedMs: number | null;
   mode: AppMode;
   options?: {
     showRankings?: boolean;

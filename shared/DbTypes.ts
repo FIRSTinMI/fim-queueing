@@ -11,6 +11,11 @@ export type Event = {
   currentMatchNumber: number | null,
   mode: AppMode,
   state: EventState,
+  /**
+   * The timestamp of the most recent data we have from the FRC API, in ms since
+   * the Unix epoch. This number will only ever stay the same or get bigger
+   */
+  lastModifiedMs: number | null,
   options: {
     showRankings: boolean
   }
