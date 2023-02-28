@@ -108,7 +108,7 @@ const get = async (endpoint: string, eventCode: string | undefined = undefined
     const lastModifiedMs = Date.parse(lastModified);
     let ctx = context[eventCode];
     if (!ctx) ctx = defaultContext;
-    if (ctx.lastModifiedMs && ctx.lastModifiedMs < lastModifiedMs) {
+    if (!ctx.lastModifiedMs || ctx.lastModifiedMs < lastModifiedMs) {
       ctx.lastModifiedMs = lastModifiedMs;
     }
   }
