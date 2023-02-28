@@ -33,7 +33,11 @@ exports.updateQualSchedule = async function(schedule: ApiSchedule,
   admin
       .database()
       .ref(`/seasons/${season}/events/${eventKey}`)
-      .update({mode: "automatic", hasQualSchedule: true});
+      .update({
+        mode: "automatic",
+        hasQualSchedule: true,
+        numQualMatches: matchSchedule.length,
+      });
 
   admin
       .database()

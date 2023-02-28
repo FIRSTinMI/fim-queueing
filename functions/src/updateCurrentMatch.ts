@@ -157,10 +157,12 @@ async function setCurrentQualMatch(season: number, event: Event,
           .update({
             currentMatchNumber: latestMatch.matchNumber + 1,
           });
-    }
 
-    if (latestMatch.matchNumber > results["Matches"].length) {
-      event.state = "AwaitingAlliances";
+      const lastScheduledMatchNumber = event.numQualMatches;
+      if (lastScheduledMatchNumber &&
+        latestMatch.matchNumber + 1 > lastScheduledMatchNumber) {
+        event.state = "AwaitingAlliances";
+      }
     }
   } catch (e) {
     functions.logger.error(e);

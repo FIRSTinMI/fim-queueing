@@ -9,6 +9,7 @@ export type Event = {
   name: string,
   eventCode: string,
   currentMatchNumber: number | null,
+  numQualMatches: number | null,
   mode: AppMode,
   state: EventState,
   /**
