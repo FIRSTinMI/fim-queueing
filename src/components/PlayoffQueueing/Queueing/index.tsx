@@ -91,7 +91,7 @@ const PlayoffQueueing = () => {
         nextMatch: matchDisplays[currentMatchIndex + 1],
         // By default, we'll take the three matches after the one on deck
         queueingMatches: [2, 3, 4].map((x) => matchDisplays[currentMatchIndex + x])
-          .filter((x) => x !== null) as PlayoffMatchDisplay[],
+          .filter((x) => x !== undefined) as PlayoffMatchDisplay[],
       });
       setLoadingState('ready');
     } catch (e) {
@@ -155,7 +155,7 @@ const PlayoffQueueing = () => {
                 <MatchDisplay
                   className={styles.queueingMatches}
                   match={x}
-                  key={x.num}
+                  key={x?.num}
                 />
               ))}
             </div>
