@@ -36,9 +36,9 @@ const TeamRankings = () => {
     <>
       <MenuBar event={event} season={season} />
       <div className={styles.teamRankings}>
-        <div className={styles.betaBar}>
+        {/* <div className={styles.betaBar}>
           β - Utilize <u>frc.events</u> for official data.
-        </div>
+        </div> */}
         <table>
           <thead>
             <tr>
