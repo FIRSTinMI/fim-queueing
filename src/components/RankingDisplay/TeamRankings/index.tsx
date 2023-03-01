@@ -44,7 +44,7 @@ const TeamRankings = () => {
             <tr>
               <th>Rank</th>
               <th>Team #</th>
-              <th>RP</th>
+              <th>RS</th>
               {/* Game specific: 2023 */}
               <th>Match</th>
               <th>Charge</th>
