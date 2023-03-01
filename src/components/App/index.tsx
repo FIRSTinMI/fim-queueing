@@ -37,9 +37,9 @@ const App = () => {
 
   const [appContext, setAppContext] = useState<AppContextType>({});
   const [acFeatures, setFeatures] = useState<any>();
-  const [acSeason, setSeason] = useState<any>();
-  const [acEvent, setEvent] = useState<any>();
-  const [acToken, setToken] = useState<any>();
+  const [acSeason, setSeason] = useState<number | undefined>();
+  const [acEvent, setEvent] = useState<Event | undefined>();
+  const [acToken, setToken] = useState<string | undefined>();
 
   // Used to make sure sendCurrentStatus always has the latest
   const appContextRef = useRef<AppContextType>();
@@ -74,14 +74,13 @@ const App = () => {
       season: acSeason,
       token: acToken,
     };
-    console.log('updating context', newCtx);
     setAppContext(newCtx);
     appContextRef.current = appContext;
   }, [acFeatures, acEvent, acSeason, acToken]);
 
   useEffect(() => {
     sendCurrentStatus();
-  }, [hub.current, appContext, appContext.event?.eventCode]);
+  }, [hub.current, appContext.token, appContext.event?.eventCode, acEvent?.eventCode]);
 
   const onLogin = (token?: string) => {
     if (appContext === undefined) throw new Error('appContext was undefined');
@@ -92,8 +91,6 @@ const App = () => {
     onValue(ref(db, `/seasons/${appContext.season}/events/${token}`), (snap) => {
       setEvent(snap.val() as Event);
       setToken(token);
-
-      sendCurrentStatus();
     });
   };
 

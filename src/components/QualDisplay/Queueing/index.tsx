@@ -2,10 +2,12 @@ import { h, Fragment } from 'preact';
 import {
   DatabaseReference, getDatabase, child, ref, update, onValue, off,
 } from 'firebase/database';
-import { useContext, useEffect, useState } from 'preact/hooks';
+import {
+  useContext, useEffect, useState, useRef,
+} from 'preact/hooks';
 
 import {
-  AppMode, Match, TeamRanking,
+  AppMode, Match, TeamRanking, Event
 } from '../../../types';
 import MatchDisplay from '../MatchDisplay';
 import Ranking from '../../Tickers/Ranking';
@@ -22,6 +24,8 @@ const Queueing = () => {
 
   const [loadingState, setLoadingState] = useState<LoadingState>('loading');
   const [eventRef, setEventRef] = useState<DatabaseReference>();
+  const eventRefRef = useRef<DatabaseReference>();
+  const eventButItsARef = useRef<Event>(event);
   const [qualMatches, setQualMatches] = useState<Match[]>([]);
   const [displayMatches, setDisplayMatches] = useState<{
     currentMatch: Match | null,
@@ -29,6 +33,14 @@ const Queueing = () => {
     queueingMatches: Match[]
   }>({ currentMatch: null, nextMatch: null, queueingMatches: [] });
   const [rankings, setRankings] = useState<TeamRanking[]>([]);
+
+  useEffect(() => {
+    eventRefRef.current = eventRef;
+  }, [eventRef]);
+
+  useEffect(() => {
+    eventButItsARef.current = event;
+  }, [event]);
 
   useEffect(() => {
     if (!token) return () => {};
@@ -46,19 +58,19 @@ const Queueing = () => {
   }, [event.eventCode, season, token]);
 
   const decrementMatchNumber = (): void => {
-    if (eventRef === undefined) throw new Error('No event ref');
     if (event.mode !== 'assisted') return;
-    const matchNumber = event.currentMatchNumber ?? 0;
-    update(eventRef, {
+    if (eventRefRef.current === undefined) throw new Error('No event ref');
+    const matchNumber = eventButItsARef.current.currentMatchNumber ?? 0;
+    update(eventRefRef.current, {
       currentMatchNumber: matchNumber - 1,
     });
   };
 
   const incrementMatchNumber = (): void => {
     if (event.mode !== 'assisted') return;
-    if (eventRef === undefined) throw new Error('No event ref');
-    const matchNumber = event.currentMatchNumber ?? 0;
-    update(eventRef, {
+    if (eventRefRef.current === undefined) throw new Error('No event ref');
+    const matchNumber = eventButItsARef.current.currentMatchNumber ?? 0;
+    update(eventRefRef.current, {
       currentMatchNumber: matchNumber + 1,
     });
   };
@@ -71,8 +83,8 @@ const Queueing = () => {
     const matchNumber = event.currentMatchNumber;
 
     if (matchNumber === null || matchNumber === undefined) {
-      if (eventRef === undefined) throw new Error('No event ref');
-      update(eventRef, {
+      if (eventRefRef.current === undefined) throw new Error('No event ref');
+      update(eventRefRef.current, {
         currentMatchNumber: 1,
       });
       return;
@@ -95,7 +107,7 @@ const Queueing = () => {
   };
 
   const swapMode = (mode: AppMode | null = null): void => {
-    if (eventRef === undefined) throw new Error('No event ref');
+    if (eventRefRef.current === undefined) throw new Error('No event ref');
     let appMode = mode;
     if (appMode === null) appMode = event.mode === 'assisted' ? 'automatic' : 'assisted';
     if (appMode === 'assisted') {
@@ -103,7 +115,7 @@ const Queueing = () => {
         updateMatches();
       }
     }
-    update(eventRef, {
+    update(eventRefRef.current, {
       mode: appMode,
     });
   };
@@ -125,15 +137,15 @@ const Queueing = () => {
   };
 
   const setShowEventName = (value: boolean): void => {
-    if (eventRef === undefined) throw new Error('No event ref');
-    update(child(eventRef, 'options'), {
+    if (eventRefRef.current === undefined) throw new Error('No event ref');
+    update(child(eventRefRef.current, 'options'), {
       showEventName: value,
     });
   };
 
   const setShowRankings = (value: boolean): void => {
-    if (eventRef === undefined) throw new Error('No event ref');
-    update(child(eventRef, 'options'), {
+    if (eventRefRef.current === undefined) throw new Error('No event ref');
+    update(child(eventRefRef.current, 'options'), {
       showRankings: value,
     });
   };
