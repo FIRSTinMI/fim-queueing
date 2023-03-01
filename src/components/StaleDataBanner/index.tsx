@@ -1,7 +1,8 @@
 import { h, Fragment } from 'preact';
-import { useContext, useRef, useState } from 'preact/hooks';
-import { useEffect } from 'react';
-import AppContext from '../../AppContext';
+import {
+  useContext, useEffect, useRef, useState,
+} from 'preact/hooks';
+import AppContext, { AppContextType } from '../../AppContext';
 import styles from './styles.scss';
 
 const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
@@ -14,17 +15,26 @@ const units = {
 
 const StaleDataBanner = (): JSX.Element => {
   const context = useContext(AppContext);
+  const contextRef = useRef<AppContextType>();
   const intervalRef = useRef<ReturnType<typeof setTimeout> | null>();
   const [isShown, setIsShown] = useState<boolean>(false);
   const [asOf, setAsOf] = useState<string | null>(null);
 
+  useEffect(() => {
+    contextRef.current = context;
+  }, [context]);
+
   const checkStaleness = () => {
+    // When this function runs under the setInterval, it needs access to the most recent context...
+    // TODO(@evanlihou): check this again when I have more time
+    const ctx = contextRef.current;
+
     // If the data is more than 15 minutes old
-    if (context?.event?.lastModifiedMs
-      && Date.now() - (15 * units.minute) > context.event.lastModifiedMs) {
+    if (ctx?.event?.lastModifiedMs
+      && Date.now() - (15 * units.minute) > ctx.event.lastModifiedMs) {
       // Show the banner
       setIsShown(true);
-      const elapsed = context.event.lastModifiedMs - Date.now();
+      const elapsed = ctx.event.lastModifiedMs - Date.now();
 
       const [unit, val] = Object.entries(units).filter(([u, v]) => Math.abs(elapsed) > v || u === 'second')[0];
       if (Math.abs(elapsed) > val || unit === 'second') {
