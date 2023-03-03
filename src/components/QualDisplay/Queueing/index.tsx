@@ -7,7 +7,7 @@ import {
 } from 'preact/hooks';
 
 import {
-  AppMode, Match, TeamRanking, Event
+  AppMode, Match, TeamRanking, Event,
 } from '../../../types';
 import MatchDisplay from '../MatchDisplay';
 import Ranking from '../../Tickers/Ranking';
@@ -83,7 +83,7 @@ const Queueing = () => {
     const matchNumber = event.currentMatchNumber;
 
     if (matchNumber === null || matchNumber === undefined) {
-      if (eventRefRef.current === undefined) throw new Error('No event ref');
+      if (eventRefRef.current === undefined) return; // throw new Error('No event ref');
       update(eventRefRef.current, {
         currentMatchNumber: 1,
       });
