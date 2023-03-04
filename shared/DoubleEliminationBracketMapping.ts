@@ -105,8 +105,8 @@ const DoubleEliminationBracketMapping: BracketMapping = {
       y: 180,
       winsRequired: 1,
       participants: {
-        red: { allianceNumber: 3 },
-        blue: { allianceNumber: 6 },
+        red: { allianceNumber: 2 },
+        blue: { allianceNumber: 7 },
       },
     },
     {
@@ -115,8 +115,8 @@ const DoubleEliminationBracketMapping: BracketMapping = {
       y: 270,
       winsRequired: 1,
       participants: {
-        red: { allianceNumber: 2 },
-        blue: { allianceNumber: 7 },
+        red: { allianceNumber: 3 },
+        blue: { allianceNumber: 6 },
       },
     },
     // Lower bracket, round 2
