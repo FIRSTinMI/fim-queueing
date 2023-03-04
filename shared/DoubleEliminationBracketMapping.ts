@@ -189,8 +189,8 @@ const DoubleEliminationBracketMapping: BracketMapping = {
       y: 445,
       winsRequired: 1,
       participants: {
-        red: { winnerFrom: 10 },
-        blue: { winnerFrom: 9 },
+        red: { winnerFrom: 7 },
+        blue: { winnerFrom: 8 },
       },
     },
     // Upper bracket, round 4
@@ -200,8 +200,8 @@ const DoubleEliminationBracketMapping: BracketMapping = {
       y: 135,
       winsRequired: 1,
       participants: {
-        red: { winnerFrom: 7 },
-        blue: { winnerFrom: 8 },
+        red: { winnerFrom: 10 },
+        blue: { winnerFrom: 9 },
       },
     },
     // Lower bracket, round 5
@@ -211,8 +211,8 @@ const DoubleEliminationBracketMapping: BracketMapping = {
       y: 445,
       winsRequired: 1,
       participants: {
-        red: { loserFrom: 12 },
-        blue: { winnerFrom: 11 },
+        red: { loserFrom: 11 },
+        blue: { winnerFrom: 12 },
       },
     },
     // Final
@@ -223,7 +223,7 @@ const DoubleEliminationBracketMapping: BracketMapping = {
       y: 200,
       winsRequired: 2,
       participants: {
-        red: { winnerFrom: 12 },
+        red: { winnerFrom: 11 },
         blue: { winnerFrom: 13 },
       },
     },
