@@ -186,7 +186,7 @@ const DoubleEliminationBracketMapping: BracketMapping = {
     {
       number: 11,
       round: 'Round 4',
-      y: 445,
+      y: 135,
       winsRequired: 1,
       participants: {
         red: { winnerFrom: 7 },
@@ -197,7 +197,7 @@ const DoubleEliminationBracketMapping: BracketMapping = {
     {
       number: 12,
       round: 'Round 4',
-      y: 135,
+      y: 445,
       winsRequired: 1,
       participants: {
         red: { winnerFrom: 10 },
