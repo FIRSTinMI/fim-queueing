@@ -26,7 +26,8 @@ exports.populateAlliances = async function(season: number, event: Event,
         `Error while fetching alliances for event ${event.eventCode}`, e);
   }
 
-  if (alliances !== undefined && alliances.count > 0) {
+  if (alliances !== undefined && alliances.count > 0 &&
+      alliances.Alliances[0]?.round2) {
     admin
         .database()
         .ref(`/seasons/${season}/alliances/${eventKey}`)

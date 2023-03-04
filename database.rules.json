@@ -15,7 +15,7 @@
             ".read": "data.child('startMs').val() < now && data.child('endMs').val() > now",
             ".write": false,
             "currentMatchNumber": {
-              ".write": "data.parent().child('mode').val() == 'assisted' && data.parent().child('startMs').val() < now && data.parent().child('endMs').val() > now",
+              ".write": "data.parent().child('startMs').val() < now && data.parent().child('endMs').val() > now",
               ".validate": "newData.isNumber() && newData.val() > -5 && newData.val() < 200"
             },
             "mode": {
