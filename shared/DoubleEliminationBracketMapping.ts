@@ -8,7 +8,7 @@
 export type AllianceSource = { allianceNumber: number };
 /** Alliance is determined by who won a previous match */
 export type WinnerSource = { winnerFrom: number };
-/** Alliance is determined by who lose a previous match */
+/** Alliance is determined by who lost a previous match */
 export type LoserSource = { loserFrom: number };
 
 /**
