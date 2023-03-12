@@ -1,10 +1,10 @@
 import { FunctionalComponent, h } from 'preact';
 
-import { BracketMatch } from '../../../../shared/DoubleEliminationBracketMapping';
+import { PlayoffMatch } from '@shared/DbTypes';
+import { BracketMatch } from '@shared/DoubleEliminationBracketMapping';
+import { Alliance } from '@/types';
 import { defaultStyle, getCalculatedStyles, Options } from './settings';
 import { MatchComponentProps } from './Match';
-import { Alliance } from '../../../types';
-import { PlayoffMatch } from '../../../../shared/DbTypes';
 
 function MatchWrapper({
   match,

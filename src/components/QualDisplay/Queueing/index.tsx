@@ -6,8 +6,9 @@ import {
   useContext, useEffect, useState, useRef,
 } from 'preact/hooks';
 
+import { Event, AppMode } from '@shared/DbTypes';
 import {
-  AppMode, Match, TeamRanking, Event,
+  Match, TeamRanking,
 } from '../../../types';
 import MatchDisplay from '../MatchDisplay';
 import Ranking from '../../Tickers/Ranking';
@@ -23,9 +24,8 @@ const Queueing = () => {
   if (event === undefined || season === undefined) throw new Error('App context has undefineds');
 
   const [loadingState, setLoadingState] = useState<LoadingState>('loading');
-  const [eventRef, setEventRef] = useState<DatabaseReference>();
-  const eventRefRef = useRef<DatabaseReference>();
-  const eventButItsARef = useRef<Event>(event);
+  const dbEventRef = useRef<DatabaseReference>();
+  const eventRef = useRef<Event>(event);
   const [qualMatches, setQualMatches] = useState<Match[]>([]);
   const [displayMatches, setDisplayMatches] = useState<{
     currentMatch: Match | null,
@@ -35,17 +35,13 @@ const Queueing = () => {
   const [rankings, setRankings] = useState<TeamRanking[]>([]);
 
   useEffect(() => {
-    eventRefRef.current = eventRef;
-  }, [eventRef]);
-
-  useEffect(() => {
-    eventButItsARef.current = event;
+    eventRef.current = event;
   }, [event]);
 
   useEffect(() => {
     if (!token) return () => {};
 
-    setEventRef(ref(getDatabase(), `/seasons/${season}/events/${token}`));
+    dbEventRef.current = ref(getDatabase(), `/seasons/${season}/events/${token}`);
 
     const matchesRef = ref(getDatabase(), `/seasons/${season}/matches/${token}`);
     onValue(matchesRef, (snap) => {
@@ -57,20 +53,30 @@ const Queueing = () => {
     };
   }, [event.eventCode, season, token]);
 
+  /**
+   * NOTE: This function must use refs instead of state. It can be called by an event listener
+   * which is only initialized as the component mounts.
+   * @returns {void}
+   */
   const decrementMatchNumber = (): void => {
-    if (event.mode !== 'assisted') return;
-    if (eventRefRef.current === undefined) throw new Error('No event ref');
-    const matchNumber = eventButItsARef.current.currentMatchNumber ?? 0;
-    update(eventRefRef.current, {
+    if (eventRef.current.mode !== 'assisted') return;
+    if (dbEventRef.current === undefined) throw new Error('No event ref');
+    const matchNumber = eventRef.current.currentMatchNumber ?? 0;
+    update(dbEventRef.current, {
       currentMatchNumber: matchNumber - 1,
     });
   };
 
+  /**
+   * NOTE: This function must use refs instead of state. It can be called by an event listener
+   * which is only initialized as the component mounts.
+   * @returns {void}
+   */
   const incrementMatchNumber = (): void => {
-    if (event.mode !== 'assisted') return;
-    if (eventRefRef.current === undefined) throw new Error('No event ref');
-    const matchNumber = eventButItsARef.current.currentMatchNumber ?? 0;
-    update(eventRefRef.current, {
+    if (eventRef.current.mode !== 'assisted') return;
+    if (dbEventRef.current === undefined) throw new Error('No event ref');
+    const matchNumber = eventRef.current.currentMatchNumber ?? 0;
+    update(dbEventRef.current, {
       currentMatchNumber: matchNumber + 1,
     });
   };
@@ -80,18 +86,17 @@ const Queueing = () => {
   ) ?? null;
 
   const updateMatches = (): void => {
-    const matchNumber = event.currentMatchNumber;
+    const matchNumber = eventRef.current.currentMatchNumber;
 
     if (matchNumber === null || matchNumber === undefined) {
-      if (eventRefRef.current === undefined) return; // throw new Error('No event ref');
-      update(eventRefRef.current, {
+      if (dbEventRef.current === undefined) return; // throw new Error('No event ref');
+      update(dbEventRef.current, {
         currentMatchNumber: 1,
       });
       return;
     }
 
     try {
-      console.log('Match number changed, updating state');
       setDisplayMatches({
         currentMatch: getMatchByNumber(matchNumber),
         nextMatch: getMatchByNumber(matchNumber + 1),
@@ -106,16 +111,22 @@ const Queueing = () => {
     }
   };
 
+  /**
+   * Swap the event's mode
+   * NOTE: This function must use refs instead of state. It can be called by an event listener
+   * which is only initialized as the component mounts.
+   * @param {"automatic" | "assisted" | null} mode The mode to switch to
+   */
   const swapMode = (mode: AppMode | null = null): void => {
-    if (eventRefRef.current === undefined) throw new Error('No event ref');
+    if (dbEventRef.current === undefined) throw new Error('No event ref');
     let appMode = mode;
-    if (appMode === null) appMode = event.mode === 'assisted' ? 'automatic' : 'assisted';
+    if (appMode === null) appMode = eventRef.current.mode === 'assisted' ? 'automatic' : 'assisted';
     if (appMode === 'assisted') {
-      if (loadingState === 'noAutomatic' || event.currentMatchNumber === null) {
+      if (loadingState === 'noAutomatic' || eventRef.current.currentMatchNumber === null) {
         updateMatches();
       }
     }
-    update(eventRefRef.current, {
+    update(dbEventRef.current, {
       mode: appMode,
     });
   };
@@ -137,15 +148,15 @@ const Queueing = () => {
   };
 
   const setShowEventName = (value: boolean): void => {
-    if (eventRefRef.current === undefined) throw new Error('No event ref');
-    update(child(eventRefRef.current, 'options'), {
+    if (dbEventRef.current === undefined) throw new Error('No event ref');
+    update(child(dbEventRef.current, 'options'), {
       showEventName: value,
     });
   };
 
   const setShowRankings = (value: boolean): void => {
-    if (eventRefRef.current === undefined) throw new Error('No event ref');
-    update(child(eventRefRef.current, 'options'), {
+    if (dbEventRef.current === undefined) throw new Error('No event ref');
+    update(child(dbEventRef.current, 'options'), {
       showRankings: value,
     });
   };
@@ -187,8 +198,6 @@ const Queueing = () => {
     };
   }, []);
 
-  // FIXME (@evanlihou): This effect runs twice on initial load, which causes the "waiting for
-  // schedule to be posted" message to flash on the screen for one rendering cycle
   useEffect(() => {
     updateMatches();
   }, [event.currentMatchNumber, qualMatches]);
@@ -254,7 +263,7 @@ const Queueing = () => {
               <RankingList>
                 {rankings.map((x) => (<Ranking teamNumber={x.teamNumber} ranking={x.rank} />))}
               </RankingList>
-            ) : '')}
+            ) : <></>)}
           </div>
           )}
       </div>

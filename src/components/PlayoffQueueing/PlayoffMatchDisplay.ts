@@ -1,5 +1,5 @@
-import { PlayoffMatch } from '../../../shared/DbTypes';
-import { BracketMatch, BracketMatchNumber } from '../../../shared/DoubleEliminationBracketMapping';
+import { PlayoffMatch } from '@shared/DbTypes';
+import { BracketMatch, BracketMatchNumber } from '@shared/DoubleEliminationBracketMapping';
 
 export type PlayoffMatchDisplay = {
   result: PlayoffMatch | null,

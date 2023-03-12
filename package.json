@@ -33,6 +33,17 @@
             ".tsx"
           ]
         }
+      ],
+      "import/extensions": [
+        "error",
+        "ignorePackages",
+        {
+          "": "never",
+          "js": "never",
+          "jsx": "never",
+          "ts": "never",
+          "tsx": "never"
+        }
       ]
     },
     "settings": {
@@ -55,6 +66,7 @@
     "@babel/plugin-transform-react-jsx-source": "^7.19.6",
     "@types/js-cookie": "^3.0.1",
     "@types/react": "^17.0.43",
+    "babel-plugin-module-resolver": "^5.0.0",
     "dotenv-webpack": "^7.1.0",
     "eslint-config-airbnb": "^18.2.1",
     "eslint-config-airbnb-typescript": "^16.1.1",

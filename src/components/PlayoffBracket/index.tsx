@@ -4,14 +4,14 @@ import {
   getDatabase, off, onValue, ref,
 } from 'firebase/database';
 
+import { PlayoffMatch } from '@shared/DbTypes';
+import { BracketMatchNumber } from '@shared/DoubleEliminationBracketMapping';
 import styles from './styles.scss';
 import DoubleEliminationBracket from './TournamentBracket/DoubleEliminationBracket';
 import { Alliance } from '../../types';
-import { PlayoffMatch } from '../../../shared/DbTypes';
 import MenuBar from '../MenuBar';
 import AppContext from '../../AppContext';
 import Match from './TournamentBracket/Match';
-import { BracketMatchNumber } from '../../../shared/DoubleEliminationBracketMapping';
 
 /**
  * TODO: A bracket for double elimination playoffs

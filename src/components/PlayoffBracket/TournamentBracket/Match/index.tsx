@@ -1,9 +1,9 @@
 import { Fragment, FunctionalComponent, h } from 'preact';
 
+import { ParticipantSource } from '@shared/DoubleEliminationBracketMapping';
+import { DriverStation, PlayoffMatch } from '@shared/DbTypes';
+import { Alliance } from '@/types';
 import styles from './styles.scss';
-import { ParticipantSource } from '../../../../../shared/DoubleEliminationBracketMapping';
-import { Alliance } from '../../../../types';
-import { DriverStation, PlayoffMatch } from '../../../../../shared/DbTypes';
 
 export type MatchComponentProps = {
   matchName: string,

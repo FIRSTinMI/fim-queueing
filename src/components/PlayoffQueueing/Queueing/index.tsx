@@ -4,12 +4,12 @@ import {
 } from 'firebase/database';
 import { useContext, useEffect, useState } from 'preact/hooks';
 
+import DoubleEliminationBracketMapping, { BracketMatchNumber } from '@shared/DoubleEliminationBracketMapping';
+import { PlayoffMatch } from '@shared/DbTypes';
+import AppContext from '@/AppContext';
+import MenuBar from '@/components/MenuBar';
 import MatchDisplay from '../MatchDisplay';
 import styles from './styles.scss';
-import MenuBar from '../../MenuBar';
-import AppContext from '../../../AppContext';
-import DoubleEliminationBracketMapping, { BracketMatchNumber } from '../../../../shared/DoubleEliminationBracketMapping';
-import { PlayoffMatch } from '../../../../shared/DbTypes';
 import { PlayoffMatchDisplay } from '../PlayoffMatchDisplay';
 
 type LoadingState = 'loading' | 'ready' | 'error' | 'noAutomatic';

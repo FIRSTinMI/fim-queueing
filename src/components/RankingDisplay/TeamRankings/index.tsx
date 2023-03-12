@@ -5,7 +5,7 @@ import { useContext, useEffect, useState } from 'preact/hooks';
 import {
   getDatabase, ref, onValue, off,
 } from 'firebase/database';
-import { TeamRanking } from '../../../types';
+import { TeamRanking } from '@/types';
 import MenuBar from '../../MenuBar';
 import styles from './styles.scss';
 import AppContext from '../../../AppContext';

@@ -1,5 +1,5 @@
 import { Context, createContext } from 'preact';
-import { Event } from './types';
+import { Event } from '@shared/DbTypes';
 
 type Features = {
   showRankingsScreen?: boolean;

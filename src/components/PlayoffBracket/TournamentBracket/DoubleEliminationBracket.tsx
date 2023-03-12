@@ -1,14 +1,14 @@
 import { h, Fragment, FunctionalComponent } from 'preact';
 
-import RoundHeaders from './RoundHeaders';
-import MatchWrapper from './MatchWrapper';
+import { PlayoffMatch } from '@shared/DbTypes';
 import DoubleEliminationBracketMapping, {
   BracketMatch, BracketMatchNumber, BracketRound, WinnerSource,
-} from '../../../../shared/DoubleEliminationBracketMapping';
+} from '@shared/DoubleEliminationBracketMapping';
+import { Alliance } from '@/types';
+import RoundHeaders from './RoundHeaders';
+import MatchWrapper from './MatchWrapper';
 import { defaultStyle, getCalculatedStyles } from './settings';
 import { MatchComponentProps } from './Match';
-import { Alliance } from '../../../types';
-import { PlayoffMatch } from '../../../../shared/DbTypes';
 
 const DoubleEliminationBracket = ({
   matchResults,

@@ -4,19 +4,17 @@ import { getApp, initializeApp } from 'firebase/app';
 import {
   Database, DataSnapshot, get, getDatabase, off, onValue, ref,
 } from 'firebase/database';
-import {
-  getId, getInstallations,
-} from 'firebase/installations';
+import { getId, getInstallations } from 'firebase/installations';
 import {
   Router, Route, RouterOnChangeArgs, route as navigateToRoute,
 } from 'preact-router';
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { HubConnection, HubConnectionState } from '@microsoft/signalr';
 
+import { Event } from '@shared/DbTypes';
 import styles from './styles.scss';
 import QualQueueing from '../QualDisplay/Queueing';
 import LoginForm from '../LoginForm';
-import { Event } from '../../types';
 import ScreenChooser from '../ScreenChooser';
 import TeamRankings from '../RankingDisplay/TeamRankings';
 import PlayoffBracket from '../PlayoffBracket';
@@ -24,6 +22,7 @@ import AppContext, { AppContextType } from '../../AppContext';
 import PlayoffQueueing from '../PlayoffQueueing/Queueing';
 import LiveStream from '../LiveStream';
 import StaleDataBanner from '../StaleDataBanner';
+import useStateWithRef from '@/useStateWithRef';
 
 // TODO: Figure out why the event details sometimes aren't getting sent over to SignalR
 
@@ -35,14 +34,12 @@ const App = () => {
   }>();
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
-  const [appContext, setAppContext] = useState<AppContextType>({});
   const [acFeatures, setFeatures] = useState<any>();
   const [acSeason, setSeason] = useState<number | undefined>();
   const [acEvent, setEvent] = useState<Event | undefined>();
   const [acToken, setToken] = useState<string | undefined>();
+  const [appContext, setAppContext, appContextRef] = useStateWithRef<AppContextType>({});
 
-  // Used to make sure sendCurrentStatus always has the latest
-  const appContextRef = useRef<AppContextType>();
   const [identifyTO, setIdentifyTO] = useState<ReturnType<typeof setTimeout> | null>(null);
 
   const sendCurrentStatus = async () => {
@@ -64,10 +61,6 @@ const App = () => {
   };
 
   useEffect(() => {
-    appContextRef.current = appContext;
-  }, [appContext]);
-
-  useEffect(() => {
     const newCtx = {
       features: acFeatures,
       event: acEvent,
@@ -75,16 +68,15 @@ const App = () => {
       token: acToken,
     };
     setAppContext(newCtx);
-    appContextRef.current = appContext;
   }, [acFeatures, acEvent, acSeason, acToken]);
 
   useEffect(() => {
     sendCurrentStatus();
-  }, [hub.current, appContext.token, appContext.event?.eventCode, acEvent?.eventCode]);
+  }, [hub.current, appContext.token, appContext.event?.eventCode]);
 
   const onLogin = (token?: string) => {
     if (appContext === undefined) throw new Error('appContext was undefined');
-    if (db === undefined) throw new Error('aaa db was undefined');
+    if (db === undefined) throw new Error('db was undefined');
 
     setIsAuthenticated(true);
 
@@ -181,7 +173,7 @@ const App = () => {
       cn.on('SendNewRoute', (route) => {
         // Navigate within the SPA
         if (route[0] === '/') {
-          navigateToRoute(route);
+          navigateToRoute(`${route}${window?.location?.hash ?? ''}`);
         } else {
           window.location = route;
         }

@@ -3,8 +3,8 @@ import { route } from 'preact-router';
 import Cookies from 'js-cookie';
 import { useEffect, useState } from 'preact/hooks';
 
+import { Event } from '@shared/DbTypes';
 import styles from './styles.scss';
-import { Event } from '../../types';
 
 type MenuBarProps = {
   event: Event | undefined,
@@ -72,7 +72,7 @@ const MenuBar = (props: MenuBarProps) => {
         <div className={styles.buttons}>
           <button
             type="button"
-            onClick={(): boolean => route('/', false)}
+            onClick={(): boolean => route(`/${window?.location?.hash ?? ''}`, false)}
           >
             Back to home
           </button>

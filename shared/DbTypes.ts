@@ -9,6 +9,7 @@ export type Event = {
   name: string,
   eventCode: string,
   currentMatchNumber: number | null,
+  streamEmbedLink?: string;
   numQualMatches: number | null,
   mode: AppMode,
   state: EventState,
@@ -18,7 +19,8 @@ export type Event = {
    */
   lastModifiedMs: number | null,
   options: {
-    showRankings: boolean
+    showRankings: boolean,
+    showEventName: boolean,
   }
 };
 
