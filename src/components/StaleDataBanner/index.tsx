@@ -60,6 +60,10 @@ const StaleDataBanner = (): JSX.Element => {
     };
   }, [context?.event?.lastModifiedMs]);
 
+  if (context.features?.showStaleDataBanner === false) {
+    return <></>;
+  }
+
   if (isShown) {
     return (
       <div className={styles.staleDataBanner}>Data last published {asOf}.</div>

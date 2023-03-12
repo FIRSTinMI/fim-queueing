@@ -3,6 +3,7 @@ import { Event } from './types';
 
 type Features = {
   showRankingsScreen?: boolean;
+  showStaleDataBanner?: boolean;
 };
 
 export type AppContextType = {

@@ -48,7 +48,6 @@ exports.populateAlliances = async function(season: number, event: Event,
 exports.updatePlayoffBracket = async function(season: number, event: Event,
     eventKey: string) {
   const {eventCode} = event;
-  // TODO: Update this hardcoded season which is being used for testing
   const matches = await get(`/${season}/matches/${eventCode}` +
     "?tournamentLevel=playoff", eventCode) as ApiMatchResults;
 
@@ -56,17 +55,24 @@ exports.updatePlayoffBracket = async function(season: number, event: Event,
       Record<BracketMatchNumber, PlayoffMatch>> = {};
 
   /**
-   * Figure out which alliance won a match
-   * @param {ApiMatch} match Match from the FRC.events API
+   * Figure out which alliance won a matchup
+   * @param {ApiMatch[]} match Matches from the FRC.events API
    * @return {"red" | "blue" | null} Which alliance name won, or null
    */
-  function getWinnerFromMatch(match: ApiMatch): "red" | "blue" | null {
+  function getWinnerFromMatches(matches: ApiMatch[], numWins: number = 1):
+      "red" | "blue" | null {
     // TODO: This is not good enough to determine a real winner.
     // Since the match is immediately replayed (with a break) this should still
     // be okay
     // See Game manual chapter 11.7.2.1 for tie rules
-    if (match.scoreRedFinal > match.scoreBlueFinal) return "red";
-    if (match.scoreBlueFinal > match.scoreRedFinal) return "blue";
+    const wins = matches.map((match) => {
+      if (match.scoreRedFinal > match.scoreBlueFinal) return "red";
+      if (match.scoreBlueFinal > match.scoreRedFinal) return "blue";
+      return null;
+    });
+
+    if (wins.filter((w) => w === "red").length >= numWins) return "red";
+    if (wins.filter((w) => w === "blue").length >= numWins) return "blue";
     return null;
   }
 
@@ -113,14 +119,15 @@ exports.updatePlayoffBracket = async function(season: number, event: Event,
 
   DoubleEliminationBracketMapping.matches.forEach((match) => {
     // For now let's just take the first one, it'll be easier
-    const matchNum = (match.overrideMatchNumbers ?? [match.number])[0];
+    const matchNums = (match.overrideMatchNumbers ?? [match.number]);
 
-    const apiMatch = matches.Matches.find(
-        (m) => m.matchNumber === matchNum);
+    const apiMatches = <ApiMatch[]>matchNums.map(
+      (mn) => matches.Matches.find((am) => am.matchNumber === mn)
+    ).filter((m) => m !== undefined);
 
     playoffMatchInfo[match.number] = {
-      winner: apiMatch ? getWinnerFromMatch(apiMatch) : null,
-      participants: apiMatch?.teams.reduce((prev, team) => ({
+      winner: getWinnerFromMatches(apiMatches, match.winsRequired),
+      participants: apiMatches[0]?.teams.reduce((prev, team) => ({
         ...prev,
         [team.station]: team.teamNumber,
       }), {}) as any as Record<DriverStation, number> ?? null,
