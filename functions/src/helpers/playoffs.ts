@@ -56,7 +56,9 @@ exports.updatePlayoffBracket = async function(season: number, event: Event,
 
   /**
    * Figure out which alliance won a matchup
-   * @param {ApiMatch[]} match Matches from the FRC.events API
+   * @param {ApiMatch[]} matches Matches from the FRC.events API
+   * @param {number | undefined} numWins Number of wins required to be the
+   * overall winner
    * @return {"red" | "blue" | null} Which alliance name won, or null
    */
   function getWinnerFromMatches(matches: ApiMatch[], numWins: number = 1):
@@ -122,7 +124,7 @@ exports.updatePlayoffBracket = async function(season: number, event: Event,
     const matchNums = (match.overrideMatchNumbers ?? [match.number]);
 
     const apiMatches = <ApiMatch[]>matchNums.map(
-      (mn) => matches.Matches.find((am) => am.matchNumber === mn)
+        (mn) => matches.Matches.find((am) => am.matchNumber === mn)
     ).filter((m) => m !== undefined);
 
     playoffMatchInfo[match.number] = {
