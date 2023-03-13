@@ -31,6 +31,7 @@ const MenuBar = (props: MenuBarProps) => {
   } = props;
 
   const [showMenu, setShowMenu] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   let mouseTimeout: number | undefined;
   const handleMouseMove = () => {
@@ -44,6 +45,21 @@ const MenuBar = (props: MenuBarProps) => {
     }
   };
 
+  // Watch for fullscreenchange
+  useEffect(() => {
+    function onFullscreenChange() {
+      setIsFullscreen(document.fullscreenElement
+        || (document as any).webkitFullscreenElement
+        || (document as any).mozFullScreenElement
+        || (document as any).webkitIsFullScreen);
+    }
+
+    const prefixes = ['', 'moz', 'webkit', 'ms'];
+    prefixes.forEach((pre) => document.addEventListener(`${pre}fullscreenchange`, onFullscreenChange));
+
+    return () => prefixes.forEach((pre) => document.removeEventListener(`${pre}fullscreenchange`, onFullscreenChange));
+  }, []);
+
   if (!alwaysShow) {
     useEffect(() => {
       document.addEventListener('mousemove', handleMouseMove);
@@ -51,6 +67,42 @@ const MenuBar = (props: MenuBarProps) => {
         document.removeEventListener('mousemove', handleMouseMove);
       };
     }, []);
+  }
+
+  async function enterFullscreen() {
+    try {
+      if (document.body.requestFullscreen) {
+        await document.body.requestFullscreen();
+      } else if ((document.body as any).webkitRequestFullscreen) {
+        // Safari
+        await (document.body as any).webkitRequestFullscreen();
+      } else if ((document.body as any).msRequestFullscreen) { /* IE11 */
+        (document.body as any).msRequestFullscreen();
+      } else {
+        throw new Error('Unknown browser');
+      }
+    } catch (e) {
+      // eslint-disable-next-line no-alert
+      alert('Unable to enter fullscreen.');
+    }
+  }
+
+  async function exitFullscreen() {
+    try {
+      if (document.exitFullscreen) {
+        await document.exitFullscreen();
+      } else if ((document as any).webkitExitFullscreen) {
+        // Safari
+        await (document as any).webkitExitFullscreen();
+      } else if ((document as any).msExitFullscreen) { /* IE11 */
+        (document as any).msExitFullscreen();
+      } else {
+        throw new Error('Unknown browser');
+      }
+    } catch (e) {
+      // eslint-disable-next-line no-alert
+      alert('Unable to exit fullscreen. Press the escape key.');
+    }
   }
 
   if (event === undefined || season === undefined) return (<></>);
@@ -70,6 +122,22 @@ const MenuBar = (props: MenuBarProps) => {
           {options}
         </div>
         <div className={styles.buttons}>
+          {!isFullscreen && (
+            <button
+              type="button"
+              onClick={() => enterFullscreen()}
+            >
+              Enter Fullscreen
+            </button>
+          )}
+          {isFullscreen && (
+            <button
+              type="button"
+              onClick={() => exitFullscreen()}
+            >
+              Exit Fullscreen
+            </button>
+          )}
           <button
             type="button"
             onClick={(): boolean => route(`/${window?.location?.hash ?? ''}`, false)}
