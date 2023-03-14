@@ -44,6 +44,22 @@
           "ts": "never",
           "tsx": "never"
         }
+      ],
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        { 
+          "argsIgnorePattern": "^_",
+          "varsIgnorePattern": "^_",
+          "caughtErrorsIgnorePattern": "^_"
+        }
+      ],
+      "@typescript-eslint/naming-convention": [
+        "error",
+        {
+          "selector": "default",
+          "format": ["camelCase", "PascalCase", "UPPER_CASE"],
+          "leadingUnderscore": "allow"
+        }
       ]
     },
     "settings": {
@@ -57,6 +73,7 @@
     "@microsoft/signalr": "^7.0.2",
     "firebase": "^9.6.10",
     "js-cookie": "^3.0.1",
+    "milligram": "^1.4.1",
     "preact": "^10.3.1",
     "preact-cli": "^3.4.3",
     "preact-render-to-string": "^5.1.4",
