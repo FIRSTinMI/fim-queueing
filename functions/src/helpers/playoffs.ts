@@ -67,6 +67,10 @@ exports.updatePlayoffBracket = async function(season: number, event: Event,
     // Since the match is immediately replayed (with a break) this should still
     // be okay
     // See Game manual chapter 11.7.2.1 for tie rules
+
+    // TODO: This totally breaks things, because we don't know what alliance is
+    // playing a match without this method working. We may need to fetch the
+    // season-specific scoring data in the event of a tie
     const wins = matches.map((match) => {
       if (match.scoreRedFinal > match.scoreBlueFinal) return "red";
       if (match.scoreBlueFinal > match.scoreRedFinal) return "blue";
