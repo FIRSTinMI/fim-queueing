@@ -71,6 +71,13 @@ exports.updatePlayoffBracket = async function(season: number, event: Event,
     if (match.scoreRedFinal > match.scoreBlueFinal) return "red";
     if (match.scoreBlueFinal > match.scoreRedFinal) return "blue";
 
+    if (bracketMatchNumber === "F") {
+      // Finals don't have any tiebreak rules, they just get sent to overtime.
+      // Right now we're not handling overtime matches. I'm okay with just not
+      // declaring a winner of the tournament in this system.
+      return null;
+    }
+
     // The score details endpoint is season-specific
     if (season !== 2023) {
       throw new Error("Unable to handle game-specific tiebreak rules for " +
