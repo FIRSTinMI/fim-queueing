@@ -47,7 +47,7 @@ export default function ScreenChooser() {
         will automatically switch between your selections as the event progresses.
       </p>
       <form className={styles.setup} onSubmit={onSetupSubmit}>
-        <label htmlFor="modeSelect">
+        <label htmlFor="qualSelect">
           Qualifications
           <select
             id="qualSelect"
@@ -59,7 +59,7 @@ export default function ScreenChooser() {
             <option value="/stream">Stream</option>
           </select>
         </label>
-        <label htmlFor="modeSelect">
+        <label htmlFor="playoffSelect">
           Playoffs
           <select
             id="playoffSelect"
