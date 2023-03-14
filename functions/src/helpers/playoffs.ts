@@ -54,28 +54,82 @@ exports.updatePlayoffBracket = async function(season: number, event: Event,
   const playoffMatchInfo: Partial<
       Record<BracketMatchNumber, PlayoffMatch>> = {};
 
+  let scoreDetails: any = undefined;
+  /**
+   * Find the winner for a particulat match in the schedule. Factor in tiebreak
+   * rules if applicable
+   * @param {ApiMatch} match Match results from the FRC API
+   * @param {BracketMatchNumber} bracketMatchNumber The match number in the
+   * bracket
+   * @return {Promise<"red" | "blue" | null>} The winner, or null if no winner
+   */
+  async function getWinnerFromMatch(match: ApiMatch,
+      bracketMatchNumber: BracketMatchNumber): Promise<"red" | "blue" | null> {
+    if (match.scoreRedFinal === null || match.scoreBlueFinal === null) {
+      return null;
+    }
+    if (match.scoreRedFinal > match.scoreBlueFinal) return "red";
+    if (match.scoreBlueFinal > match.scoreRedFinal) return "blue";
+
+    // The score details endpoint is season-specific
+    if (season !== 2023) {
+      throw new Error("Unable to handle game-specific tiebreak rules for " +
+          "other seasons");
+    }
+
+    // We have a tie, let's make sure we haven't already calculated a winner
+    // See Game manual chapter 11.7.2.1 for tie rules
+    const winner = (await admin.database()
+        .ref(`/seasons/${season}/bracket/${eventKey}/${bracketMatchNumber}` +
+        "/winner")
+        .get()).val();
+    if (winner !== null && winner !== undefined) return winner;
+
+    functions.logger.info("Need to fetch score details for match",
+        bracketMatchNumber);
+    if (scoreDetails === undefined) {
+      scoreDetails = await get(`/${season}/scores/${eventCode}/playoff`,
+          eventCode) as any;
+    }
+
+    const matchDetails = scoreDetails.MatchScores
+        .find((x: any) => x.matchNumber === match.matchNumber);
+    const redAlliance = matchDetails.alliances
+        .find((x: any) => x.alliance === "Red");
+    const blueAlliance = matchDetails.alliances
+        .find((x: any) => x.alliance === "Blue");
+
+    // Alliance with the most tech foul points wins
+    if (redAlliance.techFoulCount > blueAlliance.techFoulCount) return "blue";
+    if (blueAlliance.techFoulCount > redAlliance.techFoulCount) return "red";
+
+    // Alliance with most charge station points wins
+    if (redAlliance.totalChargeStationPoints >
+        blueAlliance.totalChargeStationPoints) return "red";
+    if (blueAlliance.totalChargeStationPoints >
+          redAlliance.totalChargeStationPoints) return "blue";
+
+    // Alliance with most autonomous points wins
+    if (redAlliance.autoPoints > blueAlliance.autoPoints) return "red";
+    if (blueAlliance.autoPoints > redAlliance.autoPoints) return "blue";
+
+    return null;
+  }
+
   /**
    * Figure out which alliance won a matchup
    * @param {ApiMatch[]} matches Matches from the FRC.events API
+   * @param {BracketMatchNumber} bracketMatchNumber Match number in the bracket
    * @param {number | undefined} numWins Number of wins required to be the
    * overall winner
    * @return {"red" | "blue" | null} Which alliance name won, or null
    */
-  function getWinnerFromMatches(matches: ApiMatch[], numWins: number = 1):
-      "red" | "blue" | null {
-    // TODO: This is not good enough to determine a real winner.
-    // Since the match is immediately replayed (with a break) this should still
-    // be okay
-    // See Game manual chapter 11.7.2.1 for tie rules
-
-    // TODO: This totally breaks things, because we don't know what alliance is
-    // playing a match without this method working. We may need to fetch the
-    // season-specific scoring data in the event of a tie
-    const wins = matches.map((match) => {
-      if (match.scoreRedFinal > match.scoreBlueFinal) return "red";
-      if (match.scoreBlueFinal > match.scoreRedFinal) return "blue";
-      return null;
-    });
+  async function getWinnerFromMatches(matches: ApiMatch[],
+      bracketMatchNumber: BracketMatchNumber, numWins: number = 1):
+      Promise<"red" | "blue" | null> {
+    const wins = await Promise.all(matches.map(async (match) => {
+      return await getWinnerFromMatch(match, bracketMatchNumber);
+    }));
 
     if (wins.filter((w) => w === "red").length >= numWins) return "red";
     if (wins.filter((w) => w === "blue").length >= numWins) return "blue";
@@ -123,7 +177,7 @@ exports.updatePlayoffBracket = async function(season: number, event: Event,
     } else throw new Error("Participant source not as expected");
   }
 
-  DoubleEliminationBracketMapping.matches.forEach((match) => {
+  for (const match of DoubleEliminationBracketMapping.matches) {
     // For now let's just take the first one, it'll be easier
     const matchNums = (match.overrideMatchNumbers ?? [match.number]);
 
@@ -132,7 +186,8 @@ exports.updatePlayoffBracket = async function(season: number, event: Event,
     ).filter((m) => m !== undefined);
 
     playoffMatchInfo[match.number] = {
-      winner: getWinnerFromMatches(apiMatches, match.winsRequired),
+      winner: await getWinnerFromMatches(apiMatches, match.number,
+          match.winsRequired),
       participants: apiMatches[0]?.teams.reduce((prev, team) => ({
         ...prev,
         [team.station]: team.teamNumber,
@@ -140,7 +195,7 @@ exports.updatePlayoffBracket = async function(season: number, event: Event,
       redAlliance: participantToAllianceNumber(match.participants.red),
       blueAlliance: participantToAllianceNumber(match.participants.blue),
     };
-  });
+  }
 
   if (playoffMatchInfo["F"]?.winner) {
     event.state = "EventOver";
