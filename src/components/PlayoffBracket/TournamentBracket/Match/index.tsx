@@ -28,17 +28,17 @@ const Match: FunctionalComponent<MatchComponentProps> = ({
 
   const getTeamDisplay = (team: ParticipantSource, color: 'red' | 'blue') => {
     // If we do know exactly who will be in the match
-    if (color === 'red' && matchResult?.redAlliance !== undefined && matchResult.participants?.Red1 !== undefined) {
+    if (color === 'red' && (matchResult?.redAlliance !== undefined || matchResult?.participants?.Red1 !== undefined)) {
       return (
         <>
-          <b>A{matchResult.redAlliance}</b>: {(['Red1', 'Red2', 'Red3'] as DriverStation[]).map((m) => matchResult.participants[m]).join(', ')}
+          <b>A{matchResult.redAlliance ?? '?'}</b>: {(['Red1', 'Red2', 'Red3'] as DriverStation[]).map((m) => matchResult.participants[m]).join(', ')}
         </>
       );
     }
-    if (color === 'blue' && matchResult?.blueAlliance !== undefined && matchResult.participants?.Blue1 !== undefined) {
+    if (color === 'blue' && (matchResult?.blueAlliance !== undefined || matchResult?.participants?.Blue1 !== undefined)) {
       return (
         <>
-          <b>A{matchResult.blueAlliance}</b>: {(['Blue1', 'Blue2', 'Blue3'] as DriverStation[]).map((m) => matchResult.participants[m]).join(', ')}
+          <b>A{matchResult.blueAlliance ?? '?'}</b>: {(['Blue1', 'Blue2', 'Blue3'] as DriverStation[]).map((m) => matchResult.participants[m]).join(', ')}
         </>
       );
     }

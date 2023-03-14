@@ -60,7 +60,7 @@ function MatchDisplay({ halfWidth, match, className }: MatchDisplayProps): JSX.E
   if (match?.result?.participants?.Red1) {
     redContent = (
       <span className={[styles.red, styles.teamNums].join(' ')}>
-        <span>A{match.result.redAlliance}</span>
+        <span>A{match.result.redAlliance ?? '?'}</span>
         {[1, 2, 3].map((n) => <TeamDisplay key={`${match?.num}r${n}`} teamNumber={match.result?.participants[`Red${n}` as DriverStation]} />)}
       </span>
     );
@@ -74,7 +74,7 @@ function MatchDisplay({ halfWidth, match, className }: MatchDisplayProps): JSX.E
   if (match?.result?.participants?.Blue1) {
     blueContent = (
       <span className={[styles.blue, styles.teamNums].join(' ')}>
-        <span>A{match.result.blueAlliance}</span>
+        <span>A{match.result.blueAlliance ?? '?'}</span>
         {[1, 2, 3].map((n) => <TeamDisplay key={`${match?.num}b${n}`} teamNumber={match.result?.participants[`Blue${n}` as DriverStation]} />)}
       </span>
     );
