@@ -5,6 +5,10 @@ import { useEffect, useState } from 'preact/hooks';
 
 import { Event } from '@shared/DbTypes';
 import styles from './styles.scss';
+import Fullscreen from '@/assets/fullscreen.svg';
+import FullscreenExit from '@/assets/fullscreen_exit.svg';
+import Home from '@/assets/home.svg';
+import Logout from '@/assets/logout.svg';
 
 type MenuBarProps = {
   event: Event | undefined,
@@ -20,6 +24,13 @@ function onLogout(): void {
   window.location.reload();
 }
 
+function getBrowserFullscreenStatus(): boolean {
+  return document.fullscreenElement
+  || (document as any).webkitFullscreenElement
+  || (document as any).mozFullScreenElement
+  || (document as any).webkitIsFullScreen;
+}
+
 /**
  * A reusable menu bar component with a dynamic area for options.
  * Always displays on mobile devices, and slides down upon mouse movement for
@@ -31,7 +42,7 @@ const MenuBar = (props: MenuBarProps) => {
   } = props;
 
   const [showMenu, setShowMenu] = useState(false);
-  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(getBrowserFullscreenStatus());
 
   let mouseTimeout: number | undefined;
   const handleMouseMove = () => {
@@ -48,10 +59,7 @@ const MenuBar = (props: MenuBarProps) => {
   // Watch for fullscreenchange
   useEffect(() => {
     function onFullscreenChange() {
-      setIsFullscreen(document.fullscreenElement
-        || (document as any).webkitFullscreenElement
-        || (document as any).mozFullScreenElement
-        || (document as any).webkitIsFullScreen);
+      setIsFullscreen(getBrowserFullscreenStatus());
     }
 
     const prefixes = ['', 'moz', 'webkit', 'ms'];
@@ -127,7 +135,8 @@ const MenuBar = (props: MenuBarProps) => {
               type="button"
               onClick={() => enterFullscreen()}
             >
-              Enter Fullscreen
+              {/* <Fullscreen alt="Enter Fullscreen" title="Enter Fullscreen" /> */}
+              <img src={Fullscreen} alt="Enter Fullscreen" title="Enter Fullscreen" />
             </button>
           )}
           {isFullscreen && (
@@ -135,20 +144,21 @@ const MenuBar = (props: MenuBarProps) => {
               type="button"
               onClick={() => exitFullscreen()}
             >
-              Exit Fullscreen
+              <img src={FullscreenExit} alt="Exit Fullscreen" title="Exit Fullscreen" />
             </button>
           )}
           <button
             type="button"
             onClick={(): boolean => route(`/${window?.location?.hash ?? ''}`, false)}
           >
-            Back to home
+            <img src={Home} alt="Go Home" title="Go Home" />
           </button>
           <button
             type="button"
+            className="button-outline"
             onClick={(): void => onLogout()}
           >
-            Log out
+            <img src={Logout} alt="Log Out" title="Log Out" />
           </button>
         </div>
       </div>

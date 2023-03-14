@@ -21,6 +21,7 @@ import PlayoffBracket from '../PlayoffBracket';
 import AppContext, { AppContextType } from '../../AppContext';
 import PlayoffQueueing from '../PlayoffQueueing/Queueing';
 import LiveStream from '../LiveStream';
+import Automated from '../Automated';
 import StaleDataBanner from '../StaleDataBanner';
 import useStateWithRef from '@/useStateWithRef';
 
@@ -252,6 +253,7 @@ const App = () => {
           <Route component={PlayoffBracket} path="/playoff/bracket" />
           <Route component={PlayoffQueueing} path="/playoff/queueing" />
           <Route component={LiveStream} path="/stream" />
+          <Route component={Automated} path="/automated" />
         </Router>
       </>
     );
