@@ -42,6 +42,10 @@
         display: flex;
         justify-content: space-between;
 
+        img {
+          height: 100%;
+        }
+
         span {
             text-overflow: ellipsis;
             text-align: center;
@@ -51,10 +55,19 @@
             font-size: 0.5em;
         }
 
-        .buttons button {
+        .buttons{
+          display: flex;
+          gap: .5em;
+          button {
             display: block;
             width: 100%;
             margin-block: .5em;
+            padding: .2em;
+
+            &:hover img {
+              filter: grayscale(1);
+            }
+          }
         }
     }
 }

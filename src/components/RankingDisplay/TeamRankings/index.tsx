@@ -29,16 +29,13 @@ const TeamRankings = () => {
   const tableRef: RefObject<HTMLTableSectionElement> = createRef();
   useEffect(() => {
     if (!tableRef.current) return;
-    tableRef.current.style.animationDuration = `${(tableRef.current.clientHeight / 50)}s`;
+    tableRef.current.style.animationDuration = `${(tableRef.current.clientHeight / 40)}s`;
   }, [tableRef]);
 
   return (
     <>
       <MenuBar event={event} season={season} />
       <div className={styles.teamRankings}>
-        {/* <div className={styles.betaBar}>
-          β - Utilize <u>frc.events</u> for official data.
-        </div> */}
         <table>
           <thead>
             <tr>
@@ -50,12 +47,14 @@ const TeamRankings = () => {
               <th>Charge</th>
               <th>Auto</th>
               {/* End game specific */}
-              <th className={styles.wtlCell}>
-                <span>W</span>
-                <span>-</span>
-                <span>T</span>
-                <span>-</span>
-                <span>L</span>
+              <th>
+                <span className={styles.wtlCell}>
+                  <span>W</span>
+                  <span>-</span>
+                  <span>T</span>
+                  <span>-</span>
+                  <span>L</span>
+                </span>
               </th>
             </tr>
           </thead>

@@ -3,19 +3,17 @@ import {
   DatabaseReference, getDatabase, child, ref, update, onValue, off,
 } from 'firebase/database';
 import {
-  useContext, useEffect, useState, useRef,
+  useContext, useEffect, useState, useRef, useReducer,
 } from 'preact/hooks';
 
-import { Event, AppMode } from '@shared/DbTypes';
-import {
-  Match, TeamRanking,
-} from '../../../types';
+import { AppMode } from '@shared/DbTypes';
+import { Match, TeamRanking } from '@/types';
+import AppContext from '@/AppContext';
+import styles from './styles.scss';
 import MatchDisplay from '../MatchDisplay';
 import Ranking from '../../Tickers/Ranking';
 import RankingList from '../../Tickers/RankingList';
-import styles from './styles.scss';
 import MenuBar from '../../MenuBar';
-import AppContext from '../../../AppContext';
 
 type LoadingState = 'loading' | 'ready' | 'error' | 'noAutomatic';
 
@@ -25,7 +23,6 @@ const Queueing = () => {
 
   const [loadingState, setLoadingState] = useState<LoadingState>('loading');
   const dbEventRef = useRef<DatabaseReference>();
-  const eventRef = useRef<Event>(event);
   const [qualMatches, setQualMatches] = useState<Match[]>([]);
   const [displayMatches, setDisplayMatches] = useState<{
     currentMatch: Match | null,
@@ -33,10 +30,6 @@ const Queueing = () => {
     queueingMatches: Match[]
   }>({ currentMatch: null, nextMatch: null, queueingMatches: [] });
   const [rankings, setRankings] = useState<TeamRanking[]>([]);
-
-  useEffect(() => {
-    eventRef.current = event;
-  }, [event]);
 
   useEffect(() => {
     if (!token) return () => {};
@@ -53,40 +46,12 @@ const Queueing = () => {
     };
   }, [event.eventCode, season, token]);
 
-  /**
-   * NOTE: This function must use refs instead of state. It can be called by an event listener
-   * which is only initialized as the component mounts.
-   * @returns {void}
-   */
-  const decrementMatchNumber = (): void => {
-    if (eventRef.current.mode !== 'assisted') return;
-    if (dbEventRef.current === undefined) throw new Error('No event ref');
-    const matchNumber = eventRef.current.currentMatchNumber ?? 0;
-    update(dbEventRef.current, {
-      currentMatchNumber: matchNumber - 1,
-    });
-  };
-
-  /**
-   * NOTE: This function must use refs instead of state. It can be called by an event listener
-   * which is only initialized as the component mounts.
-   * @returns {void}
-   */
-  const incrementMatchNumber = (): void => {
-    if (eventRef.current.mode !== 'assisted') return;
-    if (dbEventRef.current === undefined) throw new Error('No event ref');
-    const matchNumber = eventRef.current.currentMatchNumber ?? 0;
-    update(dbEventRef.current, {
-      currentMatchNumber: matchNumber + 1,
-    });
-  };
-
   const getMatchByNumber = (matchNumber: number): Match | null => qualMatches?.find(
     (x) => x.matchNumber === matchNumber,
   ) ?? null;
 
   const updateMatches = (): void => {
-    const matchNumber = eventRef.current.currentMatchNumber;
+    const matchNumber = event.currentMatchNumber;
 
     if (matchNumber === null || matchNumber === undefined) {
       if (dbEventRef.current === undefined) return; // throw new Error('No event ref');
@@ -120,9 +85,9 @@ const Queueing = () => {
   const swapMode = (mode: AppMode | null = null): void => {
     if (dbEventRef.current === undefined) throw new Error('No event ref');
     let appMode = mode;
-    if (appMode === null) appMode = eventRef.current.mode === 'assisted' ? 'automatic' : 'assisted';
+    if (appMode === null) appMode = event.mode === 'assisted' ? 'automatic' : 'assisted';
     if (appMode === 'assisted') {
-      if (loadingState === 'noAutomatic' || eventRef.current.currentMatchNumber === null) {
+      if (loadingState === 'noAutomatic' || event.currentMatchNumber === null) {
         updateMatches();
       }
     }
@@ -131,16 +96,56 @@ const Queueing = () => {
     });
   };
 
+  /**
+   * A reducer is being used because some actions can be performed in the context of an event
+   * listener, where access to the current state is not guaranteed.
+   */
+  const [_, dispatchEventChange] = useReducer<void, {
+    type: 'decrement' | 'increment' | 'set' | 'swap',
+    /** Used if type === 'set' */
+    number?: number
+    /** Used if type === 'swap' */
+    mode?: AppMode
+  }>((_s, action) => {
+    if (!dbEventRef.current) throw new Error('DB ref not defined');
+    const { type, number, mode } = action;
+    if (type === 'swap') {
+      swapMode(mode);
+      return;
+    }
+
+    if (event.mode !== 'assisted') {
+      console.warn('Tried to set current match number while not in assisted mode!');
+      return;
+    }
+    let newMatchNumber: number;
+    if (type === 'increment') {
+      newMatchNumber = event.currentMatchNumber! + 1;
+    } else if (type === 'decrement') {
+      if (event.mode !== 'assisted') return;
+      newMatchNumber = event.currentMatchNumber! - 1;
+    } else if (type === 'set') {
+      if (event.mode !== 'assisted') return;
+      if (number === undefined) throw new Error('`number` is required for `set` dispatches');
+      newMatchNumber = number;
+    } else {
+      throw new Error('Unknown action type passed to match number reducer');
+    }
+    update(dbEventRef.current, {
+      currentMatchNumber: newMatchNumber,
+    });
+  }, undefined);
+
   const handleKeyPress = (e: KeyboardEvent): void => {
     switch (e.code) {
       case 'KeyA':
-        swapMode();
+        dispatchEventChange({ type: 'swap' });
         break;
       case 'ArrowLeft':
-        decrementMatchNumber();
+        dispatchEventChange({ type: 'decrement' });
         break;
       case 'ArrowRight':
-        incrementMatchNumber();
+        dispatchEventChange({ type: 'increment' });
         break;
       default:
         break;
@@ -165,8 +170,12 @@ const Queueing = () => {
     <>
       <label htmlFor="modeSelect">
         Mode:
-        {/* @ts-ignore */}
-        <select value={event.mode} onInput={(e): void => swapMode(e.target.value)} id="modeSelect">
+        <select
+          value={event.mode}
+          /* @ts-ignore */
+          onInput={(e): void => dispatchEventChange({ type: 'swap', mode: e.target.value })}
+          id="modeSelect"
+        >
           <option value="automatic">Automatic</option>
           <option value="assisted">Assisted</option>
         </select>
@@ -229,8 +238,18 @@ const Queueing = () => {
           <div className={styles.qualsDisplay}>
             {event.mode === 'assisted' && (
               <div className={styles.touchMatchControlButtons}>
-                <button type="button" onClick={() => decrementMatchNumber()}>Prev</button>
-                <button type="button" onClick={() => incrementMatchNumber()}>Next</button>
+                <button
+                  type="button"
+                  onClick={() => dispatchEventChange({ type: 'decrement' })}
+                >
+                  Prev
+                </button>
+                <button
+                  type="button"
+                  onClick={() => dispatchEventChange({ type: 'increment' })}
+                >
+                  Next
+                </button>
               </div>
             )}
             <div className={styles.matches}>

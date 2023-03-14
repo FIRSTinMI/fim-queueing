@@ -1,0 +1,22 @@
+@import "./custom_variables.scss";
+@import "milligram/src/_Color.sass";
+@import "milligram/src/_Button.sass";
+@import "milligram/src/_Form.sass";
+@import "milligram/src/_List.sass";
+@import "milligram/src/_Link.sass";
+
+button {
+  font-size: .8rem;
+  line-height: 2rem;
+  height: 2rem;
+
+  &:focus {
+    box-shadow: 0px 0px 0px 3px darken($color-primary, 20%);
+    background-color: $color-primary;
+  }
+}
+
+select {
+  font-size: .8rem;
+  height: 2.5rem;
+}
