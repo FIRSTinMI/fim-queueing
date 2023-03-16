@@ -29,9 +29,9 @@ const StaleDataBanner = (): JSX.Element => {
     // TODO(@evanlihou): check this again when I have more time
     const ctx = contextRef.current;
 
-    // If the data is more than 15 minutes old
+    // If the data is more than 20 minutes old
     if (ctx?.event?.lastModifiedMs
-      && Date.now() - (15 * units.minute) > ctx.event.lastModifiedMs) {
+      && Date.now() - (20 * units.minute) > ctx.event.lastModifiedMs) {
       // Show the banner
       setIsShown(true);
       const elapsed = ctx.event.lastModifiedMs - Date.now();
