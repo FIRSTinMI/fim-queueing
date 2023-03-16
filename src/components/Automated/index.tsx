@@ -9,6 +9,7 @@ import PlayoffQueueing from '../PlayoffQueueing/Queueing';
 import PlayoffBracket from '../PlayoffBracket';
 import LiveStream from '../LiveStream';
 import TeamRankings from '../RankingDisplay/TeamRankings';
+import FrcPit from '../FrcPit';
 
 type AutomatedProps = {
   matches: {
@@ -53,6 +54,7 @@ const Automated = (props: AutomatedProps) => {
         case '/qual/queueing': return <QualQueueing />;
         case '/rankings': return <TeamRankings />;
         case '/stream': return <LiveStream />;
+        case '/frcpit': return <FrcPit />;
         default:
           return (
             <Error>
@@ -66,6 +68,7 @@ const Automated = (props: AutomatedProps) => {
         case '/playoff/queueing': return <PlayoffQueueing />;
         case '/playoff/bracket': return <PlayoffBracket />;
         case '/stream': return <LiveStream />;
+        case '/frcpit': return <FrcPit />;
         default:
           return (
             <Error>

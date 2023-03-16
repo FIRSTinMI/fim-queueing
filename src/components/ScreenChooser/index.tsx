@@ -57,6 +57,7 @@ export default function ScreenChooser() {
             <option value="/qual/queueing">Queueing</option>
             <option value="/rankings">Rankings</option>
             <option value="/stream">Stream</option>
+            <option value="/frcpit">FRC Pit Display</option>
           </select>
         </label>
         <label htmlFor="playoffSelect">
@@ -69,6 +70,7 @@ export default function ScreenChooser() {
             <option value="/playoff/queueing">Queueing</option>
             <option value="/playoff/bracket">Bracket</option>
             <option value="/stream">Stream</option>
+            <option value="/frcpit">FRC Pit Display</option>
           </select>
         </label>
         <button type="submit">Start</button>
@@ -81,6 +83,7 @@ export default function ScreenChooser() {
         <li><Link href="/playoff/bracket">Playoff Bracket</Link></li>
         <li><Link href="/playoff/queueing">Playoff Queueing</Link></li>
         <li><Link href="/stream">Live Stream</Link></li>
+        <li><Link href="/frcpit">FRC Pit Display</Link></li>
       </ul>
     </div>
   );
