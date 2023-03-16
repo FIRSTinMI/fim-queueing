@@ -195,10 +195,11 @@ exports.updatePlayoffBracket = async function(season: number, event: Event,
     playoffMatchInfo[match.number] = {
       winner: await getWinnerFromMatches(apiMatches, match.number,
           match.winsRequired),
-      participants: apiMatches[0]?.teams.reduce((prev, team) => ({
-        ...prev,
-        [team.station]: team.teamNumber,
-      }), {}) as any as Record<DriverStation, number> ?? null,
+      participants: apiMatches[0]?.teams.filter((team) => team.teamNumber !== 0)
+          .reduce((prev, team) => ({
+            ...prev,
+            [team.station]: team.teamNumber,
+          }), {}) as any as Record<DriverStation, number> ?? null,
       redAlliance: participantToAllianceNumber(match.participants.red),
       blueAlliance: participantToAllianceNumber(match.participants.blue),
     };
