@@ -1,3 +1,5 @@
+import { BracketMatchNumber } from './DoubleEliminationBracketMapping';
+
 export type EventState = 'Pending' | 'AwaitingQualSchedule' | 'QualsInProgress'
 | 'AwaitingAlliances' | 'PlayoffsInProgress' | 'EventOver';
 
@@ -9,6 +11,7 @@ export type Event = {
   name: string,
   eventCode: string,
   currentMatchNumber: number | null,
+  playoffMatchNumber: BracketMatchNumber | null
   streamEmbedLink?: string;
   numQualMatches: number | null,
   mode: AppMode,
