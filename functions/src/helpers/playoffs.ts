@@ -213,7 +213,7 @@ exports.updatePlayoffBracket = async function(season: number, event: Event,
   const currentMatchNumber = lastMatchWithWinner !== undefined ?
       DoubleEliminationBracketMapping.matches[
           DoubleEliminationBracketMapping.matches
-              .findIndex((x) => x.number == lastMatchWithWinner)+1].number :
+              .findIndex((x) => x.number == lastMatchWithWinner)+1]?.number :
     undefined;
   if (lastMatchWithWinner != event.playoffMatchNumber) {
     await admin.database()
