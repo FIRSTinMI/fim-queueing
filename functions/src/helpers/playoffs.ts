@@ -184,6 +184,7 @@ exports.updatePlayoffBracket = async function(season: number, event: Event,
     } else throw new Error("Participant source not as expected");
   }
 
+  let lastMatchWithWinner: BracketMatchNumber | undefined = undefined;
   for (const match of DoubleEliminationBracketMapping.matches) {
     // For now let's just take the first one, it'll be easier
     const matchNums = (match.overrideMatchNumbers ?? [match.number]);
@@ -192,9 +193,10 @@ exports.updatePlayoffBracket = async function(season: number, event: Event,
         (mn) => matches.Matches.find((am) => am.matchNumber === mn)
     ).filter((m) => m !== undefined);
 
+    const winner = await getWinnerFromMatches(apiMatches, match.number,
+        match.winsRequired);
     playoffMatchInfo[match.number] = {
-      winner: await getWinnerFromMatches(apiMatches, match.number,
-          match.winsRequired),
+      winner,
       participants: apiMatches[0]?.teams.filter((team) => team.teamNumber !== 0)
           .reduce((prev, team) => ({
             ...prev,
@@ -203,6 +205,22 @@ exports.updatePlayoffBracket = async function(season: number, event: Event,
       redAlliance: participantToAllianceNumber(match.participants.red),
       blueAlliance: participantToAllianceNumber(match.participants.blue),
     };
+    if (winner) {
+      lastMatchWithWinner = match.number;
+    }
+  }
+
+  const currentMatchNumber = lastMatchWithWinner !== undefined ?
+      DoubleEliminationBracketMapping.matches[
+          DoubleEliminationBracketMapping.matches
+              .findIndex((x) => x.number == lastMatchWithWinner)+1]?.number :
+    undefined;
+  if (lastMatchWithWinner != event.playoffMatchNumber) {
+    await admin.database()
+        .ref(`/seasons/${season}/events/${eventKey}`)
+        .update({
+          playoffMatchNumber: currentMatchNumber,
+        });
   }
 
   if (playoffMatchInfo["F"]?.winner) {
