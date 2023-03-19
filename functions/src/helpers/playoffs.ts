@@ -219,7 +219,7 @@ exports.updatePlayoffBracket = async function(season: number, event: Event,
     await admin.database()
         .ref(`/seasons/${season}/events/${eventKey}`)
         .update({
-          playoffMatchNumber: currentMatchNumber,
+          playoffMatchNumber: currentMatchNumber ?? null,
         });
   }
 
