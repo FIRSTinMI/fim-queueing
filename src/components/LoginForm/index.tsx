@@ -68,7 +68,7 @@ const LoginForm = ({ onLogin }: LoginFormProps) => {
           type="password"
           maxLength={10}
           minLength={10}
-          onInput={(e): void => setEventToken((e.target as HTMLInputElement).value)}
+          onInput={(e): void => setEventToken((e.target as HTMLInputElement).value.toUpperCase())}
         />
         <button type="submit">Log in</button>
       </form>
