@@ -3,13 +3,9 @@ import { useContext } from 'preact/hooks';
 
 import AppContext from '@/AppContext';
 import MenuBar from '../MenuBar';
+import AppErrorMessage, { ErrorMessageType } from '../ErrorMessage';
 import Link from '../Link';
-import QualQueueing from '../QualDisplay/Queueing';
-import PlayoffQueueing from '../PlayoffQueueing/Queueing';
-import PlayoffBracket from '../PlayoffBracket';
-import LiveStream from '../LiveStream';
-import TeamRankings from '../RankingDisplay/TeamRankings';
-import FrcPit from '../FrcPit';
+import Routes from '@/routes';
 
 type AutomatedProps = {
   matches: {
@@ -22,71 +18,69 @@ const Automated = (props: AutomatedProps) => {
   const { event, season } = useContext(AppContext);
   const { matches: { playoff, qual } } = props;
 
-  const Error = ({ children }: { children: ComponentChildren }) => (
+  const ErrorMessage = ({ children, type }: {
+    children: ComponentChildren,
+    type?: ErrorMessageType,
+  }) => (
     <>
       <MenuBar event={event} season={season} alwaysShow />
-      <div style={{
-        margin: '1em',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: '100%',
-      }}
-      >
-        <p>{ children }</p>
+      <div>
+        <AppErrorMessage type={type}>{ children }</AppErrorMessage>
       </div>
     </>
   );
 
+  ErrorMessage.defaultProps = {
+    type: 'info',
+  };
+
   if (!playoff || !qual) {
     return (
-      <Error>
+      <ErrorMessage>
         You&apos;re missing some configuration info... Try going {' '}
         <Link href="/">home</Link> and giving it another shot.
-      </Error>
+      </ErrorMessage>
     );
   }
   switch (event?.state) {
     case 'Pending':
     case 'AwaitingQualSchedule':
     case 'QualsInProgress':
-      switch (qual) {
-        case '/qual/queueing': return <QualQueueing />;
-        case '/rankings': return <TeamRankings />;
-        case '/stream': return <LiveStream />;
-        case '/frcpit': return <FrcPit />;
-        default:
-          return (
-            <Error>
-              Double check your configuration, something isn&apos;t right here...
-            </Error>
-          );
+    {
+      const routeToUse = Routes.find((r) => r.url === qual && r.usedIn.includes('qual'));
+      if (!routeToUse) {
+        return (
+          <ErrorMessage>
+            Double check your configuration, something isn&apos;t right here...
+          </ErrorMessage>
+        );
       }
+      return (<routeToUse.component routeParams={routeToUse.params} />);
+    }
     case 'AwaitingAlliances':
     case 'PlayoffsInProgress':
-      switch (playoff) {
-        case '/playoff/queueing': return <PlayoffQueueing />;
-        case '/playoff/bracket': return <PlayoffBracket />;
-        case '/stream': return <LiveStream />;
-        case '/frcpit': return <FrcPit />;
-        default:
-          return (
-            <Error>
-              Double check your configuration, something isn&apos;t right here...
-            </Error>
-          );
+    {
+      const routeToUse = Routes.find((r) => r.url === playoff && r.usedIn.includes('playoff'));
+      if (!routeToUse) {
+        return (
+          <ErrorMessage>
+            Double check your configuration, something isn&apos;t right here...
+          </ErrorMessage>
+        );
       }
+      return (<routeToUse.component routeParams={routeToUse.params} />);
+    }
     case 'EventOver':
       return (
-        <Error>
+        <ErrorMessage type="arrow">
           The event has ended. See you next time!
-        </Error>
+        </ErrorMessage>
       );
     default:
       return (
-        <Error>
+        <ErrorMessage>
           Hmm... I&apos;m not sure what the event is up to right now...
-        </Error>
+        </ErrorMessage>
       );
   }
 };

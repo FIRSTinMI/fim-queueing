@@ -1,5 +1,6 @@
 import Dotenv  from 'dotenv-webpack'
 const crypto = require("crypto");
+// const Visualizer = require('webpack-visualizer-plugin');
 
 /**
  * md4 algorithm is not available anymore in NodeJS 17+ (because of lib SSL 3).
@@ -26,6 +27,7 @@ try {
  */
 export default (config, env, helpers) => { 
     config.plugins.push(new Dotenv({path: "./.env", systemvars: true}));
+    // config.plugins.push(new Visualizer());
 
     if (env.isProd) {
       config.devtool = false;

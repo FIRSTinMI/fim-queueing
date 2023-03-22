@@ -1,5 +1,10 @@
 // TODO: Move any relevant portions of this file to `shared`
 
+import { FunctionalComponent } from 'preact';
+
+export type RouteComponent<TParams = {}, TRouteParams = undefined> =
+  FunctionalComponent<TParams & TRouteParams>;
+
 export type AppMode = 'automatic' | 'assisted';
 
 export type Event = {

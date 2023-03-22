@@ -47,7 +47,7 @@
       ],
       "@typescript-eslint/no-unused-vars": [
         "error",
-        { 
+        {
           "argsIgnorePattern": "^_",
           "varsIgnorePattern": "^_",
           "caughtErrorsIgnorePattern": "^_"
@@ -57,7 +57,11 @@
         "error",
         {
           "selector": "default",
-          "format": ["camelCase", "PascalCase", "UPPER_CASE"],
+          "format": [
+            "camelCase",
+            "PascalCase",
+            "UPPER_CASE"
+          ],
           "leadingUnderscore": "allow"
         }
       ]
@@ -77,7 +81,8 @@
     "preact": "^10.3.1",
     "preact-cli": "^3.4.3",
     "preact-render-to-string": "^5.1.4",
-    "preact-router": "^4.1.0"
+    "preact-router": "^4.1.0",
+    "react-error-boundary": "^4.0.1"
   },
   "devDependencies": {
     "@babel/plugin-transform-react-jsx-source": "^7.19.6",

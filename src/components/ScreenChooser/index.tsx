@@ -5,12 +5,13 @@ import Link from '@/components/Link';
 import AppContext from '@/AppContext';
 import MenuBar from '../MenuBar';
 import styles from './styles.scss';
+import Routes from '@/routes';
 
 let previousSetupState: { qual: string, playoff: string } | undefined;
 
 export default function ScreenChooser() {
   const ctx = useContext(AppContext);
-  const { event, season, features } = ctx;
+  const { event, season } = ctx;
   const [qualScreen, setQualScreen] = useState<string>('/qual/queueing');
   const [playoffScreen, setPlayoffScreen] = useState<string>('/playoff/queueing');
 
@@ -54,10 +55,9 @@ export default function ScreenChooser() {
             value={qualScreen}
             onChange={(e: any) => setQualScreen(e.target.value)}
           >
-            <option value="/qual/queueing">Queueing</option>
-            <option value="/rankings">Rankings</option>
-            <option value="/stream">Stream</option>
-            <option value="/frcpit">FRC Pit Display</option>
+            {Routes.filter((r) => r.usedIn.includes('qual')).map((r) => (
+              <option value={r.url}>{r.name}</option>
+            ))}
           </select>
         </label>
         <label htmlFor="playoffSelect">
@@ -67,10 +67,9 @@ export default function ScreenChooser() {
             value={playoffScreen}
             onChange={(e: any) => setPlayoffScreen(e.target.value)}
           >
-            <option value="/playoff/queueing">Queueing</option>
-            <option value="/playoff/bracket">Bracket</option>
-            <option value="/stream">Stream</option>
-            <option value="/frcpit">FRC Pit Display</option>
+            {Routes.filter((r) => r.usedIn.includes('playoff')).map((r) => (
+              <option value={r.url}>{r.name}</option>
+            ))}
           </select>
         </label>
         <button type="submit">Start</button>
@@ -78,12 +77,11 @@ export default function ScreenChooser() {
       <hr />
       <h4>Or, Select Directly</h4>
       <ul>
-        <li><Link href="/qual/queueing">Qualification Queueing</Link></li>
-        {features?.showRankingsScreen === true && <li><Link href="/rankings">Rankings</Link></li>}
-        <li><Link href="/playoff/bracket">Playoff Bracket</Link></li>
-        <li><Link href="/playoff/queueing">Playoff Queueing</Link></li>
-        <li><Link href="/stream">Live Stream</Link></li>
-        <li><Link href="/frcpit">FRC Pit Display</Link></li>
+        {Routes.filter((r) => r.hideFromNav !== true).map((r) => (
+          <li>
+            <Link href={r.url}>{r.name}</Link>
+          </li>
+        ))}
       </ul>
     </div>
   );

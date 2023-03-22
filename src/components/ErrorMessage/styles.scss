@@ -1,0 +1,44 @@
+.errorMessage {
+  padding-top: 2em;
+  text-align: center;
+  padding-left: 1em;
+  padding-right: 1em;
+
+  .symbol::after {
+    font-size: 2em;
+    border-radius: 50%;
+    aspect-ratio: 1 / 1;
+    width: 1.5em;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 3rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .error::after {
+    background: red;
+    color: white;
+    content: "!";
+  }
+
+  .warning::after {
+    background: yellow;
+    border: 2px solid black;
+    color: black;
+    content: "!";
+  }
+
+  .arrow::after {
+    background: green;
+    color: white;
+    content: "\2b95";
+  }
+
+  .info::after {
+    background: blue;
+    color: white;
+    content: "i";
+  }
+}

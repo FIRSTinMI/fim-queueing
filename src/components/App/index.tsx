@@ -10,23 +10,27 @@ import {
 } from 'preact-router';
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { HubConnection, HubConnectionState } from '@microsoft/signalr';
+import { ErrorBoundary } from 'react-error-boundary';
 
 import { Event } from '@shared/DbTypes';
+import Routes from '@/routes';
 import styles from './styles.scss';
-import QualQueueing from '../QualDisplay/Queueing';
 import LoginForm from '../LoginForm';
 import ScreenChooser from '../ScreenChooser';
-import TeamRankings from '../RankingDisplay/TeamRankings';
-import PlayoffBracket from '../PlayoffBracket';
 import AppContext, { AppContextType } from '../../AppContext';
-import PlayoffQueueing from '../PlayoffQueueing/Queueing';
-import LiveStream from '../LiveStream';
-import FrcPit from '../FrcPit';
-import Automated from '../Automated';
 import StaleDataBanner from '../StaleDataBanner';
 import useStateWithRef from '@/useStateWithRef';
+import ErrorMessage from '../ErrorMessage';
 
 // TODO: Figure out why the event details sometimes aren't getting sent over to SignalR
+
+const ErrorFallback = () => (
+  <ErrorMessage type="error">
+    An unexpected error has occurred. Please use the{' '}
+    <span style={{ whiteSpace: 'nowrap' }}>#av-help</span>{' '}
+    FiM Slack channel for support.
+  </ErrorMessage>
+);
 
 const App = () => {
   const [db, setDb] = useState<Database>();
@@ -248,14 +252,11 @@ const App = () => {
       <>
         <StaleDataBanner />
         <Router onChange={onNewRoute}>
+          {/* NOTE: Do not add new routes here. Add them in `src/routes.ts` */}
           <Route default component={ScreenChooser} />
-          <Route component={QualQueueing} path="/qual/queueing" />
-          <Route component={TeamRankings} path="/rankings" />
-          <Route component={PlayoffBracket} path="/playoff/bracket" />
-          <Route component={PlayoffQueueing} path="/playoff/queueing" />
-          <Route component={LiveStream} path="/stream" />
-          <Route component={FrcPit} path="/frcpit" />
-          <Route component={Automated} path="/automated" />
+          {Routes.map((rt) => (
+            <Route component={rt.component as any} path={rt.url} routeParams={rt.params} />
+          ))}
         </Router>
       </>
     );
@@ -266,16 +267,18 @@ const App = () => {
   return (
     <div id="preact_root" className={styles.app}>
       {identifyTO !== null && <div className={styles.identify}>{hub.current?.connectionId}</div>}
-      <AppContext.Provider value={appContext ?? {}}>
-        { connection?.connectionStatus === 'offline' && (
-          <div className={styles.warningBar}>
-            Check network connection.
-            {connection.lastConnectedDate
-              && ` Last connected ${connection.lastConnectedDate?.toLocaleString([], { timeStyle: 'short' })}`}
-          </div>
-        ) }
-        { appContent }
-      </AppContext.Provider>
+      <ErrorBoundary FallbackComponent={ErrorFallback}>
+        <AppContext.Provider value={appContext ?? {}}>
+          { connection?.connectionStatus === 'offline' && (
+            <div className={styles.warningBar}>
+              Check network connection.
+              {connection.lastConnectedDate
+                && ` Last connected ${connection.lastConnectedDate?.toLocaleString([], { timeStyle: 'short' })}`}
+            </div>
+          ) }
+          { appContent }
+        </AppContext.Provider>
+      </ErrorBoundary>
     </div>
   );
 };
