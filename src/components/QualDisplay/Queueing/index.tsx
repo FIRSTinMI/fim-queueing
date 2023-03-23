@@ -215,7 +215,7 @@ const Queueing = () => {
     const rankingsRef = ref(getDatabase(), `/seasons/${season}/rankings/${token}`);
     if (event.options?.showRankings) {
       onValue(rankingsRef, (snap) => {
-        setRankings((snap.val() as TeamRanking[]).sort((a, b) => a.rank - b.rank));
+        setRankings((snap.val() as TeamRanking[])?.sort((a, b) => a.rank - b.rank) ?? []);
       });
     } else {
       off(rankingsRef);

@@ -20,7 +20,7 @@ const TeamRankings = () => {
 
     const rankingsRef = ref(getDatabase(), `/seasons/${season}/rankings/${token}`);
     onValue(rankingsRef, (snap) => {
-      setRankings((snap.val() as TeamRanking[]).sort((a, b) => a.rank - b.rank));
+      setRankings((snap.val() as TeamRanking[])?.sort((a, b) => a.rank - b.rank) ?? []);
     });
 
     return () => { off(rankingsRef); };
