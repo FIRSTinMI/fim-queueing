@@ -163,7 +163,15 @@ const App = () => {
     if (!process.env.PREACT_APP_SIGNALR_SERVER) return;
     import(/* webpackChunkName: "signalr" */ '@microsoft/signalr').then(async (signalR) => {
       const cn = new signalR.HubConnectionBuilder()
-        .withUrl(`${process.env.PREACT_APP_SIGNALR_SERVER}/DisplayHub`).withAutomaticReconnect().build();
+        .withUrl(`${process.env.PREACT_APP_SIGNALR_SERVER}/DisplayHub`).withAutomaticReconnect({
+          nextRetryDelayInMilliseconds(retryContext) {
+            if (retryContext.previousRetryCount > 10) {
+              return null;
+            }
+
+            return 2_000 * retryContext.previousRetryCount;
+          },
+        }).build();
       hub.current = cn;
       cn.on('SendRefresh', async () => {
         // Clear caches and reload
