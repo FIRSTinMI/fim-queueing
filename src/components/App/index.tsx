@@ -27,12 +27,15 @@ import ErrorMessage from '../ErrorMessage';
 const ErrorFallback = ({ error }: { error: Error }) => {
   console.error(error);
   return (
-    <ErrorMessage type="error">
-      An unexpected error has occurred. Please use the{' '}
-      <span style={{ whiteSpace: 'nowrap' }}>#av-help</span>{' '}
-      FiM Slack channel for support.
-    </ErrorMessage>
-  )
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <ErrorMessage type="error">
+        An unexpected error has occurred. Please use the{' '}
+        <span style={{ whiteSpace: 'nowrap' }}>#av-help</span>{' '}
+        FiM Slack channel for support.
+      </ErrorMessage>
+      <small style={{ fontSize: '.5em', display: 'block', paddingTop: '1em' }}>{error.message}</small>
+    </div>
+  );
 };
 
 const App = () => {
