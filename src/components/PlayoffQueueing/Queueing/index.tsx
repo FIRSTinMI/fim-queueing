@@ -49,9 +49,9 @@ const PlayoffQueueing = () => {
     // Get the basic list of matches
     const matchDisplays: PlayoffMatchDisplay[] = DoubleEliminationBracketMapping.matches.map(
       (m) => ({
-        result: results[m.number] ?? null,
+        result: results ? results[m.number] ?? null : null,
         match: m,
-        num: m.number,
+        num: m?.number,
       }),
     );
     // TODO: Find a better way to do this?
