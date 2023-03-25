@@ -24,13 +24,16 @@ import ErrorMessage from '../ErrorMessage';
 
 // TODO: Figure out why the event details sometimes aren't getting sent over to SignalR
 
-const ErrorFallback = () => (
-  <ErrorMessage type="error">
-    An unexpected error has occurred. Please use the{' '}
-    <span style={{ whiteSpace: 'nowrap' }}>#av-help</span>{' '}
-    FiM Slack channel for support.
-  </ErrorMessage>
-);
+const ErrorFallback = ({ error }: { error: Error }) => {
+  console.error(error);
+  return (
+    <ErrorMessage type="error">
+      An unexpected error has occurred. Please use the{' '}
+      <span style={{ whiteSpace: 'nowrap' }}>#av-help</span>{' '}
+      FiM Slack channel for support.
+    </ErrorMessage>
+  )
+};
 
 const App = () => {
   const [db, setDb] = useState<Database>();
