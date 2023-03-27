@@ -61,7 +61,7 @@ function MatchDisplay({ halfWidth, match, className }: MatchDisplayProps): JSX.E
     redContent = (
       <span className={[styles.red, styles.teamNums].join(' ')}>
         <span>A{match.result.redAlliance ?? '?'}</span>
-        {[1, 2, 3].map((n) => <TeamDisplay key={`${match?.num}r${n}`} teamNumber={match.result?.participants[`Red${n}` as DriverStation]} />)}
+        {[1, 2, 3].map((n) => <TeamDisplay key={`${match?.num}r${n}`} teamNumber={(match.result?.participants ?? {})[`Red${n}` as DriverStation]} />)}
       </span>
     );
   } else {
@@ -75,7 +75,7 @@ function MatchDisplay({ halfWidth, match, className }: MatchDisplayProps): JSX.E
     blueContent = (
       <span className={[styles.blue, styles.teamNums].join(' ')}>
         <span>A{match.result.blueAlliance ?? '?'}</span>
-        {[1, 2, 3].map((n) => <TeamDisplay key={`${match?.num}b${n}`} teamNumber={match.result?.participants[`Blue${n}` as DriverStation]} />)}
+        {[1, 2, 3].map((n) => <TeamDisplay key={`${match?.num}b${n}`} teamNumber={(match.result?.participants ?? {})[`Blue${n}` as DriverStation]} />)}
       </span>
     );
   } else {
