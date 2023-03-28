@@ -24,7 +24,26 @@ import ErrorMessage from '../ErrorMessage';
 
 // TODO: Figure out why the event details sometimes aren't getting sent over to SignalR
 
-const ErrorFallback = ({ error }: { error: Error }) => {
+const ErrorFallback = ({ error, resetErrorBoundary }
+  : { error: Error, resetErrorBoundary: () => void }) => {
+  const refreshTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Reload after a while to try a recovery
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if ('caches' in window) {
+        caches.keys().then((names) => {
+          names.forEach(async (name) => {
+            await caches.delete(name);
+          });
+        });
+      }
+      window?.location?.reload();
+    }, 300_000);
+
+    return () => clearTimeout(timeout);
+  }, []);
+
   console.error(error);
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
