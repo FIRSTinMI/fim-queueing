@@ -1,0 +1,15 @@
+$border-color: #222;
+
+.fullHeight {
+    height: 100%;
+}
+
+.staticBottom {
+    position: fixed;
+    bottom: 0;
+}
+
+.staticTop {
+    position: fixed;
+    top: 0;
+}
