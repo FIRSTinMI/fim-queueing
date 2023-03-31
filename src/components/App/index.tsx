@@ -26,8 +26,6 @@ import ErrorMessage from '../ErrorMessage';
 
 const ErrorFallback = ({ error }
 : { error: Error }) => {
-  const refreshTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
-
   // Reload after a while to try a recovery
   useEffect(() => {
     const timeout = setTimeout(() => {
