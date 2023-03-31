@@ -23,7 +23,7 @@ const KeyableTicker = () => {
   const [rankings, setRankings] = useState<TeamRanking[]>([]);
 
   useEffect(() => {
-    if (!token) return () => { };
+    if (!token) return;
     dbEventRef.current = ref(getDatabase(), `/seasons/${season}/events/${token}`);
   }, [event.eventCode, season, token]);
 
@@ -55,7 +55,7 @@ const KeyableTicker = () => {
     <>
       <MenuBar event={event} season={season} options={menuOptions()} />
       {/* Give this div a custom ID so that it can be re-styled in applications like OBS */}
-      <div id="chroma-background" className={styles.fullHeight} style={{background: bgColor}}>
+      <div id="chroma-background" className={styles.fullHeight} style={{ background: bgColor }}>
         <div className={forceBottom ? styles.staticBottom : styles.staticTop}>
           <RankingList>
             {rankings.map((x) => (<Ranking teamNumber={x.teamNumber} ranking={x.rank} />))}
