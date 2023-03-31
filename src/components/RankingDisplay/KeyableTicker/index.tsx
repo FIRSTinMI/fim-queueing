@@ -9,9 +9,9 @@ import {
 import { TeamRanking } from '@/types';
 import AppContext from '@/AppContext';
 import styles from './styles.scss';
-import Ranking from '../../../Tickers/Ranking';
-import RankingList from '../../../Tickers/RankingList';
-import MenuBar from '../../../MenuBar';
+import Ranking from '../../Tickers/Ranking';
+import RankingList from '../../Tickers/RankingList';
+import MenuBar from '../../MenuBar';
 
 const KeyableTicker = () => {
   const { event, season, token } = useContext(AppContext);
@@ -54,7 +54,8 @@ const KeyableTicker = () => {
   return (
     <>
       <MenuBar event={event} season={season} options={menuOptions()} />
-      <div className={styles.fullHeight} style={{background: bgColor}}>
+      {/* Give this div a custom ID so that it can be re-styled in applications like OBS */}
+      <div id="chroma-background" className={styles.fullHeight} style={{background: bgColor}}>
         <div className={forceBottom ? styles.staticBottom : styles.staticTop}>
           <RankingList>
             {rankings.map((x) => (<Ranking teamNumber={x.teamNumber} ranking={x.rank} />))}
