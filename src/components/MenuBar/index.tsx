@@ -123,7 +123,9 @@ const MenuBar = (props: MenuBarProps) => {
       <div className={styles.eventName}>
         {event.name}
         {' '}
-        ({season})
+        (
+        {season}
+        )
       </div>
       <div className={styles.actions}>
         <div>

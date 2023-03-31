@@ -6,6 +6,8 @@ export type EventState = 'Pending' | 'AwaitingQualSchedule' | 'QualsInProgress'
 export type AppMode = 'automatic' | 'assisted';
 
 export type Event = {
+  // TODO: temporary
+  dataSource?: string,
   start: string,
   end: string,
   name: string,
@@ -35,4 +37,32 @@ export type PlayoffMatch = {
   participants: Record<DriverStation, number>,
   redAlliance: number | null,
   blueAlliance: number | null
+};
+
+export type QualMatch = {
+  number: number,
+  participants: Record<DriverStation, number>,
+};
+
+export type TeamRanking = {
+  rank: number;
+  teamNumber: number;
+  rankingPoints: number;
+  wins: number;
+  ties: number;
+  losses: number;
+  sortOrder2: number;
+  sortOrder3: number;
+  sortOrder4: number;
+};
+
+export type Alliance = {
+  number: number,
+  captain: number,
+  round1: number,
+  round2: number,
+  round3?: number,
+  backup?: number,
+  backupReplaced: number,
+  name: string,
 };

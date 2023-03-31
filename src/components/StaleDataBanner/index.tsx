@@ -66,7 +66,9 @@ const StaleDataBanner = (): JSX.Element => {
 
   if (isShown) {
     return (
-      <div className={styles.staleDataBanner}>Data last published {asOf}.</div>
+      <div className={styles.staleDataBanner}>
+        Data last published {asOf}.
+      </div>
     );
   }
 

@@ -37,8 +37,12 @@ const Automated = (props: AutomatedProps) => {
   if (!playoff || !qual) {
     return (
       <ErrorMessage>
-        You&apos;re missing some configuration info... Try going {' '}
-        <Link href="/">home</Link> and giving it another shot.
+        You&apos;re missing some configuration info... Try going
+        {' '}
+        {' '}
+        <Link href="/">home</Link>
+        {' '}
+        and giving it another shot.
       </ErrorMessage>
     );
   }

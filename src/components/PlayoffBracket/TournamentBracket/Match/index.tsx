@@ -45,15 +45,34 @@ const Match: FunctionalComponent<MatchComponentProps> = ({
     if ('allianceNumber' in team) {
       // This *shouldn't* happen. The FRC API should immediately be populating team numbers...
       // But just in case
-      return (<><b>A{team.allianceNumber}</b> {getTeamsInAlliance(team.allianceNumber)}</>);
+      return (
+        <>
+          <b>
+            A
+            {team.allianceNumber}
+          </b>
+          {' '}
+          {getTeamsInAlliance(team.allianceNumber)}
+        </>
+      );
     }
 
     // If we don't yet know who will be in a match
     if ('winnerFrom' in team) {
-      return (<>Winner of M{team.winnerFrom}</>);
+      return (
+        <>
+          Winner of M
+          {team.winnerFrom}
+        </>
+      );
     }
     if ('loserFrom' in team) {
-      return (<>Loser of M{team.loserFrom}</>);
+      return (
+        <>
+          Loser of M
+          {team.loserFrom}
+        </>
+      );
     }
     throw new Error('ParticipantSource did not match any expected formats');
   };

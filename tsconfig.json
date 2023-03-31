@@ -63,5 +63,5 @@
           "@shared/*": ["./shared/*"]
         }
     },
-    "include": ["src/**/*", "tests/**/*", "shared/**/*"]
+    "include": ["src/**/*", "tests/**/*", "shared/**/*", "./*.js"]
 }

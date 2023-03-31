@@ -37,7 +37,7 @@ const ErrorFallback = ({ error }
         });
       }
       window?.location?.reload();
-    }, 300_000);
+    }, 30_000);
 
     return () => clearTimeout(timeout);
   }, []);
@@ -75,8 +75,10 @@ const ErrorFallback = ({ error }
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       <ErrorMessage type="error">
-        An unexpected error has occurred. Please use the{' '}
-        <span style={{ whiteSpace: 'nowrap' }}>#av-help</span>{' '}
+        An unexpected error has occurred. Please use the
+        {' '}
+        <span style={{ whiteSpace: 'nowrap' }}>#av-help</span>
+        {' '}
         FiM Slack channel for support.
       </ErrorMessage>
       <small style={{ fontSize: '.5em', display: 'block', paddingTop: '1em' }}>{error.message}</small>
