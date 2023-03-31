@@ -8,6 +8,7 @@ import Embeddable, { EmbeddableRouteParams } from './components/Embeddable';
 import PlayoffBracket from './components/PlayoffBracket';
 import PlayoffQueueing from './components/PlayoffQueueing/Queueing';
 import Queueing from './components/QualDisplay/Queueing';
+import KeyableTicker from './components/RankingDisplay/KeyableTicker';
 import TeamRankings from './components/RankingDisplay/TeamRankings';
 
 type Route<TParams> = {
@@ -43,6 +44,12 @@ const Routes: Route<any>[] = [
     url: '/playoff/bracket',
     component: PlayoffBracket,
     usedIn: ['playoff'],
+  },
+  {
+    name: 'Rankings Ticker (Audience Display)',
+    url: '/ranking/ticker',
+    component: KeyableTicker,
+    usedIn: [],
   },
   {
     name: 'FRC Pit Display',

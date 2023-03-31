@@ -24,10 +24,8 @@ import ErrorMessage from '../ErrorMessage';
 
 // TODO: Figure out why the event details sometimes aren't getting sent over to SignalR
 
-const ErrorFallback = ({ error, resetErrorBoundary }
-  : { error: Error, resetErrorBoundary: () => void }) => {
-  const refreshTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
-
+const ErrorFallback = ({ error }
+: { error: Error }) => {
   // Reload after a while to try a recovery
   useEffect(() => {
     const timeout = setTimeout(() => {
