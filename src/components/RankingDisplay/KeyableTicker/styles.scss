@@ -4,12 +4,40 @@ $border-color: #222;
     height: 100%;
 }
 
+.tickerBox {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    width: 100vw;
+}
+
+.asOf {
+  background-color: #0c0e15;
+  color: white;
+  display: inline;
+  padding: .15em;
+  padding-left: 1.5em;
+  font-size: .65em;
+}
+
 .staticBottom {
+    display: flex;
+    flex-direction: column-reverse;
     position: fixed;
     bottom: 0;
+
+    .asOf {
+      -webkit-clip-path: polygon(1.2em 0, 0 100%, 100% 100%, 100% 0);
+      clip-path: polygon(1.2em 0, 0 100%, 100% 100%, 100% 0);
+    }
 }
 
 .staticTop {
     position: fixed;
     top: 0;
+
+    .asOf {
+      -webkit-clip-path: polygon(0 0, 1.2em 100%, 100% 100%, 100% 0);
+      clip-path: polygon(0 0, 1.2em 100%, 100% 100%, 100% 0);
+    }
 }

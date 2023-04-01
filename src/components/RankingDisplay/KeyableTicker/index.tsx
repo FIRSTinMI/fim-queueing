@@ -21,18 +21,39 @@ const KeyableTicker = () => {
   const [forceBottom, setForceBottom] = useState(false);
   const [bgColor, setBgColor] = useState('#FF00FF');
   const [rankings, setRankings] = useState<TeamRanking[]>([]);
+  const [showAsOf, setShowAsOf] = useState<boolean>(true);
+  const [asOf, setAsOf] = useState<string>('');
 
   useEffect(() => {
     if (!token) return;
     dbEventRef.current = ref(getDatabase(), `/seasons/${season}/events/${token}`);
   }, [event.eventCode, season, token]);
 
+  useEffect(() => {
+    if (!showAsOf || !event.lastModifiedMs) {
+      setAsOf('');
+      return;
+    }
+    if (event.lastModifiedMs < Date.now() - 24 * 60 * 60 * 1000) {
+      setAsOf('a long time ago');
+      return;
+    }
+
+    setAsOf(new Date(event.lastModifiedMs).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit', timeZoneName: 'shortGeneric' }));
+  }, [event.lastModifiedMs, showAsOf]);
+
   const menuOptions = () => (
     <>
-      <label htmlFor="rankingDisplay">
+      <label htmlFor="forceBottom">
         Force Bottom:
         {/* @ts-ignore */}
         <input type="checkbox" checked={forceBottom} onInput={(e): void => setForceBottom(e.target.checked)} id="forceBottom" />
+      </label>
+
+      <label htmlFor="showAsOf">
+        Show as of:
+        {/* @ts-ignore */}
+        <input type="checkbox" checked={showAsOf} onInput={(e): void => setShowAsOf(e.target.checked)} id="showAsOf" />
       </label>
 
       <label htmlFor="bgColorSelect">
@@ -56,10 +77,12 @@ const KeyableTicker = () => {
       <MenuBar event={event} season={season} options={menuOptions()} />
       {/* Give this div a custom ID so that it can be re-styled in applications like OBS */}
       <div id="chroma-background" className={styles.fullHeight} style={{ background: bgColor }}>
-        <div className={forceBottom ? styles.staticBottom : styles.staticTop}>
+        <div className={[styles.tickerBox, (forceBottom ? styles.staticBottom : styles.staticTop)].join(' ')}>
           <RankingList>
             {rankings.map((x) => (<Ranking teamNumber={x.teamNumber} ranking={x.rank} />))}
           </RankingList>
+          {asOf !== ''
+            && <div className={styles.asOf}>As of {asOf}</div>}
         </div>
       </div>
     </>
