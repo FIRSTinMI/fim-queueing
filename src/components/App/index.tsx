@@ -42,6 +42,35 @@ const ErrorFallback = ({ error }
     return () => clearTimeout(timeout);
   }, []);
 
+  useEffect(() => {
+    if (!process.env.PREACT_APP_REPORT_ERROR_URL) return;
+    async function reportError() {
+      try {
+        const formBody: string[] = [];
+        Object.getOwnPropertyNames(error).forEach((key) => {
+          const encodedKey = encodeURIComponent(key);
+          const encodedValue = encodeURIComponent((error as any)[key]);
+          formBody.push(`${encodedKey}=${encodedValue}`);
+        });
+        console.log('asd', formBody);
+
+        await fetch(process.env.PREACT_APP_REPORT_ERROR_URL!, {
+          method: 'POST',
+          headers: {
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: formBody.join('&'),
+          mode: 'no-cors',
+        });
+      } catch (_) {
+        // Pass
+      }
+    }
+
+    reportError();
+  }, []);
+
   console.error(error);
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
