@@ -16,12 +16,16 @@ function RankingList(props: RankingListProps): JSX.Element {
     listRef.current.style.animationDuration = `${(listRef.current.clientWidth / 75)}s`;
   }, [listRef]);
   return (
-    <div className={styles.ticker} style={{backgroundColor: customBgColor || "#0c0e15"}}>
+    <div className={styles.ticker} style={{ backgroundColor: customBgColor }}>
       <div className={styles['ticker-list']} ref={listRef}>
         {children}
       </div>
     </div>
   );
 }
+
+RankingList.defaultProps = {
+  customBgColor: '#0c0e15',
+};
 
 export default RankingList;

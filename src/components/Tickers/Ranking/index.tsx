@@ -4,6 +4,8 @@ import styles from './styles.scss';
 interface RankingProps {
   ranking: number;
   teamNumber: number;
+  customTextColor?: string;
+  customAccentColor?: string;
 }
 
 function numberToOrdinal(num: number) {
@@ -27,13 +29,22 @@ function numberToOrdinal(num: number) {
 }
 
 function Ranking(props: RankingProps): JSX.Element {
-  const { teamNumber, ranking } = props;
+  const {
+    teamNumber, ranking, customTextColor, customAccentColor,
+  } = props;
   return (
-    <div className={styles.newsticker}>
-      <span className={styles.ranking}>{numberToOrdinal(ranking)}</span>
-      <span className={styles.teamNumber}>{teamNumber}</span>
+    <div className={styles.newsticker} style={{ borderRightColor: customAccentColor }}>
+      <span className={styles.ranking} style={{ color: customAccentColor }}>
+        {numberToOrdinal(ranking)}
+      </span>
+      <span className={styles.teamNumber} style={{ color: customTextColor }}>{teamNumber}</span>
     </div>
   );
 }
+
+Ranking.defaultProps = {
+  customTextColor: '#fff',
+  customAccentColor: '#ccc',
+};
 
 export default Ranking;

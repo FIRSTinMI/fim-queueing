@@ -1,9 +1,15 @@
-$border-color: #222;
-
 // Mad hacks to hid the stale banner when the ticker is in the lower position
 .chromaContainer {
   height: 200vh;
   margin-top: -50vh;
+
+  &.textDark {
+    color: black;
+  }
+
+  &.textLight {
+    color: white;
+  }
 }
 
 .tickerBox {
@@ -26,7 +32,6 @@ $border-color: #222;
 }
 
 .asOf {
-  color: white;
   display: inline;
   padding: .15em;
   padding-left: 1.5em;
@@ -34,7 +39,6 @@ $border-color: #222;
 }
 
 .branding {
-  color: white;
   display: inline;
   padding: .15em;
   padding-right: 1.5em;
