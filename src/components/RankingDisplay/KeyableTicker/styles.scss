@@ -1,23 +1,62 @@
 $border-color: #222;
 
-.fullHeight {
-    height: 100%;
+// Mad hacks to hid the stale banner when the ticker is in the lower position
+.chromaContainer {
+  height: 200vh;
+  margin-top: -50vh;
 }
 
 .tickerBox {
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
+    align-items: space-between;
     width: 100vw;
 }
 
+.tickerAddons {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100vw;
+
+  img {
+    max-height: 1em;
+    padding-right: .1em;
+  }
+}
+
 .asOf {
-  background-color: #0c0e15;
   color: white;
   display: inline;
   padding: .15em;
   padding-left: 1.5em;
   font-size: .65em;
+}
+
+.branding {
+  color: white;
+  display: inline;
+  padding: .15em;
+  padding-right: 1.5em;
+  font-size: .65em;
+}
+
+.flex {
+  display: flex;
+
+  .child {
+    margin: auto
+  }
+}
+
+.colorBtnContainer {
+  width: 100%;
+  margin-top: .2em;
+  text-align: center;
+
+  button {
+    margin: .1em;
+  }
 }
 
 .staticBottom {
@@ -30,6 +69,11 @@ $border-color: #222;
       -webkit-clip-path: polygon(1.2em 0, 0 100%, 100% 100%, 100% 0);
       clip-path: polygon(1.2em 0, 0 100%, 100% 100%, 100% 0);
     }
+
+    .branding {
+      -webkit-clip-path: polygon(0 0, calc(100% - 1.2em) 0, 100% 100%, 0 100%);
+      clip-path: polygon(0 0, calc(100% - 1.2em) 0, 100% 100%, 0 100%);
+    }
 }
 
 .staticTop {
@@ -39,5 +83,10 @@ $border-color: #222;
     .asOf {
       -webkit-clip-path: polygon(0 0, 1.2em 100%, 100% 100%, 100% 0);
       clip-path: polygon(0 0, 1.2em 100%, 100% 100%, 100% 0);
+    }
+
+    .branding {
+      -webkit-clip-path: polygon(0 0, 1.2em 100%, calc(100% - 1.2em) 100%, 100% 0);
+      clip-path: polygon(0 0, 0 100%, calc(100% - 1.2em) 100%, 100% 0);
     }
 }
