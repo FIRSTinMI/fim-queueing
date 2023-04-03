@@ -75,6 +75,7 @@
   },
   "dependencies": {
     "@microsoft/signalr": "^7.0.2",
+    "color": "^4.2.3",
     "firebase": "^9.6.10",
     "js-cookie": "^3.0.1",
     "milligram": "^1.4.1",
@@ -86,6 +87,7 @@
   },
   "devDependencies": {
     "@babel/plugin-transform-react-jsx-source": "^7.19.6",
+    "@types/color": "^3.0.3",
     "@types/js-cookie": "^3.0.1",
     "@types/react": "^17.0.43",
     "babel-plugin-module-resolver": "^5.0.0",

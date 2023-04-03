@@ -4,23 +4,28 @@ import type { ComponentChildren } from 'preact';
 import styles from './styles.scss';
 
 interface RankingListProps {
-  children: ComponentChildren
+  children: ComponentChildren,
+  customBgColor?: string,
 }
 
 function RankingList(props: RankingListProps): JSX.Element {
-  const { children } = props;
+  const { children, customBgColor } = props;
   const listRef: RefObject<HTMLDivElement> = createRef();
   useEffect(() => {
     if (!listRef.current) return;
     listRef.current.style.animationDuration = `${(listRef.current.clientWidth / 75)}s`;
   }, [listRef]);
   return (
-    <div className={styles.ticker}>
+    <div className={styles.ticker} style={{ backgroundColor: customBgColor }}>
       <div className={styles['ticker-list']} ref={listRef}>
         {children}
       </div>
     </div>
   );
 }
+
+RankingList.defaultProps = {
+  customBgColor: '#0c0e15',
+};
 
 export default RankingList;
