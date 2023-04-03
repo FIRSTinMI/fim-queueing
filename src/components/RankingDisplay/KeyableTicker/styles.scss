@@ -27,7 +27,8 @@
 
   img {
     display: block;
-    max-height: 1em;
+    margin: 0 auto;
+    max-height: 1.5em;
     padding-right: .1em;
   }
 }
@@ -81,6 +82,10 @@
       -webkit-clip-path: polygon(0 0, calc(100% - 1.2em) 0, 100% 100%, 0 100%);
       clip-path: polygon(0 0, calc(100% - 1.2em) 0, 100% 100%, 0 100%);
     }
+
+    .tickerAddons {
+      align-items: flex-end;
+    }
 }
 
 .staticTop {
@@ -95,5 +100,9 @@
     .branding {
       -webkit-clip-path: polygon(0 0, 1.2em 100%, calc(100% - 1.2em) 100%, 100% 0);
       clip-path: polygon(0 0, 0 100%, calc(100% - 1.2em) 100%, 100% 0);
+    }
+
+    .tickerAddons {
+      align-items: flex-start;
     }
 }
