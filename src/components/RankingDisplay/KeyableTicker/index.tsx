@@ -7,6 +7,7 @@ import {
 } from 'preact/hooks';
 import Color from 'color';
 
+import { EventState } from '@shared/DbTypes';
 import { TeamRanking } from '@/types';
 import AppContext from '@/AppContext';
 import styles from './styles.scss';
@@ -19,6 +20,7 @@ const KeyableTicker = () => {
   if (event === undefined || season === undefined) throw new Error('App context has undefineds');
   const dbEventRef = useRef<DatabaseReference>();
 
+  const [showTicker, setShowTicker] = useState(false);
   const [forceBottom, setForceBottom] = useState(true);
   const [bgColor, setBgColor] = useState('#FF00FF');
   const [tickerColor, setTickerColor] = useState('#0c0e15');
@@ -72,6 +74,16 @@ const KeyableTicker = () => {
       window.history.replaceState({}, '', url.toString());
     }, 2000);
   }, [tickerColor, bgColor, forceBottom, showAsOf, customBrandingImgUrl, customBrandingText]);
+
+  useEffect(() => {
+    if (!(['QualsInProgress', 'AwaitingAlliances'] as EventState[]).includes(event.state)) {
+      setShowTicker(false);
+    } else if (!rankings || rankings.length === 0) {
+      setShowTicker(false);
+    } else {
+      setShowTicker(true);
+    }
+  }, [rankings, event.state]);
 
   useEffect(() => {
     if (!showAsOf || !event.lastModifiedMs) {
@@ -176,16 +188,18 @@ const KeyableTicker = () => {
       {/* Give this div a custom ID so that it can be re-styled in applications like OBS */}
       <div id="chroma-background" className={[styles.chromaContainer, textMode === 'light' ? styles.textLight : styles.textDark].join(' ')} style={{ background: bgColor }}>
         <div className={[styles.tickerBox, (forceBottom ? styles.staticBottom : styles.staticTop)].join(' ')}>
-          <RankingList customBgColor={tickerColor}>
-            {rankings.map((x) => (
-              <Ranking
-                teamNumber={x.teamNumber}
-                ranking={x.rank}
-                customTextColor={textMode === 'light' ? '#fff' : '#000'}
-                customAccentColor={textMode === 'light' ? '#ccc' : '#333'}
-              />
-            ))}
-          </RankingList>
+          {showTicker && (
+            <RankingList customBgColor={tickerColor}>
+              {rankings.map((x) => (
+                <Ranking
+                  teamNumber={x.teamNumber}
+                  ranking={x.rank}
+                  customTextColor={textMode === 'light' ? '#fff' : '#000'}
+                  customAccentColor={textMode === 'light' ? '#ccc' : '#333'}
+                />
+              ))}
+            </RankingList>
+          )}
           <div className={styles.tickerAddons}>
             {customBrandingText !== ''
               ? (
@@ -199,7 +213,7 @@ const KeyableTicker = () => {
                   {/* Display an empty div so that the flex property functions properly */}
                 </div>
               )}
-            {asOf !== ''
+            {asOf !== '' && showTicker
               && (
                 <div className={styles.asOf} style={{ backgroundColor: tickerColor }}>
                   As of {asOf}
