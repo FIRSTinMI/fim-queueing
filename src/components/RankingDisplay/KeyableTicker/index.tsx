@@ -203,7 +203,15 @@ const KeyableTicker = () => {
           <div className={styles.tickerAddons}>
             {customBrandingText !== ''
               ? (
-                <div className={styles.branding} style={{ backgroundColor: tickerColor }}>
+                <div
+                  className={styles.branding}
+                  style={{
+                    backgroundColor: tickerColor,
+                    paddingLeft: showTicker ? null : '1em',
+                    paddingRight: showTicker ? null : '2em',
+                    paddingBlock: showTicker ? null : '0.6em',
+                  }}
+                >
                   {customBrandingImgUrl !== '' && <img src={customBrandingImgUrl} alt="custom branding logo" /> }
                   {customBrandingText}
                 </div>
