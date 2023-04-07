@@ -43,13 +43,17 @@ const PlayoffBracket = () => {
   }, [season, event?.eventCode, token]);
 
   return (
-    <div>
+    <div style={{ flexGrow: 1 }}>
       <MenuBar event={event} season={season} />
+      {/* TODO (@evanlihou): Clean this up, make showing the event name a proper option */}
+      {/* {event?.options.showEventName && ( */}
+      <div style={{ textAlign: 'center' }}>{event?.name}</div>
+      {/* )} */}
       {(!bracket || !alliances) && (
         <div className={styles.infoText}>Waiting for alliances...</div>
       )}
       {bracket && alliances && (
-        <div style={{ padding: '1em' }}>
+        <div style={{ paddingInline: '1em' }}>
           <DoubleEliminationBracket
             matchResults={bracket}
             alliances={alliances}

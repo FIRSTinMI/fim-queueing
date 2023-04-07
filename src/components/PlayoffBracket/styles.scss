@@ -13,7 +13,7 @@ $color-border: #363636;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  flex-grow: 1;
   white-space: nowrap;
   font-size: 2vh;
   .round {

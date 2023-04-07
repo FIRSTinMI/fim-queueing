@@ -24,8 +24,8 @@ export type ComputedOptions = Options & {
 
 export const defaultStyle: Options = {
   width: 210,
-  boxHeight: 105,
-  heightMultiplier: 1.28,
+  boxHeight: 100,
+  heightMultiplier: 1.2,
   spaceBetweenColumns: 50,
   connectorColor: 'rgb(47, 54, 72)',
   connectorOffsetY: 12,
