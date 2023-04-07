@@ -197,7 +197,11 @@ const App = () => {
       }
 
       const season = Number.parseInt(seasonData.val(), 10);
-      const token = Cookies.get('queueing-event-key');
+      let token = Cookies.get('queueing-event-key');
+      if (!token) {
+        const url = new URL(window.location.href);
+        token = url.searchParams.get('key') ?? undefined;
+      }
 
       setSeason(season);
       setToken(token);

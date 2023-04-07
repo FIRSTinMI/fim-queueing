@@ -71,9 +71,12 @@ const KeyableTicker = () => {
       url.searchParams.set('showAsOf', showAsOf.toString());
       url.searchParams.set('customBrandingText', customBrandingText);
       url.searchParams.set('customBrandingImgUrl', customBrandingImgUrl ?? '');
+      if (token) url.searchParams.set('key', token);
       window.history.replaceState({}, '', url.toString());
     }, 2000);
-  }, [tickerColor, bgColor, forceBottom, showAsOf, customBrandingImgUrl, customBrandingText]);
+  }, [
+    tickerColor, bgColor, forceBottom, showAsOf, customBrandingImgUrl, customBrandingText, token,
+  ]);
 
   useEffect(() => {
     if (!(['QualsInProgress', 'AwaitingAlliances'] as EventState[]).includes(event.state)) {
