@@ -1,4 +1,4 @@
-import { h } from 'preact';
+import { h, Fragment } from 'preact';
 import styles from './styles.scss';
 
 interface RankingProps {
@@ -19,10 +19,10 @@ function numberToOrdinal(num: number) {
     ['few', 'rd'],
     ['other', 'th'],
   ]);
-  const formatOrdinals = (n: number) => {
+  const formatOrdinals = (n: number): JSX.Element => {
     const rule = pr.select(n);
     const suffix = suffixes.get(rule);
-    return `${n}${suffix}`;
+    return (<>{n}<sup>{suffix}</sup></>);
   };
 
   return formatOrdinals(num);
