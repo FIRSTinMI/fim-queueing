@@ -66,7 +66,7 @@ const Routes: Route<any>[] = [
     component: Embeddable,
     usedIn: ['qual', 'playoff'],
     params: {
-      iframeUrl: (_, evt) => evt.streamEmbedLink,
+      iframeUrl: (_, evt) => evt.streamEmbedLink?.replace('%HOST%', window?.location?.host),
     },
   } as Route<EmbeddableRouteParams>,
   {
