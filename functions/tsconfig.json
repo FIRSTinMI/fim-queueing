@@ -18,5 +18,8 @@
     // todo remove this?
     "test",
     "../shared",
-  ]
+  ],
+  "paths": {
+    "@shared/*": ["../shared/*"]
+  }
 }

@@ -1,5 +1,6 @@
-import { DriverStation, QualMatch, TeamRanking } from '../../../shared/DbTypes';
-import { BracketMatch } from '../../../shared/DoubleEliminationBracketMapping';
+import {
+  Alliance, DriverStation, QualMatch, TeamRanking,
+} from '../../../shared/DbTypes';
 import GenericApiClient from './GenericApiClient';
 
 export default class FrcEventsApiClient extends GenericApiClient {
@@ -42,18 +43,47 @@ export default class FrcEventsApiClient extends GenericApiClient {
     }));
   }
 
-  public async getPlayoffSchedule(eventCode: string, season: string): Promise<BracketMatch[]> {
-    const resp = await this.get<ApiSchedule>(`/${season}/schedule/${eventCode}?tournamentLevel=playoff`, eventCode);
-    // TODO
-    throw new Error('not implemented');
-  }
-
-  public async getRankings(eventCode: string, season: string): Promise<TeamRanking[]> {
+  /** @inheritdoc */
+  /* public async getPlayoffSchedule(eventCode: string, season: string)
+    : Promise<Partial<PlayoffMatch>[]> {
+    const resp = await this.get<ApiSchedule>(
+      `/${season}/schedule/${eventCode}?tournamentLevel=playoff`, eventCode);
+    return resp.Schedule.map((x) => ({
+      number: x.matchNumber,
+      participants: x.teams.filter((team) => !!team.teamNumber)
+        .reduce((prev, team) => ({
+          ...prev,
+          [team.station]: team.teamNumber,
+        }), {} as Record<DriverStation, number>),
+    }));
+  } */
+  public async getPlayoffMatches(eventCode: string, season: string): Promise<unknown> {
+    this.get(`${season}`, eventCode); // TODO
     throw new Error('Method not implemented.');
   }
 
-  public async getAlliances(eventCode: string, season: string): Promise<Alliance[]> {
+  public async getRankings(eventCode: string, season: string): Promise<TeamRanking[]> {
+    this.get(`${season}`, eventCode); // TODO
+    throw new Error('Method not implemented.');
+  }
 
+  public async getAlliances(eventCode: string, season: string): Promise<Alliance[] | null> {
+    let alliances: ApiAlliances | undefined;
+    try {
+      alliances = await this.get<ApiAlliances>(`/${season}/alliances/${eventCode}`, eventCode) as ApiAlliances;
+    } catch (e) {
+      // The FRC API seems to just error out sometimes fetching alliances...
+      functions.logger.warn(`Error while fetching alliances for event ${eventCode}`, e);
+    }
+
+    if (!alliances || !alliances.Alliances?.length || !alliances.Alliances[0].captain) {
+      return null;
+    }
+    return alliances.Alliances.map((a) => ({
+      number: a.number,
+      shortName: a.name.replace('Alliance', '').trim(),
+      teams: [a.captain, a.round1, a.round2, a.round3, a.backup].filter((t) => !!t) as number[],
+    }));
   }
 }
 
@@ -70,17 +100,6 @@ type ApiSchedule = {
       'surrogate': boolean;
     }[]
   }[]
-};
-
-export type ApiAvatars = {
-  'teams': {
-    'teamNumber': number;
-    'encodedAvatar': string
-  }[];
-  'teamCountTotal': number,
-  'teamCountPage': number,
-  'pageCurrent': number,
-  'pageTotal': number
 };
 
 export type ApiMatchResults = {

@@ -1,6 +1,5 @@
-import { ApiMatchResults, ApiRankings } from './apiTypes';
 import { Alliance, Event } from '../../shared/DbTypes';
-import FrcEventsApiClient from './api/frcEventsApiClient';
+import FrcEventsApiClient from './api/FrcEventsApiClient';
 import GenericApiClient from './api/GenericApiClient';
 
 const functions = require('firebase-functions');
@@ -148,9 +147,9 @@ exports.updateCurrentMatch = async function updateCurrentMatch() {
       }
 
       if (event.state === 'AwaitingAlliances') {
-        let alliances: Alliance[];
+        let alliances: Alliance[] | null;
         try {
-          alliances = apiClient.getAlliances(event.eventCode, season);
+          alliances = await apiClient.getAlliances(event.eventCode, season);
         } catch (e) {
           // The FRC API seems to just error out sometimes fetching alliances...
           functions.logger.warn(
@@ -159,8 +158,7 @@ exports.updateCurrentMatch = async function updateCurrentMatch() {
           return;
         }
 
-        if (alliances !== undefined && alliances.length > 0
-            && alliances[0]?.round2) {
+        if (alliances !== null) {
           admin
             .database()
             .ref(`/seasons/${season}/alliances/${eventKey}`)

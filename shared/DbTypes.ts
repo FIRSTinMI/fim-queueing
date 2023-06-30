@@ -57,12 +57,7 @@ export type TeamRanking = {
 };
 
 export type Alliance = {
-  number: number,
-  captain: number,
-  round1: number,
-  round2: number,
-  round3?: number,
-  backup?: number,
-  backupReplaced: number,
-  name: string,
+  number: number;
+  teams: number[];
+  shortName: string;
 };

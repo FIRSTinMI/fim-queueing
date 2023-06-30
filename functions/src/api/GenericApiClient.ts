@@ -1,5 +1,4 @@
 import { Alliance, QualMatch, TeamRanking } from '../../../shared/DbTypes';
-import { BracketMatch } from '../../../shared/DoubleEliminationBracketMapping';
 
 const functions = require('firebase-functions');
 const fetch = require('node-fetch');
@@ -95,8 +94,9 @@ export default abstract class GenericApiClient {
   public abstract getCurrentQualMatch(eventCode: string, season: string,
     lastKnown: string | undefined): Promise<string | null>;
   public abstract getQualSchedule(eventCode: string, season: string): Promise<QualMatch[]>;
-  public abstract getPlayoffSchedule(eventCode: string, season: string): Promise<BracketMatch[]>;
-  // TODO: Fix return type
+  // public abstract getPlayoffSchedule(eventCode: string, season: string)
+  // : Promise<Partial<PlayoffMatch>[]>;
+  public abstract getPlayoffMatches(eventCode: string, season: string): Promise<unknown>;
   public abstract getRankings(eventCode: string, season: string): Promise<TeamRanking[]>;
-  public abstract getAlliances(eventCode: string, season: string): Promise<Alliance[]>;
+  public abstract getAlliances(eventCode: string, season: string): Promise<Alliance[] | null>;
 }
