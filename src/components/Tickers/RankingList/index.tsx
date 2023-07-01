@@ -16,7 +16,7 @@ function RankingList(props: RankingListProps): JSX.Element {
     listRef.current.style.animationDuration = `${(listRef.current.clientWidth / 75)}s`;
   }, [listRef]);
   return (
-    <div className={styles.ticker} style={{ backgroundColor: customBgColor }}>
+    <div className={styles.ticker} style={{ background: customBgColor }}>
       <div className={styles['ticker-list']} ref={listRef}>
         {children}
       </div>
