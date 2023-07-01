@@ -21,7 +21,7 @@ describe('FrcEventsApiClient', () => {
       const fileContent = await readFile('../../test_data/FrcApi/2023-MIKET-QualMatches.json');
       return JSON.parse(fileContent.toString());
     });
-    const currentQualMatch = await client.getCurrentQualMatch('EVENT', '9999');
+    const currentQualMatch = await client.getCurrentQualMatch('EVENT', 9999);
 
     expect(currentQualMatch).toEqual('8');
 
@@ -36,7 +36,7 @@ describe('FrcEventsApiClient', () => {
       return JSON.parse(fileContent.toString());
     });
 
-    await client.getCurrentQualMatch('EVENT', '9999', '6');
+    await client.getCurrentQualMatch('EVENT', 9999, 6);
 
     expect(getSpy).toBeCalledTimes(1);
     expect(getSpy).toBeCalledWith('/9999/matches/EVENT?tournamentLevel=qual&start=6', 'EVENT');

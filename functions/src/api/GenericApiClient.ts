@@ -1,4 +1,7 @@
-import { Alliance, QualMatch, TeamRanking } from '../../../shared/DbTypes';
+import {
+  Alliance, QualMatch, TeamRanking, DriverStation,
+} from '../../../shared/DbTypes';
+import { BracketMatchNumber } from '../../../shared/DoubleEliminationBracketMapping';
 
 const functions = require('firebase-functions');
 const fetch = require('node-fetch');
@@ -88,15 +91,41 @@ export default abstract class GenericApiClient {
    * search there, saving some resources since current will never decrease (in
    * this context. It can decrease in assisted mode)
    * @param {string} eventCode Event's code to pass to the underlying API
-   * @param {string} season The season the event is in
-   * @param {string | undefined} lastKnown Start search here, if passed in
+   * @param {number} season The season the event is in
+   * @param {number | undefined} lastKnown Start search here, if passed in
    */
-  public abstract getCurrentQualMatch(eventCode: string, season: string,
-    lastKnown: string | undefined): Promise<string | null>;
-  public abstract getQualSchedule(eventCode: string, season: string): Promise<QualMatch[]>;
+  public abstract getCurrentQualMatch(eventCode: string, season: number,
+    lastKnown: number | undefined): Promise<number | null>;
+  public abstract getQualSchedule(eventCode: string, season: number): Promise<QualMatch[]>;
   // public abstract getPlayoffSchedule(eventCode: string, season: string)
   // : Promise<Partial<PlayoffMatch>[]>;
-  public abstract getPlayoffMatches(eventCode: string, season: string): Promise<unknown>;
-  public abstract getRankings(eventCode: string, season: string): Promise<TeamRanking[]>;
-  public abstract getAlliances(eventCode: string, season: string): Promise<Alliance[] | null>;
+  // public abstract getPlayoffMatches(eventCode: string, season: number): Promise<MatchResult[]>;
+  // public abstract getPlayoffScoreDetails(eventCode: string, season: number)
+  // : Promise<ScoreBreakdown[]>;
+  public abstract getPlayoffBracket(eventCode: string, season: number)
+  : Promise<Partial<Record<BracketMatchNumber, PlayoffMatchInfo[]>>>;
+  public abstract getRankings(eventCode: string, season: number): Promise<TeamRanking[]>;
+  public abstract getAlliances(eventCode: string, season: number): Promise<Alliance[] | null>;
 }
+
+export type PlayoffMatchInfo = {
+  participants: Record<DriverStation, number>,
+  winner: 'blue' | 'red' | null
+};
+
+export type MatchResult = {
+  'matchNumber': number;
+  'scoreRedFinal': number;
+  'scoreRedFoul': number;
+  'scoreRedAuto': number;
+  'scoreBlueFinal': number;
+  'scoreBlueFoul': number;
+  'scoreBlueAuto': number;
+  'participants': Record<DriverStation, number>,
+};
+
+export type ScoreBreakdown = {
+  matchNumber: number;
+  red: any;
+  blue: any;
+};

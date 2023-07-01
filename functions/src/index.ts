@@ -25,7 +25,8 @@ exports.reportError = functions.https.onRequest(
 
 // NOTE: Do not include this function in public deployments
 // exports.webUpdateCurrentMatch = functions.https.onRequest(
-//     async (_: any, res: any) => {
-//       await updateCurrentMatch();
-//       res.sendStatus(200);
-//     });
+//   async (_: any, res: any) => {
+//     await updateCurrentMatch();
+//     res.sendStatus(200);
+//   },
+// );
