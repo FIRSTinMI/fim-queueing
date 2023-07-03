@@ -6,11 +6,20 @@
     "outDir": "lib",
     "sourceMap": true,
     "strict": true,
-    "target": "es2017"
+    "target": "es2017",
+    "types": [
+      "jest",
+      "node"
+    ]
   },
   "compileOnSave": true,
   "include": [
     "src",
+    // todo remove this?
+    "test",
     "../shared",
-  ]
+  ],
+  "paths": {
+    "@shared/*": ["../shared/*"]
+  }
 }

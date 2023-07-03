@@ -1,0 +1,184 @@
+{
+  "Schedule": [
+    {
+      "description": "Qualification 1",
+      "startTime": "2023-03-03T10:50:00",
+      "matchNumber": 1,
+      "field": "Primary",
+      "tournamentLevel": "Qualification",
+      "teams": [
+        { "teamNumber": 9251, "station": "Red1", "surrogate": false },
+        { "teamNumber": 5193, "station": "Red2", "surrogate": false },
+        { "teamNumber": 5697, "station": "Red3", "surrogate": false },
+        { "teamNumber": 5436, "station": "Blue1", "surrogate": false },
+        { "teamNumber": 6610, "station": "Blue2", "surrogate": false },
+        { "teamNumber": 4994, "station": "Blue3", "surrogate": false }
+      ]
+    },
+    {
+      "description": "Qualification 2",
+      "startTime": "2023-03-03T10:58:00",
+      "matchNumber": 2,
+      "field": "Primary",
+      "tournamentLevel": "Qualification",
+      "teams": [
+        { "teamNumber": 5282, "station": "Red1", "surrogate": false },
+        { "teamNumber": 6091, "station": "Red2", "surrogate": false },
+        { "teamNumber": 1701, "station": "Red3", "surrogate": false },
+        { "teamNumber": 7247, "station": "Blue1", "surrogate": false },
+        { "teamNumber": 8728, "station": "Blue2", "surrogate": false },
+        { "teamNumber": 70, "station": "Blue3", "surrogate": false }
+      ]
+    },
+    {
+      "description": "Qualification 3",
+      "startTime": "2023-03-03T11:06:00",
+      "matchNumber": 3,
+      "field": "Primary",
+      "tournamentLevel": "Qualification",
+      "teams": [
+        { "teamNumber": 9207, "station": "Red1", "surrogate": false },
+        { "teamNumber": 7790, "station": "Red2", "surrogate": false },
+        { "teamNumber": 5527, "station": "Red3", "surrogate": false },
+        { "teamNumber": 5260, "station": "Blue1", "surrogate": false },
+        { "teamNumber": 6067, "station": "Blue2", "surrogate": false },
+        { "teamNumber": 8767, "station": "Blue3", "surrogate": false }
+      ]
+    },
+    {
+      "description": "Qualification 4",
+      "startTime": "2023-03-03T11:14:00",
+      "matchNumber": 4,
+      "field": "Primary",
+      "tournamentLevel": "Qualification",
+      "teams": [
+        { "teamNumber": 5660, "station": "Red1", "surrogate": false },
+        { "teamNumber": 6631, "station": "Red2", "surrogate": false },
+        { "teamNumber": 1506, "station": "Red3", "surrogate": false },
+        { "teamNumber": 322, "station": "Blue1", "surrogate": false },
+        { "teamNumber": 8385, "station": "Blue2", "surrogate": false },
+        { "teamNumber": 3668, "station": "Blue3", "surrogate": false }
+      ]
+    },
+    {
+      "description": "Qualification 5",
+      "startTime": "2023-03-03T11:22:00",
+      "matchNumber": 5,
+      "field": "Primary",
+      "tournamentLevel": "Qualification",
+      "teams": [
+        { "teamNumber": 5538, "station": "Red1", "surrogate": false },
+        { "teamNumber": 6102, "station": "Red2", "surrogate": false },
+        { "teamNumber": 5460, "station": "Red3", "surrogate": false },
+        { "teamNumber": 4130, "station": "Blue1", "surrogate": false },
+        { "teamNumber": 6073, "station": "Blue2", "surrogate": false },
+        { "teamNumber": 7491, "station": "Blue3", "surrogate": false }
+      ]
+    },
+    {
+      "description": "Qualification 6",
+      "startTime": "2023-03-03T11:30:00",
+      "matchNumber": 6,
+      "field": "Primary",
+      "tournamentLevel": "Qualification",
+      "teams": [
+        { "teamNumber": 8193, "station": "Red1", "surrogate": false },
+        { "teamNumber": 9242, "station": "Red2", "surrogate": false },
+        { "teamNumber": 245, "station": "Red3", "surrogate": false },
+        { "teamNumber": 7784, "station": "Blue1", "surrogate": false },
+        { "teamNumber": 4998, "station": "Blue2", "surrogate": false },
+        { "teamNumber": 894, "station": "Blue3", "surrogate": false }
+      ]
+    },
+    {
+      "description": "Qualification 7",
+      "startTime": "2023-03-03T11:38:00",
+      "matchNumber": 7,
+      "field": "Primary",
+      "tournamentLevel": "Qualification",
+      "teams": [
+        { "teamNumber": 6091, "station": "Red1", "surrogate": false },
+        { "teamNumber": 33, "station": "Red2", "surrogate": false },
+        { "teamNumber": 2145, "station": "Red3", "surrogate": false },
+        { "teamNumber": 7790, "station": "Blue1", "surrogate": false },
+        { "teamNumber": 5641, "station": "Blue2", "surrogate": false },
+        { "teamNumber": 5697, "station": "Blue3", "surrogate": false }
+      ]
+    },
+    {
+      "description": "Qualification 8",
+      "startTime": "2023-03-03T11:46:00",
+      "matchNumber": 8,
+      "field": "Primary",
+      "tournamentLevel": "Qualification",
+      "teams": [
+        { "teamNumber": 5436, "station": "Red1", "surrogate": false },
+        { "teamNumber": 5260, "station": "Red2", "surrogate": false },
+        { "teamNumber": 1701, "station": "Red3", "surrogate": false },
+        { "teamNumber": 70, "station": "Blue1", "surrogate": false },
+        { "teamNumber": 5660, "station": "Blue2", "surrogate": false },
+        { "teamNumber": 5193, "station": "Blue3", "surrogate": false }
+      ]
+    },
+    {
+      "description": "Qualification 9",
+      "startTime": "2023-03-03T11:54:00",
+      "matchNumber": 9,
+      "field": "Primary",
+      "tournamentLevel": "Qualification",
+      "teams": [
+        { "teamNumber": 5527, "station": "Red1", "surrogate": false },
+        { "teamNumber": 322, "station": "Red2", "surrogate": false },
+        { "teamNumber": 4130, "station": "Red3", "surrogate": false },
+        { "teamNumber": 8728, "station": "Blue1", "surrogate": false },
+        { "teamNumber": 9251, "station": "Blue2", "surrogate": false },
+        { "teamNumber": 5282, "station": "Blue3", "surrogate": false }
+      ]
+    },
+    {
+      "description": "Qualification 10",
+      "startTime": "2023-03-03T12:02:00",
+      "matchNumber": 10,
+      "field": "Primary",
+      "tournamentLevel": "Qualification",
+      "teams": [
+        { "teamNumber": 5538, "station": "Red1", "surrogate": false },
+        { "teamNumber": 8385, "station": "Red2", "surrogate": false },
+        { "teamNumber": 6073, "station": "Red3", "surrogate": false },
+        { "teamNumber": 9242, "station": "Blue1", "surrogate": false },
+        { "teamNumber": 9207, "station": "Blue2", "surrogate": false },
+        { "teamNumber": 894, "station": "Blue3", "surrogate": false }
+      ]
+    },
+    {
+      "description": "Qualification 11",
+      "startTime": "2023-03-03T12:10:00",
+      "matchNumber": 11,
+      "field": "Primary",
+      "tournamentLevel": "Qualification",
+      "teams": [
+        { "teamNumber": 8767, "station": "Red1", "surrogate": false },
+        { "teamNumber": 33, "station": "Red2", "surrogate": false },
+        { "teamNumber": 5641, "station": "Red3", "surrogate": false },
+        { "teamNumber": 7784, "station": "Blue1", "surrogate": false },
+        { "teamNumber": 7247, "station": "Blue2", "surrogate": false },
+        { "teamNumber": 8193, "station": "Blue3", "surrogate": false }
+      ]
+    },
+    {
+      "description": "Qualification 12",
+      "startTime": "2023-03-03T12:18:00",
+      "matchNumber": 12,
+      "field": "Primary",
+      "tournamentLevel": "Qualification",
+      "teams": [
+        { "teamNumber": 1506, "station": "Red1", "surrogate": false },
+        { "teamNumber": 4998, "station": "Red2", "surrogate": false },
+        { "teamNumber": 3668, "station": "Red3", "surrogate": false },
+        { "teamNumber": 4994, "station": "Blue1", "surrogate": false },
+        { "teamNumber": 245, "station": "Blue2", "surrogate": false },
+        { "teamNumber": 6102, "station": "Blue3", "surrogate": false }
+      ]
+    }
+  ]
+}
