@@ -34,7 +34,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Install packages
+      - name: Install packages (webapp)
+        run: npm ci
+      - name: Install packages (functions)
         run: npm ci --prefix=functions
 
       - name: Build
