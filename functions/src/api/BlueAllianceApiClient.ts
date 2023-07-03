@@ -27,38 +27,13 @@ type SimpleMatch = {
 };
 
 export default class BlueAllianceApiClient extends GenericApiClient {
-  protected apiClientName: string = 'blue-alliance';
+  protected apiClientName: string = 'blueAlliance';
 
   constructor(apiKey: string, baseUrl: string = 'https://www.thebluealliance.com/api/v3') {
     if (!apiKey) {
       throw new Error('API key is required to initialize Blue Alliance API Client');
     }
     super({ 'X-TBA-Auth-Key': apiKey }, baseUrl);
-  }
-
-  private static teamKeyToTeamNumber(teamKey: string | undefined): number {
-    if (!teamKey) return null as unknown as number;
-    const parsed = Number.parseInt(teamKey.replace(/[^0-9]/g, ''), 10);
-    if (Number.isNaN(parsed)) return null as unknown as number;
-    return parsed;
-  }
-
-  private static isNotNullOrNegative(num: number | null): boolean {
-    return num !== null && num > 0;
-  }
-
-  private static AllianceTeamsToParticipants(
-    allianceTeams: { red: SimpleMatchAlliance, blue: SimpleMatchAlliance, },
-  )
-    : Record<DriverStation, number> {
-    return {
-      Red1: BlueAllianceApiClient.teamKeyToTeamNumber(allianceTeams.red.team_keys[0]),
-      Red2: BlueAllianceApiClient.teamKeyToTeamNumber(allianceTeams.red.team_keys[1]),
-      Red3: BlueAllianceApiClient.teamKeyToTeamNumber(allianceTeams.red.team_keys[2]),
-      Blue1: BlueAllianceApiClient.teamKeyToTeamNumber(allianceTeams.blue.team_keys[0]),
-      Blue2: BlueAllianceApiClient.teamKeyToTeamNumber(allianceTeams.blue.team_keys[1]),
-      Blue3: BlueAllianceApiClient.teamKeyToTeamNumber(allianceTeams.blue.team_keys[2]),
-    };
   }
 
   /** @inheritdoc */
@@ -75,6 +50,7 @@ export default class BlueAllianceApiClient extends GenericApiClient {
     return latestMatch.match_number + 1;
   }
 
+  /** @inheritdoc */
   public async getQualSchedule(eventCode: string, _season: number): Promise<QualMatch[]> {
     const resp = await this.get<SimpleMatch[]>(`/event/${eventCode}/matches/simple`);
     return resp.filter((m) => m.comp_level === 'qm').map((m) => ({
@@ -83,7 +59,8 @@ export default class BlueAllianceApiClient extends GenericApiClient {
     }));
   }
 
-  public async getPlayoffBracket(eventCode: string, _season: number)
+  /** @inheritdoc */
+  public async getPlayoffBracket(eventCode: string, _season: number, _eventKey: string)
     : Promise<Partial<Record<BracketMatchNumber, PlayoffMatchInfo[]>>> {
     const resp = await this.get<SimpleMatch[]>(`/event/${eventCode}/matches/simple`);
     const playoffMatches = resp.filter((m) => ['qf', 'sf', 'f'].includes(m.comp_level));
@@ -109,6 +86,7 @@ export default class BlueAllianceApiClient extends GenericApiClient {
     return bracket;
   }
 
+  /** @inheritdoc */
   public async getRankings(eventCode: string, _season: number): Promise<TeamRanking[]> {
     const resp = await this.get<ApiRankings>(`/event/${eventCode}/rankings`, eventCode);
     return resp.rankings.map((r) => ({
@@ -124,6 +102,7 @@ export default class BlueAllianceApiClient extends GenericApiClient {
     } as TeamRanking));
   }
 
+  /** @inheritdoc */
   public async getAlliances(eventCode: string, _season: number): Promise<Alliance[] | null> {
     const resp = await this.get<ApiAlliance[]>(`/event/${eventCode}/alliances`);
     if (!resp || !resp.length || !resp[0].picks[0]) {
@@ -136,6 +115,31 @@ export default class BlueAllianceApiClient extends GenericApiClient {
         .map(BlueAllianceApiClient.teamKeyToTeamNumber)
         .filter((t) => !!t),
     }));
+  }
+
+  private static teamKeyToTeamNumber(teamKey: string | undefined): number {
+    if (!teamKey) return null as unknown as number;
+    const parsed = Number.parseInt(teamKey.replace(/[^0-9]/g, ''), 10);
+    if (Number.isNaN(parsed)) return null as unknown as number;
+    return parsed;
+  }
+
+  private static isNotNullOrNegative(num: number | null): boolean {
+    return num !== null && num > 0;
+  }
+
+  private static AllianceTeamsToParticipants(
+    allianceTeams: { red: SimpleMatchAlliance, blue: SimpleMatchAlliance, },
+  )
+    : Record<DriverStation, number> {
+    return {
+      Red1: BlueAllianceApiClient.teamKeyToTeamNumber(allianceTeams.red.team_keys[0]),
+      Red2: BlueAllianceApiClient.teamKeyToTeamNumber(allianceTeams.red.team_keys[1]),
+      Red3: BlueAllianceApiClient.teamKeyToTeamNumber(allianceTeams.red.team_keys[2]),
+      Blue1: BlueAllianceApiClient.teamKeyToTeamNumber(allianceTeams.blue.team_keys[0]),
+      Blue2: BlueAllianceApiClient.teamKeyToTeamNumber(allianceTeams.blue.team_keys[1]),
+      Blue3: BlueAllianceApiClient.teamKeyToTeamNumber(allianceTeams.blue.team_keys[2]),
+    };
   }
 }
 

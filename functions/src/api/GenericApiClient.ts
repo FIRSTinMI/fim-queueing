@@ -102,7 +102,7 @@ export default abstract class GenericApiClient {
   // public abstract getPlayoffMatches(eventCode: string, season: number): Promise<MatchResult[]>;
   // public abstract getPlayoffScoreDetails(eventCode: string, season: number)
   // : Promise<ScoreBreakdown[]>;
-  public abstract getPlayoffBracket(eventCode: string, season: number)
+  public abstract getPlayoffBracket(eventCode: string, season: number, eventKey: string)
   : Promise<Partial<Record<BracketMatchNumber, PlayoffMatchInfo[]>>>;
   public abstract getRankings(eventCode: string, season: number): Promise<TeamRanking[]>;
   public abstract getAlliances(eventCode: string, season: number): Promise<Alliance[] | null>;

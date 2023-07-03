@@ -3,7 +3,6 @@ import DoubleEliminationBracketMapping, { BracketMatchNumber, ParticipantSource 
 import { Event, PlayoffMatch } from '../../../shared/DbTypes';
 import GenericApiClient, { PlayoffMatchInfo } from '../api/GenericApiClient';
 
-// const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 
 /**
@@ -18,7 +17,7 @@ const admin = require('firebase-admin');
 exports.updatePlayoffBracket = async function updatePlayoffBracket(season: number, event: Event,
   eventKey: string, apiClient: GenericApiClient) {
   const { eventCode } = event;
-  const matches = await apiClient.getPlayoffBracket(eventCode, season);
+  const matches = await apiClient.getPlayoffBracket(eventCode, season, eventKey);
 
   const playoffMatchInfo: Partial<Record<BracketMatchNumber, PlayoffMatch>> = {};
 

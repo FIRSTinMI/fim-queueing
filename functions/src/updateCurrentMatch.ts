@@ -70,7 +70,8 @@ exports.updateCurrentMatch = async function updateCurrentMatch() {
       if (event.state === 'QualsInProgress') {
         try {
           const currentMatch = await apiClient.getCurrentQualMatch(
-            event.eventCode, season, event.currentMatchNumber ?? undefined,
+            event.eventCode, season,
+            Math.min(event.numQualMatches ?? 1, event.currentMatchNumber ?? 1),
           );
 
           if (currentMatch) {
@@ -83,12 +84,11 @@ exports.updateCurrentMatch = async function updateCurrentMatch() {
                 .update({
                   currentMatchNumber: currentMatch,
                 });
-
-              const lastScheduledMatchNumber = event.numQualMatches;
-              if (lastScheduledMatchNumber
-                && currentMatch > lastScheduledMatchNumber) {
-                event.state = 'AwaitingAlliances';
-              }
+            }
+            const lastScheduledMatchNumber = event.numQualMatches;
+            if (lastScheduledMatchNumber
+              && currentMatch > lastScheduledMatchNumber) {
+              event.state = 'AwaitingAlliances';
             }
           }
         } catch (e) {
