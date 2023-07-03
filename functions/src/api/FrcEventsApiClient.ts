@@ -104,8 +104,6 @@ export default class FrcEventsApiClient extends GenericApiClient {
       const blue = matchDetails.alliances
         .find((x: any) => x.alliance === 'Blue');
 
-      console.dir(matchDetails, { depth: 5 });
-
       //
       // Begin season specific logic
       //
