@@ -1,6 +1,6 @@
 import { ComponentChildren, h } from 'preact';
 
-import styles from './styles.scss';
+import styles from './styles.module.scss';
 
 export type ErrorMessageType = 'info' | 'arrow' | 'warning' | 'error';
 export type ErrorMessageProps = {

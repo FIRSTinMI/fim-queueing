@@ -6,7 +6,7 @@ import { memo } from 'preact/compat';
 
 import { Event } from '@shared/DbTypes';
 import AppContext from '@/AppContext';
-import styles from './styles.scss';
+import styles from './styles.module.scss';
 import MenuBar from '../MenuBar';
 
 const IFrame = memo(({ src, pointer }: { src: string, pointer: string }) => (

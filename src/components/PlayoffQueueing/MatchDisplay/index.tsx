@@ -3,7 +3,7 @@ import { h, Fragment } from 'preact';
 import { DriverStation } from '@shared/DbTypes';
 import { ParticipantSource } from '@shared/DoubleEliminationBracketMapping';
 import { PlayoffMatchDisplay } from '../PlayoffMatchDisplay';
-import styles from './styles.scss';
+import styles from './styles.module.scss';
 
 type MatchDisplayProps = {
   match: PlayoffMatchDisplay | null;

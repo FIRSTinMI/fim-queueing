@@ -1,11 +1,10 @@
 import { h, Fragment } from 'preact';
-import styles from './styles.scss';
+import styles from './styles.module.scss';
 
 interface RankingProps {
   ranking: number;
   teamNumber: number;
   customTextColor?: string;
-  customAccentColor?: string;
 }
 
 function numberToOrdinal(num: number) {
@@ -30,11 +29,11 @@ function numberToOrdinal(num: number) {
 
 function Ranking(props: RankingProps): JSX.Element {
   const {
-    teamNumber, ranking, customTextColor, customAccentColor,
+    teamNumber, ranking, customTextColor,
   } = props;
   return (
-    <div className={styles.newsticker} style={{ borderRightColor: customAccentColor }}>
-      <span className={styles.ranking} style={{ color: customAccentColor }}>
+    <div className={styles.newsticker} style={{ borderRightColor: customTextColor }}>
+      <span className={styles.ranking} style={{ color: customTextColor, opacity: 0.8 }}>
         {numberToOrdinal(ranking)}
       </span>
       <span className={styles.teamNumber} style={{ color: customTextColor }}>{teamNumber}</span>
@@ -44,7 +43,6 @@ function Ranking(props: RankingProps): JSX.Element {
 
 Ranking.defaultProps = {
   customTextColor: '#fff',
-  customAccentColor: '#ccc',
 };
 
 export default Ranking;

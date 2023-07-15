@@ -8,16 +8,22 @@ import Embeddable, { EmbeddableRouteParams } from './components/Embeddable';
 import PlayoffBracket from './components/PlayoffBracket';
 import PlayoffQueueing from './components/PlayoffQueueing/Queueing';
 import Queueing from './components/QualDisplay/Queueing';
-import KeyableTicker from './components/RankingDisplay/KeyableTicker';
+// import KeyableTicker from './components/RankingDisplay/KeyableTicker';
 import TeamRankings from './components/RankingDisplay/TeamRankings';
+import UserLogin from './components/Manage/UserLogin';
+import Options from './components/Manage/Options';
+import Overlay from './Overlay';
+import { AppContextType } from './AppContext';
 
 type Route<TParams> = {
   name: string,
   url: string,
+  linkFactory?: (ctx: AppContextType) => string,
   component: FunctionalComponent<any>,
   usedIn: ('qual' | 'playoff')[]
   params?: TParams,
   hideFromNav?: boolean,
+  requiresLogin?: boolean,
 };
 
 const Routes: Route<any>[] = [
@@ -45,12 +51,12 @@ const Routes: Route<any>[] = [
     component: PlayoffBracket,
     usedIn: ['playoff'],
   },
-  {
-    name: 'Rankings Ticker (Audience Display)',
-    url: '/ranking/ticker',
-    component: KeyableTicker,
-    usedIn: [],
-  },
+  // {
+  //   name: 'Rankings Ticker (Audience Display)',
+  //   url: '/ranking/ticker',
+  //   component: KeyableTicker,
+  //   usedIn: [],
+  // },
   {
     name: 'FRC Pit Display',
     url: '/frcpitdisplay',
@@ -75,6 +81,27 @@ const Routes: Route<any>[] = [
     component: Automated,
     usedIn: [],
     hideFromNav: true,
+  },
+  {
+    name: 'Login',
+    url: '/login',
+    component: UserLogin,
+    usedIn: [],
+    hideFromNav: true,
+  },
+  {
+    name: 'Manage Options',
+    url: '/manage/options',
+    component: Options,
+    usedIn: [],
+    requiresLogin: true,
+  },
+  {
+    name: 'Audience Display',
+    url: '/overlay',
+    linkFactory: (ctx: AppContextType) => `/overlay?key=${ctx.token}`,
+    component: Overlay,
+    usedIn: [],
   },
 ];
 

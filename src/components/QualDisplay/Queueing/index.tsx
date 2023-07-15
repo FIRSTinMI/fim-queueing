@@ -6,10 +6,10 @@ import {
   useContext, useEffect, useState, useRef, useReducer,
 } from 'preact/hooks';
 
-import { AppMode } from '@shared/DbTypes';
-import { Match, TeamRanking } from '@/types';
+import { AppMode, QualMatch } from '@shared/DbTypes';
+import { TeamRanking } from '@/types';
 import AppContext from '@/AppContext';
-import styles from './styles.scss';
+import styles from './styles.module.scss';
 import MatchDisplay from '../MatchDisplay';
 import Ranking from '../../Tickers/Ranking';
 import RankingList from '../../Tickers/RankingList';
@@ -23,11 +23,11 @@ const Queueing = () => {
 
   const [loadingState, setLoadingState] = useState<LoadingState>('loading');
   const dbEventRef = useRef<DatabaseReference>();
-  const [qualMatches, setQualMatches] = useState<Match[]>([]);
+  const [qualMatches, setQualMatches] = useState<QualMatch[]>([]);
   const [displayMatches, setDisplayMatches] = useState<{
-    currentMatch: Match | null,
-    nextMatch: Match | null,
-    queueingMatches: Match[]
+    currentMatch: QualMatch | null,
+    nextMatch: QualMatch | null,
+    queueingMatches: QualMatch[]
   }>({ currentMatch: null, nextMatch: null, queueingMatches: [] });
   const [rankings, setRankings] = useState<TeamRanking[]>([]);
 
@@ -36,9 +36,9 @@ const Queueing = () => {
 
     dbEventRef.current = ref(getDatabase(), `/seasons/${season}/events/${token}`);
 
-    const matchesRef = ref(getDatabase(), `/seasons/${season}/matches/${token}`);
+    const matchesRef = ref(getDatabase(), `/seasons/${season}/qual/${token}`);
     onValue(matchesRef, (snap) => {
-      setQualMatches(snap.val() as Match[]);
+      setQualMatches(snap.val() as QualMatch[]);
     });
 
     return () => {
@@ -46,8 +46,8 @@ const Queueing = () => {
     };
   }, [event.eventCode, season, token]);
 
-  const getMatchByNumber = (matchNumber: number): Match | null => qualMatches?.find(
-    (x) => x.matchNumber === matchNumber,
+  const getMatchByNumber = (matchNumber: number): QualMatch | null => qualMatches?.find(
+    (x) => x.number === matchNumber,
   ) ?? null;
 
   const updateMatches = (): void => {
@@ -67,7 +67,7 @@ const Queueing = () => {
         nextMatch: getMatchByNumber(matchNumber + 1),
         // By default, we'll take the three matches after the one on deck
         queueingMatches: [2, 3, 4].map((x) => getMatchByNumber(matchNumber + x))
-          .filter((x) => x !== null) as Match[],
+          .filter((x) => x !== null) as QualMatch[],
       });
       setLoadingState('ready');
     } catch (e) {
@@ -274,12 +274,12 @@ const Queueing = () => {
                 <MatchDisplay
                   className={styles.queueingMatches}
                   match={x}
-                  key={x.matchNumber}
+                  key={x.number}
                 />
               ))}
             </div>
             {(event.options?.showRankings ?? false ? (
-              <RankingList>
+              <RankingList style={{ height: '1.5em' }}>
                 {rankings.map((x) => (<Ranking teamNumber={x.teamNumber} ranking={x.rank} />))}
               </RankingList>
             ) : <></>)}

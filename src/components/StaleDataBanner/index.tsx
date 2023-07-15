@@ -3,7 +3,7 @@ import {
   useContext, useEffect, useRef, useState,
 } from 'preact/hooks';
 import AppContext, { AppContextType } from '../../AppContext';
-import styles from './styles.scss';
+import styles from './styles.module.scss';
 
 const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
 const units = {
@@ -60,7 +60,7 @@ const StaleDataBanner = (): JSX.Element => {
     };
   }, [context?.event?.lastModifiedMs]);
 
-  if (context.features?.showStaleDataBanner === false) {
+  if (context.features?.showStaleDataBanner === false || window.location.pathname.includes('overlay')) {
     return <></>;
   }
 

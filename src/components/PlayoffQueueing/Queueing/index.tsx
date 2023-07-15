@@ -9,7 +9,7 @@ import { PlayoffMatch } from '@shared/DbTypes';
 import AppContext from '@/AppContext';
 import MenuBar from '@/components/MenuBar';
 import MatchDisplay from '../MatchDisplay';
-import styles from './styles.scss';
+import styles from './styles.module.scss';
 import { PlayoffMatchDisplay } from '../PlayoffMatchDisplay';
 
 type LoadingState = 'loading' | 'ready' | 'error' | 'noAutomatic';

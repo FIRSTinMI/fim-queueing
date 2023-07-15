@@ -2,13 +2,34 @@ import { h } from 'preact';
 import { get, getDatabase, ref } from 'firebase/database';
 import Cookies from 'js-cookie';
 import { useContext, useState } from 'preact/hooks';
+import styled from 'styled-components';
 
-import styles from './styles.scss';
-import AppContext from '../../AppContext';
+import AppContext from '../AppContext';
+import Disclaimer from './shared/Disclaimer';
 
 type LoginFormProps = {
   onLogin: (token: string) => void;
 };
+
+const StyledLoginForm = styled.form`
+  padding: 20px;
+  text-align: center;
+  input {
+    width: 50%;
+    min-width: 200px;
+    padding: 20px;
+    margin-left: 20px;
+    margin-right: 20px;
+  }
+  input[type="password"] {
+    font:small-caption;
+    font-size:2rem;
+  }
+`;
+
+const StyledBadCode = styled.div`
+  text-align: center;
+`;
 
 /**
  * Form displayed to the user when they do not already have an event token.
@@ -59,9 +80,8 @@ const LoginForm = ({ onLogin }: LoginFormProps) => {
 
   return (
     <div>
-      <form
+      <StyledLoginForm
         onSubmit={(e: Event): void => { handleSubmit(e); }}
-        className={styles.loginForm}
       >
         <div>Enter your 10-character event key:</div>
         <input
@@ -71,15 +91,15 @@ const LoginForm = ({ onLogin }: LoginFormProps) => {
           onInput={(e): void => setEventToken((e.target as HTMLInputElement).value.toUpperCase())}
         />
         <button type="submit">Log in</button>
-      </form>
+      </StyledLoginForm>
       { badToken && (
-        <div className={styles.badCode}>Bad event token or event not eligible for queueing</div>
+        <StyledBadCode>Bad event token or event not eligible for queueing</StyledBadCode>
       )}
-      <div className={styles.disclaimer}>
+      <Disclaimer>
         This system is only for use by A/V volunteers at FIRST in Michigan events.
         If you have not been given explicit permission to use this system, please don&apos;t.
         You&apos;ll ruin it for everyone.
-      </div>
+      </Disclaimer>
     </div>
   );
 };

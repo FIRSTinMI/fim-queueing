@@ -7,7 +7,7 @@ import {
 } from 'firebase/database';
 import { TeamRanking } from '@/types';
 import MenuBar from '../../MenuBar';
-import styles from './styles.scss';
+import styles from './styles.module.scss';
 import AppContext from '../../../AppContext';
 
 const numFmt = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });

@@ -4,7 +4,7 @@ import { route } from 'preact-router';
 import Link from '@/components/Link';
 import AppContext from '@/AppContext';
 import MenuBar from '../MenuBar';
-import styles from './styles.scss';
+import styles from './styles.module.scss';
 import Routes from '@/routes';
 
 let previousSetupState: { qual: string, playoff: string } | undefined;
@@ -79,7 +79,7 @@ export default function ScreenChooser() {
       <ul>
         {Routes.filter((r) => r.hideFromNav !== true).map((r) => (
           <li>
-            <Link href={r.url}>{r.name}</Link>
+            <Link href={r.linkFactory === undefined ? r.url : r.linkFactory(ctx)}>{r.name}</Link>
           </li>
         ))}
       </ul>

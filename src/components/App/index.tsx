@@ -5,6 +5,7 @@ import {
   Database, DataSnapshot, get, getDatabase, off, onValue, ref,
 } from 'firebase/database';
 import { getId, getInstallations } from 'firebase/installations';
+import { connectAuthEmulator, getAuth } from 'firebase/auth';
 import {
   Router, Route, RouterOnChangeArgs, route as navigateToRoute,
 } from 'preact-router';
@@ -14,13 +15,14 @@ import { ErrorBoundary } from 'react-error-boundary';
 
 import { Event } from '@shared/DbTypes';
 import Routes from '@/routes';
-import styles from './styles.scss';
+import styles from './styles.module.scss';
 import LoginForm from '../LoginForm';
 import ScreenChooser from '../ScreenChooser';
 import AppContext, { AppContextType } from '../../AppContext';
 import StaleDataBanner from '../StaleDataBanner';
 import useStateWithRef from '@/useStateWithRef';
 import ErrorMessage from '../ErrorMessage';
+import AuthenticatedRoute from '../AuthenticatedRoute';
 
 // TODO: Figure out why the event details sometimes aren't getting sent over to SignalR
 
@@ -43,7 +45,7 @@ const ErrorFallback = ({ error }
   }, []);
 
   useEffect(() => {
-    if (!process.env.PREACT_APP_REPORT_ERROR_URL) return;
+    if (!import.meta.env.APP_REPORT_ERROR_URL) return;
     async function reportError() {
       try {
         const formBody: string[] = [];
@@ -54,7 +56,7 @@ const ErrorFallback = ({ error }
         });
         console.log('asd', formBody);
 
-        await fetch(process.env.PREACT_APP_REPORT_ERROR_URL!, {
+        await fetch(import.meta.env.APP_REPORT_ERROR_URL!, {
           method: 'POST',
           headers: {
             // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -155,15 +157,23 @@ const App = () => {
   // Initialize app
   useEffect(() => {
     console.log('Running initialization...');
+    console.log(import.meta.env);
     const firebaseConfig = {
-      apiKey: process.env.PREACT_APP_FIRE_KEY,
-      databaseURL: process.env.PREACT_APP_RTDB_URL,
-      projectId: process.env.PREACT_APP_FIRE_PROJ,
-      appId: process.env.PREACT_APP_FIRE_APPID,
-      measurementId: process.env.PREACT_APP_FIRE_MEASUREID,
+      apiKey: import.meta.env.APP_FIRE_KEY,
+      databaseURL: import.meta.env.APP_RTDB_URL,
+      projectId: import.meta.env.APP_FIRE_PROJ,
+      appId: import.meta.env.APP_FIRE_APPID,
+      authDomain: import.meta.env.APP_FIRE_AUTH_DOMAIN,
+      measurementId: import.meta.env.APP_FIRE_MEASUREID,
     };
 
-    initializeApp(firebaseConfig);
+    const app = initializeApp(firebaseConfig);
+
+    if (/:\/\/(localhost|127\.0\.0\.1)/.test(import.meta.env.APP_FIRE_AUTH_DOMAIN)) {
+      const auth = getAuth(app);
+      connectAuthEmulator(auth, import.meta.env.APP_FIRE_AUTH_DOMAIN, { disableWarnings: true });
+    }
+
     const newDb = getDatabase();
     setDb(newDb);
 
@@ -218,10 +228,10 @@ const App = () => {
    * Plus, using SignalR allows me to remove Google Analytics entirely.
    */
   useEffect(() => {
-    if (!process.env.PREACT_APP_SIGNALR_SERVER) return;
+    if (!import.meta.env.APP_SIGNALR_SERVER) return;
     import(/* webpackChunkName: "signalr" */ '@microsoft/signalr').then(async (signalR) => {
       const cn = new signalR.HubConnectionBuilder()
-        .withUrl(`${process.env.PREACT_APP_SIGNALR_SERVER}/DisplayHub`).withAutomaticReconnect({
+        .withUrl(`${import.meta.env.APP_SIGNALR_SERVER}/DisplayHub`).withAutomaticReconnect({
           nextRetryDelayInMilliseconds(retryContext) {
             if (retryContext.previousRetryCount > 10) {
               return null;
@@ -320,9 +330,12 @@ const App = () => {
         <Router onChange={onNewRoute}>
           {/* NOTE: Do not add new routes here. Add them in `src/routes.ts` */}
           <Route default component={ScreenChooser} />
-          {Routes.map((rt) => (
-            <Route component={rt.component as any} path={rt.url} routeParams={rt.params} />
-          ))}
+          {Routes.map((rt) => {
+            const Cmp = rt.requiresLogin === true ? AuthenticatedRoute : Route;
+            return (
+              <Cmp component={rt.component as any} path={rt.url} routeParams={rt.params} />
+            );
+          })}
         </Router>
       </>
     );

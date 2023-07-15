@@ -2,9 +2,11 @@
   // background-color: #0c0e15;
   width: 100%;
   overflow: hidden;
+  height: 100%;
 }
 
 .ticker-list {
+  height: 100%;
   display: inline-flex;
   flex: 0 0 100%;
   width: fit-content;

@@ -4,7 +4,7 @@ import Cookies from 'js-cookie';
 import { useEffect, useState } from 'preact/hooks';
 
 import { Event } from '@shared/DbTypes';
-import styles from './styles.scss';
+import styles from './styles.module.scss';
 import Fullscreen from '@/assets/fullscreen.svg';
 import FullscreenExit from '@/assets/fullscreen_exit.svg';
 import Home from '@/assets/home.svg';

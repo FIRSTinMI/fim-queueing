@@ -34,7 +34,7 @@
             }
           }
         },
-        "matches": {
+        "qual": {
           "$eventKey": {
             ".read": "root.child('seasons/'+$season+'/events/'+$eventKey).child('startMs').val() < now && root.child('seasons/'+$season+'/events/'+$eventKey).child('endMs').val() > now",
             ".write": false
@@ -58,6 +58,12 @@
             ".write": false
           }
         },
+        "cg": {
+          "$eventKey": {
+            ".read": "root.child('seasons/'+$season+'/events/'+$eventKey).child('startMs').val() < now && root.child('seasons/'+$season+'/events/'+$eventKey).child('endMs').val() > now",
+            ".write": "auth.token.admin === true || data.child('users/'+auth.uid).val() === true"
+          }
+        },
         "avatars": {
           ".read": true,
           ".write": false
@@ -66,4 +72,3 @@
     }
   }
 }
-

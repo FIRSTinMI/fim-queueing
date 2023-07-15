@@ -10,7 +10,7 @@ import Color from 'color';
 import { EventState } from '@shared/DbTypes';
 import { TeamRanking } from '@/types';
 import AppContext from '@/AppContext';
-import styles from './styles.scss';
+import styles from './styles.module.scss';
 import Ranking from '../../Tickers/Ranking';
 import RankingList from '../../Tickers/RankingList';
 import MenuBar from '../../MenuBar';
@@ -198,7 +198,6 @@ const KeyableTicker = () => {
                   teamNumber={x.teamNumber}
                   ranking={x.rank}
                   customTextColor={textMode === 'light' ? '#fff' : '#000'}
-                  customAccentColor={textMode === 'light' ? '#ccc' : '#333'}
                 />
               ))}
             </RankingList>

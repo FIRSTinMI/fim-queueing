@@ -5,6 +5,25 @@ import { FunctionalComponent } from 'preact';
 export type RouteComponent<TParams = {}, TRouteParams = undefined> =
   FunctionalComponent<TParams & TRouteParams>;
 
+export type CGConfig = {
+  pageBg: string;
+
+  showBranding: boolean;
+  brandingBg: string;
+  brandingTextColor: string;
+  brandingImage: string | null;
+  brandingText: string | null;
+
+  showTicker: boolean;
+  tickerBg: string;
+  tickerTextColor: string;
+
+  showLowerThird: boolean;
+  lowerThirdTitle: string | null;
+  lowerThirdSubtitle: string | null;
+  lowerThirdLogo: string | null;
+};
+
 export type AppMode = 'automatic' | 'assisted';
 
 export type Event = {

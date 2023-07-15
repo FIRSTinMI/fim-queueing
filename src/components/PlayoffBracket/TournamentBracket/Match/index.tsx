@@ -3,7 +3,8 @@ import { Fragment, FunctionalComponent, h } from 'preact';
 import { ParticipantSource } from '@shared/DoubleEliminationBracketMapping';
 import { DriverStation, PlayoffMatch } from '@shared/DbTypes';
 import { Alliance } from '@/types';
-import styles from './styles.scss';
+import styles from './styles.module.scss';
+import Check from '@/assets/check.svg';
 
 export type MatchComponentProps = {
   matchName: string,
@@ -89,14 +90,14 @@ const Match: FunctionalComponent<MatchComponentProps> = ({
         <div className={[styles.side, styles.red].join(' ')}>
           <div>{getTeamDisplay(red, 'red')}</div>
           <div className={styles.score}>
-            {matchResult?.winner === 'red' && (<img alt="Check" src="/assets/check.svg" />)}
+            {matchResult?.winner === 'red' && (<img alt="Check" src={Check} />)}
           </div>
         </div>
         <div className={styles.line} />
         <div className={[styles.side, styles.blue].join(' ')}>
           <div>{getTeamDisplay(blue, 'blue')}</div>
           <div className={styles.score}>
-            {matchResult?.winner === 'blue' && (<img alt="Check" src="/assets/check.svg" />)}
+            {matchResult?.winner === 'blue' && (<img alt="Check" src={Check} />)}
           </div>
         </div>
       </div>

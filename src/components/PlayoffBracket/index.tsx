@@ -6,7 +6,7 @@ import {
 
 import { PlayoffMatch } from '@shared/DbTypes';
 import { BracketMatchNumber } from '@shared/DoubleEliminationBracketMapping';
-import styles from './styles.scss';
+import styles from './styles.module.scss';
 import DoubleEliminationBracket from './TournamentBracket/DoubleEliminationBracket';
 import { Alliance } from '../../types';
 import MenuBar from '../MenuBar';

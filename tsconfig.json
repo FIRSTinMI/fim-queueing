@@ -63,5 +63,5 @@
           "@shared/*": ["./shared/*"]
         }
     },
-    "include": ["src/**/*", "tests/**/*", "shared/**/*", "./*.js"]
+    "include": ["node_modules/vite/client.d.ts", "src/**/*", "tests/**/*", "shared/**/*", "./*.js"]
 }

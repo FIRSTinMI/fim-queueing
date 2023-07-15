@@ -1,25 +1,26 @@
 import { h, Fragment } from 'preact';
-import { Match, Team, TeamAvatars } from '../../../types';
-import styles from './styles.scss';
+import { DriverStation, QualMatch } from '@shared/DbTypes';
+import styles from './styles.module.scss';
 
 type MatchDisplayProps = {
-  match: Match | null;
+  match: QualMatch | null;
   // Temp disable till I figure out what to do with avatars
   // teamAvatars: TeamAvatars | undefined;
   halfWidth?: boolean;
   className?: string;
 };
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function getAvatarForTeam(avatars: TeamAvatars | undefined, teamNumber: number | undefined)
-  : string | null {
-  if (avatars === undefined || teamNumber === undefined || !avatars[teamNumber] || avatars[teamNumber] === 'NONE') return null;
-  const avatar = avatars[teamNumber];
-  if (avatar === undefined) return null;
-  return avatar;
-}
+// function getAvatarForTeam(avatars: TeamAvatars | undefined, teamNumber: number | undefined)
+//   : string | null {
+//   if (avatars === undefined || teamNumber === undefined
+// || !avatars[teamNumber] || avatars[teamNumber] === 'NONE') return null;
+//   const avatar = avatars[teamNumber];
+//   if (avatar === undefined) return null;
+//   return avatar;
+// }
 
 type TeamDisplayProps = {
-  team: Team | undefined;
+  team: number | undefined;
 };
 function TeamDisplay({ team }: TeamDisplayProps): JSX.Element {
   if (team === undefined) return (<div />);
@@ -29,7 +30,7 @@ function TeamDisplay({ team }: TeamDisplayProps): JSX.Element {
       {/* <span class={styles.avatar}>
         {avatar && <img src={`data:image/png;base64,${avatar}`} />}
       </span> */}
-      {team.teamNumber}
+      {team}
     </div>
   );
 }
@@ -43,12 +44,12 @@ function MatchDisplay({ halfWidth, match, className }: MatchDisplayProps): JSX.E
       */}
       {match && (
       <>
-        <span className={styles.matchNumber}>{match.matchNumber}</span>
+        <span className={styles.matchNumber}>{match.number}</span>
         <span className={styles.red}>
-          {[1, 2, 3].map((n) => <TeamDisplay key={`${match?.matchNumber}r${n}`} team={match?.teams.find((x) => x.station === `Red${n}`)} />)}
+          {[1, 2, 3].map((n) => <TeamDisplay key={`${match?.number}r${n}`} team={match?.participants[`Red${n}` as DriverStation]} />)}
         </span>
         <span className={styles.blue}>
-          {[1, 2, 3].map((n) => <TeamDisplay key={`${match?.matchNumber}b${n}`} team={match?.teams.find((x) => x.station === `Blue${n}`)} />)}
+          {[1, 2, 3].map((n) => <TeamDisplay key={`${match?.number}b${n}`} team={match?.participants[`Blue${n}` as DriverStation]} />)}
         </span>
       </>
       )}
