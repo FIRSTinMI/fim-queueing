@@ -47,11 +47,8 @@ export default function Overlay() {
   useEffect(() => {
     const cgRef = ref(getDatabase(), `/seasons/${season}/cg/${token}`);
     onValue(cgRef, (snap) => {
-      setCgConfig(snap.val() as CGConfig);
+      setCgConfig(snap.val() as CGConfig ?? {});
     });
-
-    // Leave it to the streaming app or CG config to dictate the page background
-    document.body.style.background = 'rgba(0, 0, 0, 0) !important';
   }, []);
 
   // useEffect(() => {

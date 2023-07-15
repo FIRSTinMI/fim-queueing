@@ -10,6 +10,7 @@ import {
 } from 'firebase/database';
 import AppContext from '@/AppContext';
 import { CGConfig } from '@/types';
+import ErrorMessage from '../ErrorMessage';
 
 const OptionsPage = styled.div`
   font-size: 18px;
@@ -97,6 +98,8 @@ const Options = () => {
   const email = useMemo(() => getAuth().currentUser?.email, undefined);
   const { event, season, token } = useContext(AppContext);
 
+  const [error, setError] = useState<string>('');
+
   const [pageBg, setPageBg] = useState<string>('#f0f');
 
   const [syncColors, setSyncColors] = useState<boolean>(true);
@@ -148,24 +151,30 @@ const Options = () => {
   }, [syncColors, brandingBg, brandingTextColor]);
 
   const take = async () => {
-    if (cgConfigDbRef.current === undefined) {
-      console.error('DB Reference not defined');
-      return;
+    setError('');
+    try {
+      if (cgConfigDbRef.current === undefined) {
+        throw new Error('DB Reference not defined');
+      }
+      await set(cgConfigDbRef.current, {
+        pageBg: pageBg ?? null,
+        showBranding: showBranding ?? null,
+        showTicker: showTicker ?? null,
+        brandingBg: brandingBg ?? null,
+        brandingTextColor: brandingTextColor ?? null,
+        tickerBg: tickerBg ?? null,
+        tickerTextColor: tickerTextColor ?? null,
+        brandingImage: brandingImage ?? null,
+        brandingText: brandingText ?? null,
+        showLowerThird: showLowerThird ?? null,
+        lowerThirdTitle: lowerThirdTitle ?? null,
+        lowerThirdSubtitle: lowerThirdSubtitle ?? null,
+      } as CGConfig);
+    } catch (e) {
+      if (e instanceof Error) {
+        setError(e.message);
+      }
     }
-    await set(cgConfigDbRef.current, {
-      pageBg: pageBg ?? null,
-      showBranding: showBranding ?? null,
-      showTicker: showTicker ?? null,
-      brandingBg: brandingBg ?? null,
-      brandingTextColor: brandingTextColor ?? null,
-      tickerBg: tickerBg ?? null,
-      tickerTextColor: tickerTextColor ?? null,
-      brandingImage: brandingImage ?? null,
-      brandingText: brandingText ?? null,
-      showLowerThird: showLowerThird ?? null,
-      lowerThirdTitle: lowerThirdTitle ?? null,
-      lowerThirdSubtitle: lowerThirdSubtitle ?? null,
-    } as CGConfig);
   };
 
   const onClickLogout = async () => {
@@ -190,6 +199,7 @@ const Options = () => {
           </div>
         </div>
       </StyledHeader>
+      {error && <ErrorMessage type="error">{error}</ErrorMessage>}
       <main>
         <OptionsBox>
           <h2>Colors</h2>

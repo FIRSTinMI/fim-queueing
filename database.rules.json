@@ -61,7 +61,7 @@
         "cg": {
           "$eventKey": {
             ".read": "root.child('seasons/'+$season+'/events/'+$eventKey).child('startMs').val() < now && root.child('seasons/'+$season+'/events/'+$eventKey).child('endMs').val() > now",
-            ".write": "auth.token.admin === true || data.child('users/'+auth.uid).val() === true"
+            ".write": "auth.token.admin === true || root.child('seasons/'+$season+'/cgUsers/'+$eventKey+'/'+auth.uid).val() === true"
           }
         },
         "avatars": {
