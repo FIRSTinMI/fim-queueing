@@ -51,6 +51,13 @@ export default function Overlay() {
     });
   }, []);
 
+  // Hacky to support old versions of chrome because the :has() CSS selector is new
+  // Add and remove class on the body element
+  useEffect(() => {
+    document.querySelector('body')?.classList.add('no-background-color');
+    return () => document.querySelector('body')?.classList.remove('no-background-color');
+  });
+
   // useEffect(() => {
   //   tickerSpringApi.start({
   //     height: (tickerShown ? '3em' : '0'),
