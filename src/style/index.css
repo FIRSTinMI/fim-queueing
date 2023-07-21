@@ -13,7 +13,12 @@ body:not(:has(> #app > #preact_root > .--no-body-background-color)) {
 	background: #eee;
 }
 
-body.no-background-color, body:has(> #app > #preact_root > .--no-body-background-color) {
+body:has(> #app > #preact_root > .--no-body-background-color) {
+  max-height: 100vh;
+  overflow: hidden;
+}
+
+body.no-background-color {
   max-height: 100vh;
   overflow: hidden;
 }
