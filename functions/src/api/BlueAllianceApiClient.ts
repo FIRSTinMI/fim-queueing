@@ -89,6 +89,8 @@ export default class BlueAllianceApiClient extends GenericApiClient {
   /** @inheritdoc */
   public async getRankings(eventCode: string, _season: number): Promise<TeamRanking[]> {
     const resp = await this.get<ApiRankings>(`/event/${eventCode}/rankings`, eventCode);
+    if (!resp || !resp.rankings) return [];
+
     return resp.rankings.map((r) => ({
       rank: r.rank,
       teamNumber: Number.parseInt(r.team_key.replace(/[^0-9]/g, ''), 10),
