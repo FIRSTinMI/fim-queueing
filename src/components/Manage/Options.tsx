@@ -100,7 +100,7 @@ const Options = () => {
 
   const [error, setError] = useState<string>('');
 
-  const [pageBg, setPageBg] = useState<string>('#f0f');
+  const [pageBg, setPageBg] = useState<string>('');
 
   const [syncColors, setSyncColors] = useState<boolean>(true);
 
