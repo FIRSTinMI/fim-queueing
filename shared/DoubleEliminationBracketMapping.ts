@@ -228,7 +228,7 @@ const DoubleEliminationBracketMapping: BracketMapping = {
       },
     },
   ],
-  breakAfter: [4, 8, 10, 12, 13],
+  breakAfter: [10, 12, 13],
 };
 
 export default DoubleEliminationBracketMapping;
