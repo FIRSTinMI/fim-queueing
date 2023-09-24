@@ -62,7 +62,7 @@ function MatchDisplay({ halfWidth, match, className }: MatchDisplayProps): JSX.E
     if ('allianceNumber' in part) {
       return (
         <>
-          Alliance
+          Alliance{' '}
           {part.allianceNumber}
         </>
       );
