@@ -11,6 +11,7 @@
     "seasons": {
       "$season": {
         "events": {
+          ".indexOn": ["cartId"],
           "$eventKey": {
             ".read": "data.child('startMs').val() < now && data.child('endMs').val() > now",
             ".write": false,
