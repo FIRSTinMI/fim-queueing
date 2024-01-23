@@ -10,17 +10,13 @@ const LowerThirdContainer = styled(animated.div)<{ showTicker: boolean, textColo
   width: 100%;
   padding: 0.15em;
   box-sizing: border-box;
-  /* font-size: 0.65em; */
   background: #fff;
-  /* margin-bottom: -1em;
-  border-bottom-width: 1em;
-  border-bottom-style: solid;
-  border-bottom-color: ${(props) => props.background}; */
   color: #000;
-  padding-left: ${(props) => (props.showTicker ? '2em' : '2em')};
-  padding-right: ${(props) => (props.showTicker ? '2em' : '2em')};
-  padding-top: ${(props) => (props.showTicker ? null : '0.6em')};
-  padding-bottom: ${(props) => (props.showTicker ? null : '0.6em')};
+  
+  padding-left: 2em;
+  padding-right: 2em;
+  padding-top: 0.6em;
+  padding-bottom: 0.6em;
   transition-property: padding-left, padding-right, padding-top, padding-bottom;
   transition-duration: 0.3s;
   transition-timing-function: ease-in-out;
@@ -29,13 +25,15 @@ const LowerThirdContainer = styled(animated.div)<{ showTicker: boolean, textColo
 `;
 
 const SubtitleContainer = styled(animated.div)`
- /* background: '#000', color: '#fff', paddingLeft: '2em', paddingRight: '1em', paddingTop: '0.5em', paddingBottom: '0.5em', marginRight: '1.5em', display: 'inline-block' */
   width: fit-content;
   background: #000;
   color: #fff;
   padding: 0.5em 1em 0.5em 2em;
   margin-right: 1.5em;
   display: inline-block;
+  div {
+    font-size: 0.7em;
+  }
 `;
 
 type LowerThirdInfo = {
@@ -132,14 +130,17 @@ function LowerThird({
 
   if (!displayedInfo) return null;
   return (
-    <animated.div style={{ x: spring.x, display: 'flex', flexDirection: 'column-reverse' }}>
+    <animated.div style={{
+      paddingBottom: '2em', x: spring.x, display: 'flex', flexDirection: 'column-reverse',
+    }}
+    >
       {/*
         Subtitle needs to go before title in the DOM tree so that layering works properly.
         Otherwise, the subtitle displays on top of the title
       */}
       {displayedInfo.subtitle && (
         <SubtitleContainer style={{ y: spring.subtitleY }}>
-          {displayedInfo.subtitle}
+          <div>{displayedInfo.subtitle}</div>
         </SubtitleContainer>
       )}
       <animated.div style={{ filter: spring.borderWidth.to((val) => `drop-shadow(${val} 0px 0px #0066b3)`), zIndex: 30 }}>

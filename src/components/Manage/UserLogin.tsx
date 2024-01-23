@@ -28,7 +28,7 @@ const UserLogin = () => {
       const redirect = (new URLSearchParams(window.location.search))?.get('redirect') ?? '/manage/options';
       route(redirect);
     }).catch((err) => {
-      setErrorMessage(err);
+      setErrorMessage(JSON.stringify(err));
     }).finally(() => {
       setIsLoading(false);
     });

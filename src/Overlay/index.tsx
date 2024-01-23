@@ -9,17 +9,6 @@ import QualRankings from './QualRankings';
 import { CGConfig } from '@/types';
 import AppContext from '@/AppContext';
 
-// const Overlay = styled(animated.div)`
-//   position: absolute;
-//   top: 0;
-//   left: 0;
-//   bottom: 0;
-//   right: 0;
-//   background-color: black;
-//   opacity: 0;
-//   z-index: -100;
-// `;
-
 const StyledOverlay = styled.div<{ background: string }>`
   font-size: 4vh;
   height: 100vh;
@@ -31,18 +20,6 @@ export default function Overlay() {
   const [cgConfig, setCgConfig] = useState<CGConfig | undefined>();
 
   const { season, token } = useContext(AppContext);
-
-  // const [tickerSpring, tickerSpringApi] = useSpring(() => ({
-  //   from: {
-  //     // y: '100%',
-  //     height: '0',
-  //   },
-  // }));
-  // const [overlaySpring, overlaySpringApi] = useSpring(() => ({
-  //   from: {
-  //     opacity: 0,
-  //   },
-  // }));
 
   useEffect(() => {
     const cgRef = ref(getDatabase(), `/seasons/${season}/cg/${token}`);
@@ -58,29 +35,17 @@ export default function Overlay() {
     return () => document.querySelector('body')?.classList.remove('no-background-color');
   });
 
-  // useEffect(() => {
-  //   tickerSpringApi.start({
-  //     height: (tickerShown ? '3em' : '0'),
-  //   });
-  // }, [tickerShown]);
-
-  // useEffect(() => {
-  //   overlaySpringApi.start({
-  //     opacity: overlayShown ? 0.5 : 0,
-  //   });
-  // }, [overlayShown]);
-
   if (cgConfig === undefined) return null;
   return (
     <StyledOverlay className="--no-body-background-color" background={cgConfig.pageBg}>
       <div
         style={{
           position: 'absolute',
-          bottom: 'max(20vh, 7em)',
+          bottom: '20vh',
           left: 0,
         }}
       >
-        <LowerThird cgConfig={cgConfig} />
+        <div />
       </div>
       <animated.div style={{
         position: 'absolute',
@@ -93,10 +58,10 @@ export default function Overlay() {
         alignItems: 'flex-start',
       }}
       >
+        <LowerThird cgConfig={cgConfig} />
         <EventBranding cgConfig={cgConfig} />
         <QualRankings cgConfig={cgConfig} />
       </animated.div>
-      {/* <Overlay style={overlaySpring} /> */}
     </StyledOverlay>
   );
 }

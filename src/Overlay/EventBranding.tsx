@@ -22,7 +22,7 @@ const Branding = styled(animated.div)<{ showTicker: boolean, background: string,
   padding-top: ${(props) => (props.showTicker ? null : '0.6em')};
   padding-bottom: ${(props) => (props.showTicker ? null : '0.6em')};
   transition-property: padding-left, padding-right, padding-top, padding-bottom;
-  transition-duration: 0.3s;
+  transition-duration: 0.5s;
   transition-timing-function: ease-in-out;
   /* border-left-width: 0em; */
   /* border-left-style: solid; */
