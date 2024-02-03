@@ -17,6 +17,8 @@ const OptionsPage = styled.div`
 
   main {
     display: flex;
+    width: 90%;
+    margin: 0 5%;
     justify-content: center;
     flex-wrap: wrap;
     gap: 0.5em;
@@ -76,8 +78,7 @@ const StyledHeader = styled.div`
 const OptionsBox = styled.section`
   border: 1px solid #555;
   border-radius: 5px;
-  max-width: 90%;
-  min-width: 500px;
+  flex-basis: 500px;
   padding: 0.5em;
 
   h2 {
@@ -94,11 +95,25 @@ const OptionsBox = styled.section`
   }
 `;
 
+const HidableSpan = styled.span<{ isShown: boolean }>`
+  filter: blur(${(props) => (props.isShown ? '0px' : '0.25em')})
+`;
+
+const Note = styled.span`
+  font-style: italic;
+  font-size: 0.8em;
+  
+  &:before {
+    content: '\\2014' // em-dash
+  }
+`;
+
 const Options = () => {
   const email = useMemo(() => getAuth().currentUser?.email, undefined);
   const { event, season, token } = useContext(AppContext);
 
   const [error, setError] = useState<string>('');
+  const [isKeyShown, setIsKeyShown] = useState<boolean>(false);
 
   const [pageBg, setPageBg] = useState<string>('');
 
@@ -139,7 +154,6 @@ const Options = () => {
       setShowLowerThird(val.showLowerThird);
       setLowerThirdTitle(val.lowerThirdTitle);
       setLowerThirdSubtitle(val.lowerThirdSubtitle);
-      // val.lowerThirdSubtitle val.lowerThirdLogo
     });
   }, []);
 
@@ -202,9 +216,26 @@ const Options = () => {
       {error && <ErrorMessage type="error">{error}</ErrorMessage>}
       <main>
         <OptionsBox>
+          <h2>Setup</h2>
+          <p>
+            To get the overlay into vMix, create a new web input with the following URL,
+            then set it as an overlay with a lower number than Audience Display:
+          </p>
+          <span>
+            {window.location.origin}/overlay?key=
+            <HidableSpan isShown={isKeyShown}>{token}</HidableSpan>
+          </span>
+          <div><button type="button" onClick={() => setIsKeyShown(!isKeyShown)}>{isKeyShown ? 'Hide' : 'Show'} Key</button></div>
+
+          <p>
+            Note: At this time, the Overlay is only designed to work when the real-time scoring
+            in Audience Display is set to be at the top of the screen.
+          </p>
+        </OptionsBox>
+        <OptionsBox>
           <h2>Colors</h2>
           <label htmlFor="pageBg">
-            Page Background
+            Page Background <Note>Leaving this blank is recommended</Note>
             <input id="pageBg" onChange={(e) => setPageBg((e.target as HTMLInputElement).value)} value={pageBg} type="text" />
           </label>
           <label htmlFor="syncColors">
@@ -212,7 +243,7 @@ const Options = () => {
             Sync Branding and Ticker colors?
           </label>
           <label htmlFor="brandingBg">
-            Branding Background
+            Branding Background <Note>Coordinate any sponsor branding with @av-staff</Note>
             <input id="brandingBg" onChange={(e) => setBrandingBg((e.target as HTMLInputElement).value)} value={brandingBg} type="text" />
           </label>
           <label htmlFor="brandingTextColor">
@@ -243,7 +274,7 @@ const Options = () => {
             <input id="brandingText" onChange={(e) => setBrandingText((e.target as HTMLInputElement).value)} value={brandingText ?? undefined} type="text" />
           </label>
           <label htmlFor="brandingImage">
-            Branding Image URL
+            Branding Image URL <Note>Branding images should be created by @av-staff</Note>
             <input id="brandingImage" onChange={(e) => setBrandingImage((e.target as HTMLInputElement).value)} value={brandingImage ?? undefined} type="text" />
           </label>
         </OptionsBox>
@@ -254,12 +285,18 @@ const Options = () => {
             Show Rankings Ticker
           </label>
           <em>
-            &quot;As of&quot; display to be implemented. <br />
-            Rankings ticker only shown during qualification matches.
+            Rankings ticker only shown during qualification matches and while waiting
+            for alliances to be chosen.
           </em>
         </OptionsBox>
         <OptionsBox>
           <h2>Lower Third</h2>
+          <p>
+            <em>
+              This functionality can be used to introduce speakers or to display a message
+              to the audience (such as: Matches begin at 1:00 PM)
+            </em>
+          </p>
           <label htmlFor="showLowerThird">
             <input id="showLowerThird" onChange={() => setShowLowerThird(!showLowerThird)} checked={showLowerThird} type="checkbox" />
             Show Lower Third
@@ -272,9 +309,6 @@ const Options = () => {
             Subtitle
             <input id="lowerThirdSubtitle" onChange={(e) => setLowerThirdSubtitle((e.target as HTMLInputElement).value)} value={lowerThirdSubtitle ?? undefined} type="text" />
           </label>
-        </OptionsBox>
-        <OptionsBox>
-          <h2>Message</h2>
         </OptionsBox>
       </main>
       <footer>

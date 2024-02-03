@@ -24,8 +24,6 @@ const Branding = styled(animated.div)<{ showTicker: boolean, background: string,
   transition-property: padding-left, padding-right, padding-top, padding-bottom;
   transition-duration: 0.5s;
   transition-timing-function: ease-in-out;
-  /* border-left-width: 0em; */
-  /* border-left-style: solid; */
   -webkit-clip-path: polygon(0 0, calc(100% - 1.2em) 0, 100% 100%, 0 100%);
   clip-path: polygon(0 0, calc(100% - 1.2em) 0, 100% 100%, 0 100%);
 `;
@@ -132,7 +130,8 @@ function EventBranding({
   return (
     <Branding
       style={brandingSpring}
-      showTicker={cgConfig.showTicker}
+      // Temporarily hardcoded while I decide whether the padding should be consistent or not
+      showTicker={true || cgConfig.showTicker}
       background={displayedBrandingInfo.backgroundColor}
       textColor={displayedBrandingInfo.textColor}
     >
