@@ -96,9 +96,8 @@ const LoginForm = ({ onLogin }: LoginFormProps) => {
         <StyledBadCode>Bad event token or event not eligible for queueing</StyledBadCode>
       )}
       <Disclaimer>
-        This system is only for use by A/V volunteers at FIRST in Michigan events.
+        This system is not intended for public use.
         If you have not been given explicit permission to use this system, please don&apos;t.
-        You&apos;ll ruin it for everyone.
       </Disclaimer>
     </div>
   );
