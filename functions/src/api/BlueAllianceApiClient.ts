@@ -98,6 +98,7 @@ export default class BlueAllianceApiClient extends GenericApiClient {
       sortOrder2: r.sort_orders[1],
       sortOrder3: r.sort_orders[2],
       sortOrder4: r.sort_orders[3],
+      sortOrder5: r.sort_orders[4],
       wins: r.record.wins,
       ties: r.record.ties,
       losses: r.record.losses,

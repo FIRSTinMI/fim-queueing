@@ -72,6 +72,7 @@ export type TeamRanking = {
   sortOrder2: number;
   sortOrder3: number;
   sortOrder4: number;
+  sortOrder5: number;
 };
 
 export type Alliance = {

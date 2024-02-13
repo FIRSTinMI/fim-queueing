@@ -85,7 +85,7 @@ export default class FrcEventsApiClient extends GenericApiClient {
       if (winner !== null && winner !== undefined) return winner;
 
       // The score details endpoint is season-specific
-      if (season !== 2023) {
+      if (season !== 2024) {
         throw new Error('Unable to handle game-specific tiebreak rules for '
             + 'other seasons');
       }
@@ -109,24 +109,24 @@ export default class FrcEventsApiClient extends GenericApiClient {
       //
 
       if (red.techFoulCount === undefined || blue.techFoulCount === undefined
-        || red.totalChargeStationPoints === undefined
-        || blue.totalChargeStationPoints === undefined
+        || red.endGameTotalStagePoints === undefined
+        || blue.endGameTotalStagePoints === undefined
         || red.autoPoints === undefined || blue.autoPoints === undefined
       ) return null;
 
-      // Alliance with the most tech foul points wins
+      // 1. Alliance with the most tech foul points wins
       if (red.techFoulCount > blue.techFoulCount) return 'blue';
       if (blue.techFoulCount > red.techFoulCount) return 'red';
 
-      // Alliance with most charge station points wins
-      if (red.totalChargeStationPoints
-          > blue.totalChargeStationPoints) return 'red';
-      if (blue.totalChargeStationPoints
-            > red.totalChargeStationPoints) return 'blue';
-
-      // Alliance with most autonomous points wins
+      // 2. Alliance with the most auto points wins
       if (red.autoPoints > blue.autoPoints) return 'red';
       if (blue.autoPoints > red.autoPoints) return 'blue';
+
+      // 3. Alliance with the most stage points wins
+      if (red.endGameTotalStagePoints
+          > blue.endGameTotalStagePoints) return 'red';
+      if (blue.endGameTotalStagePoints
+            > red.endGameTotalStagePoints) return 'blue';
 
       //
       // End season specific logic
@@ -172,6 +172,7 @@ export default class FrcEventsApiClient extends GenericApiClient {
         sortOrder2: x.sortOrder2,
         sortOrder3: x.sortOrder3,
         sortOrder4: x.sortOrder4,
+        sortOrder5: x.sortOrder5,
       }));
     }
 

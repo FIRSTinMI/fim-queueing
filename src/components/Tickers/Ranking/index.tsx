@@ -1,30 +1,11 @@
-import { h, Fragment } from 'preact';
+import { h } from 'preact';
 import styles from './styles.module.scss';
+import numberToOrdinal from '@/util/numberToOrdinal';
 
 interface RankingProps {
   ranking: number;
   teamNumber: number;
   customTextColor?: string;
-}
-
-function numberToOrdinal(num: number) {
-  if (Number.isNaN(num)) return num;
-
-  const pr = new Intl.PluralRules('en-US', { type: 'ordinal' });
-
-  const suffixes = new Map([
-    ['one', 'st'],
-    ['two', 'nd'],
-    ['few', 'rd'],
-    ['other', 'th'],
-  ]);
-  const formatOrdinals = (n: number): JSX.Element => {
-    const rule = pr.select(n);
-    const suffix = suffixes.get(rule);
-    return (<>{n}<sup>{suffix}</sup></>);
-  };
-
-  return formatOrdinals(num);
 }
 
 function Ranking(props: RankingProps): JSX.Element {
