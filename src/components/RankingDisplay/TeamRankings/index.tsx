@@ -9,6 +9,7 @@ import { TeamRanking } from '@/types';
 import MenuBar from '../../MenuBar';
 import styles from './styles.module.scss';
 import AppContext from '../../../AppContext';
+import numberToOrdinal from '@/util/numberToOrdinal';
 
 const numFmt = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
@@ -42,10 +43,11 @@ const TeamRankings = () => {
               <th>Rank</th>
               <th>Team #</th>
               <th>RS</th>
-              {/* Game specific: 2023 */}
+              {/* Game specific: 2024 */}
+              <th>Coop</th>
               <th>Match</th>
-              <th>Charge</th>
               <th>Auto</th>
+              <th>Stage</th>
               {/* End game specific */}
               <th>
                 <span className={styles.wtlCell}>
@@ -61,13 +63,14 @@ const TeamRankings = () => {
           <tbody ref={tableRef}>
             {rankings.map((ranking) => (
               <tr key={ranking.rank}>
-                <td>{ranking.rank}</td>
+                <td>{numberToOrdinal(ranking.rank)}</td>
                 <td>{ranking.teamNumber}</td>
                 <td>{numFmt.format(ranking.rankingPoints)}</td>
-                {/* Game specific: 2023 */}
+                {/* Game specific: 2024 */}
                 <td>{numFmt.format(ranking.sortOrder2)}</td>
                 <td>{numFmt.format(ranking.sortOrder3)}</td>
                 <td>{numFmt.format(ranking.sortOrder4)}</td>
+                <td>{numFmt.format(ranking.sortOrder5)}</td>
                 {/* End game specific */}
                 <td className={styles.wtlCell}>
                   <span>{ranking.wins ?? 0}</span>
