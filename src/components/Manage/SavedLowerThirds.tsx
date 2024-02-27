@@ -107,6 +107,7 @@ const SavedLowerThirds = ({
       }
 
       await update(cgConfigRef.current, {
+        showLowerThird: true,
         lowerThirdTitle: rec.title,
         lowerThirdSubtitle: rec.subtitle,
       } as Partial<CGConfig>);
