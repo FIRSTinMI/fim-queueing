@@ -97,7 +97,7 @@ const Routes: Route<any>[] = [
     requiresLogin: true,
   },
   {
-    name: 'Audience Display',
+    name: 'Stream Overlay',
     url: '/overlay',
     linkFactory: (ctx: AppContextType) => `/overlay?key=${ctx.token}`,
     component: Overlay,
