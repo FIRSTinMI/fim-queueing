@@ -3,14 +3,15 @@ import { route } from 'preact-router';
 import { getAuth } from 'firebase/auth';
 import styled from 'styled-components';
 import {
-  useContext, useEffect, useMemo, useRef, useState,
+  useCallback, useContext, useEffect, useMemo, useRef, useState,
 } from 'preact/hooks';
 import {
-  ref, getDatabase, onValue, DatabaseReference, set,
+  ref, getDatabase, onValue, DatabaseReference, update,
 } from 'firebase/database';
 import AppContext from '@/AppContext';
 import { CGConfig } from '@/types';
 import ErrorMessage from '../ErrorMessage';
+import SavedLowerThirds, { SavedLowerThirdRecord } from './SavedLowerThirds';
 
 const OptionsPage = styled.div`
   font-size: 18px;
@@ -170,7 +171,7 @@ const Options = () => {
       if (cgConfigDbRef.current === undefined) {
         throw new Error('DB Reference not defined');
       }
-      await set(cgConfigDbRef.current, {
+      await update(cgConfigDbRef.current, {
         pageBg: pageBg ?? null,
         showBranding: showBranding ?? null,
         showTicker: showTicker ?? null,
@@ -190,6 +191,11 @@ const Options = () => {
       }
     }
   };
+
+  const onLoadLowerThird = useCallback((rec: SavedLowerThirdRecord) => {
+    setLowerThirdTitle(rec.title);
+    setLowerThirdSubtitle(rec.subtitle);
+  }, []);
 
   const onClickLogout = async () => {
     await getAuth().signOut();
@@ -309,6 +315,12 @@ const Options = () => {
             Subtitle
             <input id="lowerThirdSubtitle" onChange={(e) => setLowerThirdSubtitle((e.target as HTMLInputElement).value)} value={lowerThirdSubtitle ?? undefined} type="text" />
           </label>
+          <SavedLowerThirds
+            lowerThirdTitle={lowerThirdTitle}
+            lowerThirdSubtitle={lowerThirdSubtitle}
+            cgConfigRef={cgConfigDbRef}
+            onLoad={onLoadLowerThird}
+          />
         </OptionsBox>
       </main>
       <footer>
