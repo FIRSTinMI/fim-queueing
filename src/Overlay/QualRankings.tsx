@@ -101,7 +101,7 @@ function QualRankings({
 
   // Decide whether the ticker should *actually* be shown
   useEffect(() => {
-    setShouldShowTicker((cgConfig?.showTicker ?? false)
+    setShouldShowTicker((cgConfig?.showTicker ?? true)
       && (['QualsInProgress', 'AwaitingAlliances'] as EventState[]).includes(event?.state!)
       && rankings.length > 0);
   }, [
