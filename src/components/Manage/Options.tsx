@@ -126,7 +126,7 @@ const Options = () => {
   const [brandingImage, setBrandingImage] = useState<string | null>(null);
   const [brandingText, setBrandingText] = useState<string | null>(null);
 
-  const [showTicker, setShowTicker] = useState<boolean>(false);
+  const [showTicker, setShowTicker] = useState<boolean>(true);
   const [tickerBg, setTickerBg] = useState<string>('#000');
   const [tickerTextColor, setTickerTextColor] = useState<string>('#fff');
 
