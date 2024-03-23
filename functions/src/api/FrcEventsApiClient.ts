@@ -145,13 +145,15 @@ export default class FrcEventsApiClient extends GenericApiClient {
 
       if (matchResults.length) {
         bracket[bm.number] = await Promise.all(matchResults.map(async (mr) => ({
-          participants: mr.teams.filter((team) => !!team.teamNumber)
+          participants: mr.teams.filter((team) => !!team.teamNumber && team.teamNumber > 3)
             .reduce((prev, team) => ({
               ...prev,
               [team.station]: team.teamNumber,
             }), {} as Record<DriverStation, number>),
           winner: await getWinnerFromMatch(mr, bm.number),
         })));
+
+        if (bracket[bm.number]!)
       }
     }));
     return bracket;
