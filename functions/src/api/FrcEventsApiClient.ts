@@ -152,8 +152,6 @@ export default class FrcEventsApiClient extends GenericApiClient {
             }), {} as Record<DriverStation, number>),
           winner: await getWinnerFromMatch(mr, bm.number),
         })));
-
-        if (bracket[bm.number]!)
       }
     }));
     return bracket;
