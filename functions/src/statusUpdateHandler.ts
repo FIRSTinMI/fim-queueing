@@ -27,6 +27,11 @@ exports.statusUpdateHandler = async (oldState: string, newState: string, season:
 
   const event: Event = await eventSnap.val();
 
+  if (event.name.startsWith('[DEV]')) {
+    functions.logger.info('Skipping status update handler for dev event', event.name);
+    return;
+  }
+
   let statusText: string | undefined;
 
   if (newState === 'QualsInProgress') {
