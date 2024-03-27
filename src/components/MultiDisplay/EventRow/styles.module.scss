@@ -1,77 +1,64 @@
-$border-color: #222;
+$border-color: #fafafa;
+
+body {
+    background-color: black !important;
+    color: white !important;
+}
+
+tr {
+    color: #fafafa;
+}
+
+hr {
+    margin: 0;
+    position: absolute;
+    width: 99%;
+    border-width: 3px;
+}
 
 .infoText {
     padding-top: 2em;
     text-align: center;
 }
 
-.assistedInstruction {
-  font-size: 12px;
-  width: 20vw;
+.textCenter {
+    text-align: center;
 }
 
-.fullHeight {
-    height: 100%;
+.matchNumber {
+    text-align: center;
+    font-size: 10vh;
+    font-weight: bold;
 }
 
-.qualsDisplay {
-    height: 100%;
+.flexRow {
     display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-
-    .touchMatchControlButtons {
-        display: none;
-        @media (pointer: coarse) {
-            // Smartphones
-            display: grid;
-        }
-
-        grid-template-columns: 1fr 1fr;
-        gap: 1rem;
-        padding: 1rem;
-        margin-top: -2rem;
-
-        button {
-          width: 100%;
-          font-size: 2rem;
-          line-height: 4rem;
-          height: 4rem;
-        }
-    }
+    flex-direction: row;
 }
 
-.matches {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-    height: 100%;
+.sponsorLogo {
+    width: 14vw;
+    height: auto;
+}
 
-    &>.queueingMatches {
-        height: 100%;
-        padding: 0 2vw;
-    }
-    &>:not(:last-child) { border-bottom: 5px solid $border-color; }
+.bold {
+    font-weight: bold;
+}
 
-    .topBar {
-        display: flex;
-        justify-content: space-between;
-        gap: 20px;
-        &>* {
-            width: 100%;
-            padding: 2vw;
-        }
-
-        &>:not(:last-child) { border-right: 5px solid $border-color; }
-
-        .description {
-            text-align: center;
-            display: block;
-        }
-    }
-
-    .eventName {
+.faderBase {
+    &> div {
+        position: absolute;
+        transition: all ease .5s;
         text-align: center;
-        font-size: 1.5em;
+        width: 30vw;
+        font-weight: bold;
     }
+}
+
+.red {
+    color: red;
+}
+
+.blue {
+    color: #5454ff;
 }

@@ -14,7 +14,15 @@ import { Event } from '@shared/DbTypes';
 
 type LoadingState = 'loading' | 'ready' | 'error' | 'noAutomatic';
 
-const EventRow = ({ token, season }: { token: string, season: string }) => {
+const EventRow = ({
+  token,
+  season,
+  showLine,
+}: {
+  token: string;
+  season: string;
+  showLine: 0 | 1;
+}) => {
   // Loading state
   const [loadingState, setLoadingState] = useState<LoadingState>('loading');
 
@@ -37,10 +45,7 @@ const EventRow = ({ token, season }: { token: string, season: string }) => {
   useEffect(() => {
     if (!token) return () => {};
 
-    const eventRef = ref(
-      getDatabase(),
-      `/seasons/${season}/events/${token}`
-    );
+    const eventRef = ref(getDatabase(), `/seasons/${season}/events/${token}`);
     dbEventRef.current = eventRef;
     onValue(dbEventRef.current, (snap) => {
       setEvent(snap.val() as Event);
@@ -62,27 +67,38 @@ const EventRow = ({ token, season }: { token: string, season: string }) => {
 
   const updateMatches = (e: Event): void => {
     const matchNumber = e.currentMatchNumber;
-    console.log('Match number:', matchNumber )
 
     if (matchNumber === null || matchNumber === undefined) {
       if (dbEventRef.current === undefined) return; // throw new Error('No event ref');
-      update(dbEventRef.current, {
-        currentMatchNumber: 1,
-      }).catch((e) => {
-        console.error(e);
-      });
+      // update(dbEventRef.current, {
+      //   currentMatchNumber: 1,
+      // }).catch((e) => {
+      //   console.error(e);
+      // });
       return;
     }
 
     try {
-      setDisplayMatches({
+      // Make a new array of max queuing matches to display
+      const maxQ =
+        typeof e.options?.maxQueueingToShow === 'number'
+          ? e.options?.maxQueueingToShow
+          : 3;
+      const toFill = new Array(maxQ).fill(null);
+      toFill.forEach((_, i) => {
+        toFill[i] = i + 2;
+      });
+
+      const data = {
         currentMatch: getMatchByNumber(matchNumber),
         nextMatch: getMatchByNumber(matchNumber + 1),
         // By default, we'll take the three matches after the one on deck
-        queueingMatches: [2, 3, 4]
+        queueingMatches: toFill
           .map((x) => getMatchByNumber(matchNumber + x))
           .filter((x) => x !== null) as QualMatch[],
-      });
+      };
+
+      setDisplayMatches(data);
       setLoadingState('ready');
     } catch (e) {
       setLoadingState('error');
@@ -96,57 +112,112 @@ const EventRow = ({ token, season }: { token: string, season: string }) => {
 
   const { currentMatch, nextMatch, queueingMatches } = displayMatches;
 
+  const getRedStr = (match: QualMatch | null): string => {
+    if (!match) return '';
+    return `${match.participants.Red1} ${match.participants.Red2} ${match.participants.Red3}`;
+  };
+
+  const getBlueStr = (match: QualMatch | null): string => {
+    if (!match) return '';
+    return `${match.participants.Blue1} ${match.participants.Blue2} ${match.participants.Blue3}`;
+  };
+
   return (
     <>
-      <div className={styles.fullHeight}>
-        {loadingState === 'loading' && (
-          <div className={styles.infoText}>Loading matches...</div>
-        )}
-        {loadingState === 'error' && (
-          <div className={styles.infoText}>Failed to fetch matches</div>
-        )}
-        {loadingState === 'noAutomatic' && (
-          <div className={styles.infoText}>
-            Unable to run in automatic mode. Press the &apos;a&apos; key to
-            switch modes.
-          </div>
-        )}
-        {loadingState === 'ready' && !qualMatches?.length && (
-          <div className={styles.infoText}>
-            Waiting for schedule to be posted...
-          </div>
-        )}
-        {loadingState === 'ready' && qualMatches?.length !== 0 && (
-          <div className={styles.qualsDisplay}>
-            <div className={styles.matches}>
-              <div className={styles.topBar}>
-                {currentMatch && (
-                  <div>
-                    {/* <MatchDisplay halfWidth match={currentMatch} /> */}
-                    <h3>{currentMatch.number}</h3>
-                    <span className={styles.description}>On Field</span>
-                  </div>
-                )}
-                {nextMatch && (
-                  <div>
-                    {/* <MatchDisplay halfWidth match={nextMatch} /> */}
-                    <h3>{nextMatch.number}</h3>
-                    <span className={styles.description}>On Deck</span>
-                  </div>
-                )}
-              </div>
-              {/* {queueingMatches.map((x) => (
-                <MatchDisplay
-                  className={styles.queueingMatches}
-                  match={x}
-                  key={x.number}
+      {loadingState === 'loading' && (
+        <div className={styles.infoText}>Loading matches...</div>
+      )}
+      {loadingState === 'error' && (
+        <div className={styles.infoText}>Failed to fetch matches</div>
+      )}
+      {loadingState === 'ready' && !qualMatches?.length && (
+        <div className={styles.infoText}>
+          Waiting for schedule to be posted...
+        </div>
+      )}
+      {loadingState === 'ready' && qualMatches?.length !== 0 && (
+        <tr style={{ height: '22vh' }}>
+          {/* Sponsor Logo */}
+          <td>
+            <img
+              src={event.sponsorLogoUrl}
+              alt={event.name}
+              className={styles.sponsorLogo}
+            />
+          </td>
+
+          {/* Current Match */}
+          <td className={styles.matchNumber}>{currentMatch?.number}</td>
+
+          {/* Next Match */}
+          <td className={styles.textCenter}>
+            {nextMatch && (
+              <Fragment>
+                <span className={styles.matchNumber}>{nextMatch?.number}</span>
+                <TextFader
+                  red={getRedStr(nextMatch)}
+                  blue={getBlueStr(nextMatch)}
+                  showLine={showLine}
                 />
-              ))} */}
-            </div>
-          </div>
-        )}
-      </div>
+              </Fragment>
+            )}
+          </td>
+
+          {/* Queueing Matches */}
+          <td>
+            {queueingMatches.map((x, i) => (
+              <div
+                className={styles.flexRow}
+                style={{
+                  borderBottom:
+                    i < queueingMatches.length - 1
+                      ? 'solid black 3px'
+                      : undefined,
+                }}
+              >
+                <span className={styles.bold}>{x.number} -</span>
+                <TextFader
+                  red={getRedStr(x)}
+                  blue={getBlueStr(x)}
+                  showLine={showLine}
+                />
+              </div>
+            ))}
+          </td>
+        </tr>
+      )}
     </>
+  );
+};
+
+const TextFader = ({
+  red,
+  blue,
+  showLine,
+}: {
+  red: string;
+  blue: string;
+  showLine: 0 | 1;
+}) => {
+  return (
+    <div className={styles.faderBase}>
+      <div
+        className={styles.red}
+        style={{
+          opacity: showLine ? 0 : 1,
+        }}
+      >
+        R: {red}
+      </div>
+      <div
+        className={styles.blue}
+        style={{
+          opacity: showLine,
+        }}
+      >
+        B: {blue}
+      </div>
+    </div>
   );
 };
 
