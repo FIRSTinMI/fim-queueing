@@ -318,12 +318,14 @@ const App = () => {
     hub.current?.invoke('UpdateRoute', route.url);
   };
 
+  const skipEventKey = Routes.map((rt) => rt.skipEventKey && rt.url).includes(window.location.pathname);
+
   // Change what's rendered based on global application state
   let appContent: JSX.Element;
   if (!appContext || (!isAuthenticated && connection?.connectionStatus === undefined)
       || (isAuthenticated && appContext.event === undefined)) {
     appContent = (<div className={styles.infoText}>Loading...</div>);
-  } else if (isAuthenticated && appContext.event !== undefined) {
+  } else if ((isAuthenticated && appContext.event !== undefined) || skipEventKey) {
     appContent = (
       <>
         <StaleDataBanner />
