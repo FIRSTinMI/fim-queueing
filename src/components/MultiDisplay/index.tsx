@@ -7,14 +7,27 @@ const MultiQueueing = () => {
   const events = searchParams.getAll('e');
   const season = searchParams.get('s') ?? new Date().getFullYear().toString();
 
+  const calcClock = (): string => {
+    const now = new Date();
+    const str = now.toLocaleString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })
+    return str;
+  }
+
   const [showLine, setShowLine] = useState<0 | 1>(0);
+  const [clock, setClock] = useState<string>(calcClock());
 
   useEffect(() => {
     const interval = setInterval(() => {
       setShowLine((sl: 0 | 1) => (sl === 0 ? 1 : 0));
     }, 5000);
 
-    return () => clearInterval(interval);
+    const clockInterval = setInterval(() => setClock(calcClock()), 60000)
+    calcClock();
+
+    return () => {
+      clearInterval(interval);
+      clearInterval(clockInterval);
+    }
   }, []);
 
   return (
@@ -22,7 +35,7 @@ const MultiQueueing = () => {
       <table>
         <thead>
           <tr style={{ textAlign: 'center' }}>
-            <th>Field</th>
+            <th>{clock}</th>
             <th style={{ width: '20vw' }}>Current Match</th>
             <th style={{ width: '30vw' }}>Next Match</th>
             <th style={{ width: '32vw' }}>Queueing Matches</th>

@@ -6,7 +6,11 @@ body {
 }
 
 tr {
-    color: #fafafa;
+    color: #fafafa !important;
+}
+
+tbody > tr {
+    height: 22vh;
 }
 
 hr {
@@ -14,11 +18,6 @@ hr {
     position: absolute;
     width: 99%;
     border-width: 3px;
-}
-
-.infoText {
-    padding-top: 2em;
-    text-align: center;
 }
 
 .textCenter {
