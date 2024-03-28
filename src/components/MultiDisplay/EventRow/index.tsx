@@ -3,16 +3,43 @@ import {
   DatabaseReference,
   getDatabase,
   ref,
-  update,
   onValue,
   off,
 } from 'firebase/database';
 import { useEffect, useState, useRef } from 'preact/hooks';
-import { QualMatch } from '@shared/DbTypes';
+import { QualMatch, Event } from '@shared/DbTypes';
 import styles from './styles.module.scss';
-import { Event } from '@shared/DbTypes';
 
 type LoadingState = 'loading' | 'ready' | 'error' | 'noAutomatic';
+
+const TextFader = ({
+  red,
+  blue,
+  showLine,
+}: {
+  red: string;
+  blue: string;
+  showLine: 0 | 1;
+}) => (
+  <div className={styles.faderBase}>
+    <div
+      className={styles.red}
+      style={{
+        opacity: showLine ? 0 : 1,
+      }}
+    >
+      R: {red}
+    </div>
+    <div
+      className={styles.blue}
+      style={{
+        opacity: showLine,
+      }}
+    >
+      B: {blue}
+    </div>
+  </div>
+);
 
 const EventRow = ({
   token,
@@ -43,7 +70,7 @@ const EventRow = ({
   }>({ currentMatch: null, nextMatch: null, queueingMatches: [] });
 
   useEffect(() => {
-    if (!token) return () => {};
+    if (!token) return () => { };
 
     const eventRef = ref(getDatabase(), `/seasons/${season}/events/${token}`);
     dbEventRef.current = eventRef;
@@ -62,8 +89,8 @@ const EventRow = ({
     };
   }, [season, token]);
 
-  const getMatchByNumber = (matchNumber: number): QualMatch | null =>
-    qualMatches?.find((x) => x.number === matchNumber) ?? null;
+  // eslint-disable-next-line max-len -- HOW TO MAKE THIS SHORT?
+  const getMatchByNumber = (matchNumber: number): QualMatch | null => qualMatches?.find((x) => x.number === matchNumber) ?? null;
 
   const updateMatches = (e: Event): void => {
     const matchNumber = e.currentMatchNumber;
@@ -80,10 +107,9 @@ const EventRow = ({
 
     try {
       // Make a new array of max queuing matches to display
-      const maxQ =
-        typeof e.options?.maxQueueingToShow === 'number'
-          ? e.options?.maxQueueingToShow
-          : 3;
+      const maxQ = typeof e.options?.maxQueueingToShow === 'number'
+        ? e.options?.maxQueueingToShow
+        : 3;
       const toFill = new Array(maxQ).fill(null);
       toFill.forEach((_, i) => {
         toFill[i] = i + 2;
@@ -100,9 +126,9 @@ const EventRow = ({
 
       setDisplayMatches(data);
       setLoadingState('ready');
-    } catch (e) {
+    } catch (err: any) {
       setLoadingState('error');
-      console.error(e);
+      console.error(err);
     }
   };
 
@@ -187,37 +213,6 @@ const EventRow = ({
         </tr>
       )}
     </>
-  );
-};
-
-const TextFader = ({
-  red,
-  blue,
-  showLine,
-}: {
-  red: string;
-  blue: string;
-  showLine: 0 | 1;
-}) => {
-  return (
-    <div className={styles.faderBase}>
-      <div
-        className={styles.red}
-        style={{
-          opacity: showLine ? 0 : 1,
-        }}
-      >
-        R: {red}
-      </div>
-      <div
-        className={styles.blue}
-        style={{
-          opacity: showLine,
-        }}
-      >
-        B: {blue}
-      </div>
-    </div>
   );
 };
 
