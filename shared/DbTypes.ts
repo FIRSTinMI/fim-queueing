@@ -26,7 +26,9 @@ export type Event = {
   options: {
     showRankings: boolean,
     showEventName: boolean,
-  }
+    maxQueueingToShow?: number,
+  },
+  sponsorLogoUrl?: string,
 };
 
 export type DriverStation = 'Red1' | 'Red2' | 'Red3' | 'Blue1' | 'Blue2'

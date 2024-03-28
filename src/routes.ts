@@ -14,6 +14,7 @@ import UserLogin from './components/Manage/UserLogin';
 import Options from './components/Manage/Options';
 import Overlay from './Overlay';
 import { AppContextType } from './AppContext';
+import MultiQueueing from './components/MultiDisplay';
 
 type Route<TParams> = {
   name: string,
@@ -24,6 +25,7 @@ type Route<TParams> = {
   params?: TParams,
   hideFromNav?: boolean,
   requiresLogin?: boolean,
+  skipEventKey?: boolean,
 };
 
 const Routes: Route<any>[] = [
@@ -44,6 +46,15 @@ const Routes: Route<any>[] = [
     url: '/playoff/queueing',
     component: PlayoffQueueing,
     usedIn: ['playoff'],
+  },
+  {
+    name: 'Multi-Event Queueing',
+    url: '/multi/queueing',
+    component: MultiQueueing,
+    hideFromNav: true,
+    requiresLogin: false,
+    skipEventKey: true,
+    usedIn: [],
   },
   {
     name: 'Playoff Bracket',

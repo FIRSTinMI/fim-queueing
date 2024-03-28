@@ -26,8 +26,7 @@ import AuthenticatedRoute from '../AuthenticatedRoute';
 
 // TODO: Figure out why the event details sometimes aren't getting sent over to SignalR
 
-const ErrorFallback = ({ error }
-: { error: Error }) => {
+const ErrorFallback = ({ error }: { error: Error }) => {
   // Reload after a while to try a recovery
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -299,7 +298,7 @@ const App = () => {
 
   useEffect(() => {
     if (!db) {
-      return () => {};
+      return () => { };
     }
     const featuresRef = ref(db!, '/features');
     onValue(featuresRef, (snap: DataSnapshot) => {
@@ -318,12 +317,16 @@ const App = () => {
     hub.current?.invoke('UpdateRoute', route.url);
   };
 
+  const skipEventKey = Routes
+    .map((rt) => rt.skipEventKey && rt.url)
+    .includes(window.location.pathname);
+
   // Change what's rendered based on global application state
   let appContent: JSX.Element;
   if (!appContext || (!isAuthenticated && connection?.connectionStatus === undefined)
-      || (isAuthenticated && appContext.event === undefined)) {
+    || (isAuthenticated && appContext.event === undefined)) {
     appContent = (<div className={styles.infoText}>Loading...</div>);
-  } else if (isAuthenticated && appContext.event !== undefined) {
+  } else if ((isAuthenticated && appContext.event !== undefined) || skipEventKey) {
     appContent = (
       <>
         <StaleDataBanner />
@@ -348,14 +351,14 @@ const App = () => {
       {identifyTO !== null && <div className={styles.identify}>{hub.current?.connectionId}</div>}
       <ErrorBoundary FallbackComponent={ErrorFallback}>
         <AppContext.Provider value={appContext ?? {}}>
-          { connection?.connectionStatus === 'offline' && (
+          {connection?.connectionStatus === 'offline' && (
             <div className={styles.warningBar}>
               Check network connection.
               {connection.lastConnectedDate
                 && ` Last connected ${connection.lastConnectedDate?.toLocaleString([], { timeStyle: 'short' })}`}
             </div>
-          ) }
-          { appContent }
+          )}
+          {appContent}
         </AppContext.Provider>
       </ErrorBoundary>
     </div>
