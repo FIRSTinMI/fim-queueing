@@ -26,8 +26,7 @@ import AuthenticatedRoute from '../AuthenticatedRoute';
 
 // TODO: Figure out why the event details sometimes aren't getting sent over to SignalR
 
-const ErrorFallback = ({ error }
-  : { error: Error }) => {
+const ErrorFallback = ({ error }: { error: Error }) => {
   // Reload after a while to try a recovery
   useEffect(() => {
     const timeout = setTimeout(() => {

@@ -11,7 +11,7 @@ const MultiQueueing = () => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setShowLine((showLine: 0 | 1) => (showLine === 0 ? 1 : 0));
+      setShowLine((sl: 0 | 1) => (sl === 0 ? 1 : 0));
     }, 5000);
 
     return () => clearInterval(interval);
