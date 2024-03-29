@@ -10,9 +10,9 @@ const MultiQueueing = () => {
 
   const calcClock = (): string => {
     const now = new Date();
-    const str = now.toLocaleString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })
+    const str = now.toLocaleString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
     return str;
-  }
+  };
 
   const [showLine, setShowLine] = useState<0 | 1>(0);
   const [clock, setClock] = useState<string>(calcClock());
@@ -22,13 +22,13 @@ const MultiQueueing = () => {
       setShowLine((sl: 0 | 1) => (sl === 0 ? 1 : 0));
     }, 5000);
 
-    const clockInterval = setInterval(() => setClock(calcClock()), 60000)
+    const clockInterval = setInterval(() => setClock(calcClock()), 60000);
     calcClock();
 
     return () => {
       clearInterval(interval);
       clearInterval(clockInterval);
-    }
+    };
   }, []);
 
   return (
@@ -36,10 +36,10 @@ const MultiQueueing = () => {
       <table>
         <thead>
           <tr style={{ textAlign: 'center' }}>
-            <th>{clock}</th>
+            <th style={{ width: '20vw' }}>{clock}</th>
             <th style={{ width: '16vw' }}>On Field</th>
-            <th style={{ width: '32vw' }}>Next Match</th>
-            <th style={{ width: '32vw' }}>Queueing Matches</th>
+            <th style={{ width: '30vw' }}>Next Match</th>
+            <th style={{ width: '30vw' }}>Queueing Matches</th>
           </tr>
         </thead>
         <tbody>

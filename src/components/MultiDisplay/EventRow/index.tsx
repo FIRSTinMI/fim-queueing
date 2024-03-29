@@ -132,22 +132,26 @@ const EventRow = ({
     }
   };
 
+  // On event change, check for matches
   useEffect(() => {
     if (event) updateMatches(event);
   }, [event.currentMatchNumber, qualMatches]);
 
   const { currentMatch, nextMatch, queueingMatches } = displayMatches;
 
+  // Calculate Red alliance string
   const getRedStr = (match: QualMatch | null): string => {
     if (!match) return '';
     return `${match.participants.Red1} ${match.participants.Red2} ${match.participants.Red3}`;
   };
 
+  // Calculate Blue alliance string
   const getBlueStr = (match: QualMatch | null): string => {
     if (!match) return '';
     return `${match.participants.Blue1} ${match.participants.Blue2} ${match.participants.Blue3}`;
   };
 
+  // Ready w/ no matches
   if (loadingState === 'ready' && (qualMatches?.length ?? 0) < 1) {
     return (
       <tr>
@@ -158,8 +162,11 @@ const EventRow = ({
           <span>Waiting for schedule to be posted...</span>
         </td>
       </tr>
-    )
-  } else if (loadingState === 'loading') {
+    );
+  }
+
+  // Loading
+  if (loadingState === 'loading') {
     return (
       <tr>
         <td colSpan={4} className={styles.textCenter}>
@@ -169,8 +176,11 @@ const EventRow = ({
           <span>Loading matches...</span>
         </td>
       </tr>
-    )
-  } else if (loadingState === 'error') {
+    );
+  }
+
+  // Error
+  if (loadingState === 'error') {
     return (
       <tr>
         <td colSpan={4} className={styles.textCenter}>
@@ -178,10 +188,13 @@ const EventRow = ({
             <span><b>{event.name}</b><br /></span>
           )}
           <span>Failed to fetch matches</span>
-          </td>
+        </td>
       </tr>
-    )
-  } else if (loadingState === 'ready' && qualMatches?.length !== 0) {
+    );
+  }
+
+  // Ready and we have matches
+  if (loadingState === 'ready' && qualMatches?.length !== 0) {
     return (
       <>
         <tr style={{ height: '22vh' }}>
@@ -237,9 +250,9 @@ const EventRow = ({
         </tr>
       </>
     );
-  } else {
-    return null;
   }
+
+  return null;
 };
 
 export default EventRow;
