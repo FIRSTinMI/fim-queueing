@@ -5,6 +5,7 @@ import {
   ref,
   onValue,
   off,
+  update,
 } from 'firebase/database';
 import { useEffect, useState, useRef } from 'preact/hooks';
 import { QualMatch, Event } from '@shared/DbTypes';
@@ -97,11 +98,11 @@ const EventRow = ({
 
     if (matchNumber === null || matchNumber === undefined) {
       if (dbEventRef.current === undefined) return; // throw new Error('No event ref');
-      // update(dbEventRef.current, {
-      //   currentMatchNumber: 1,
-      // }).catch((e) => {
-      //   console.error(e);
-      // });
+      update(dbEventRef.current, {
+        currentMatchNumber: 1,
+      }).catch((err) => {
+        console.error(err);
+      });
       return;
     }
 
