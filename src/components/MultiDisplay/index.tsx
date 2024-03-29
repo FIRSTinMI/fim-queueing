@@ -36,10 +36,10 @@ const MultiQueueing = () => {
       <table>
         <thead>
           <tr style={{ textAlign: 'center' }}>
-            <th style={{ width: '20vw' }}>{clock}</th>
-            <th style={{ width: '16vw' }}>On Field</th>
-            <th style={{ width: '30vw' }}>Next Match</th>
-            <th style={{ width: '30vw' }}>Queueing Matches</th>
+            <th style={{ width: '15vw' }}>{clock}</th>
+            <th style={{ width: '18vw' }}>On Field</th>
+            <th style={{ width: '32vw' }}>Next Match</th>
+            <th style={{ width: '38vw' }}>Queueing Matches</th>
           </tr>
         </thead>
         <tbody>
