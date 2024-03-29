@@ -98,7 +98,7 @@ const EventRow = ({
         queueingMatches: toFill
           .map((x) => getMatchByNumber(matchNumber + x))
           .filter((x) => x !== null) as QualMatch[],
-      }; 
+      };
 
       setDisplayMatches(data);
       setLoadingState('ready');
