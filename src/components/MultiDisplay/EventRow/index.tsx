@@ -148,20 +148,42 @@ const EventRow = ({
     return `${match.participants.Blue1} ${match.participants.Blue2} ${match.participants.Blue3}`;
   };
 
-  return (
-    <>
-      {loadingState === 'loading' && (
-        <div className={styles.infoText}>Loading matches...</div>
-      )}
-      {loadingState === 'error' && (
-        <div className={styles.infoText}>Failed to fetch matches</div>
-      )}
-      {loadingState === 'ready' && !qualMatches?.length && (
-        <div className={styles.infoText}>
-          Waiting for schedule to be posted...
-        </div>
-      )}
-      {loadingState === 'ready' && qualMatches?.length !== 0 && (
+  if (loadingState === 'ready' && (qualMatches?.length ?? 0) < 1) {
+    return (
+      <tr>
+        <td colSpan={4} className={styles.textCenter}>
+          {event && event.name && (
+            <span><b>{event.name}</b><br /></span>
+          )}
+          <span>Waiting for schedule to be posted...</span>
+        </td>
+      </tr>
+    )
+  } else if (loadingState === 'loading') {
+    return (
+      <tr>
+        <td colSpan={4} className={styles.textCenter}>
+          {event && event.name && (
+            <span><b>{event.name}</b><br /></span>
+          )}
+          <span>Loading matches...</span>
+        </td>
+      </tr>
+    )
+  } else if (loadingState === 'error') {
+    return (
+      <tr>
+        <td colSpan={4} className={styles.textCenter}>
+          {event && event.name && (
+            <span><b>{event.name}</b><br /></span>
+          )}
+          <span>Failed to fetch matches</span>
+          </td>
+      </tr>
+    )
+  } else if (loadingState === 'ready' && qualMatches?.length !== 0) {
+    return (
+      <>
         <tr style={{ height: '22vh' }}>
           {/* Sponsor Logo */}
           <td>
@@ -211,9 +233,9 @@ const EventRow = ({
             ))}
           </td>
         </tr>
-      )}
-    </>
-  );
+      </>
+    );
+  }
 };
 
 export default EventRow;
