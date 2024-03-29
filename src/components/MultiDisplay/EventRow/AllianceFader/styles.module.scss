@@ -1,0 +1,22 @@
+
+$teamlist-size: 5.5vh;
+
+.faderBase {
+    &> div {
+        position: absolute;
+        transition: all ease .5s;
+        text-align: center;
+        width: 30vw;
+        font-weight: bold;
+        border-radius: 1em;
+        font-size: $teamlist-size;
+    }
+}
+
+.red {
+    background: rgba(255, 0, 0, .5);
+}
+
+.blue {
+    background: rgba(84, 84, 255, .5);
+}

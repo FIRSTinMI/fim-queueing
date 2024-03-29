@@ -10,37 +10,15 @@ import {
 import { useEffect, useState, useRef } from 'preact/hooks';
 import { QualMatch, Event } from '@shared/DbTypes';
 import styles from './styles.module.scss';
+import AllianceFader from './AllianceFader';
 
 type LoadingState = 'loading' | 'ready' | 'error' | 'noAutomatic';
 
-const TextFader = ({
-  red,
-  blue,
-  showLine,
-}: {
-  red: string;
-  blue: string;
-  showLine: 0 | 1;
-}) => (
-  <div className={styles.faderBase}>
-    <div
-      className={styles.red}
-      style={{
-        opacity: showLine ? 0 : 1,
-      }}
-    >
-      R: {red}
-    </div>
-    <div
-      className={styles.blue}
-      style={{
-        opacity: showLine,
-      }}
-    >
-      B: {blue}
-    </div>
-  </div>
-);
+type MatchData = {
+  currentMatch: QualMatch | null;
+  nextMatch: QualMatch | null;
+  queueingMatches: QualMatch[];
+};
 
 const EventRow = ({
   token,
@@ -64,11 +42,8 @@ const EventRow = ({
   const [qualMatches, setQualMatches] = useState<QualMatch[]>([]);
 
   // Matches to display
-  const [displayMatches, setDisplayMatches] = useState<{
-    currentMatch: QualMatch | null;
-    nextMatch: QualMatch | null;
-    queueingMatches: QualMatch[];
-  }>({ currentMatch: null, nextMatch: null, queueingMatches: [] });
+  // eslint-disable-next-line max-len
+  const [displayMatches, setDisplayMatches] = useState<MatchData>({ currentMatch: null, nextMatch: null, queueingMatches: [] });
 
   useEffect(() => {
     if (!token) return () => { };
@@ -123,7 +98,7 @@ const EventRow = ({
         queueingMatches: toFill
           .map((x) => getMatchByNumber(matchNumber + x))
           .filter((x) => x !== null) as QualMatch[],
-      };
+      }; 
 
       setDisplayMatches(data);
       setLoadingState('ready');
@@ -217,7 +192,7 @@ const EventRow = ({
               <Fragment>
                 <span className={styles.matchNumber}>{nextMatch?.number}</span>
                 <span className={styles.nextMatchScroll}>
-                  <TextFader
+                  <AllianceFader
                     red={getRedStr(nextMatch)}
                     blue={getBlueStr(nextMatch)}
                     showLine={showLine}
@@ -240,7 +215,7 @@ const EventRow = ({
                 }}
               >
                 <span className={styles.bold}>{x.number} -</span>
-                <TextFader
+                <AllianceFader
                   red={getRedStr(x)}
                   blue={getBlueStr(x)}
                   showLine={showLine}
