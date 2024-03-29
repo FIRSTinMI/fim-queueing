@@ -202,11 +202,13 @@ const EventRow = ({
             {nextMatch && (
               <Fragment>
                 <span className={styles.matchNumber}>{nextMatch?.number}</span>
-                <TextFader
-                  red={getRedStr(nextMatch)}
-                  blue={getBlueStr(nextMatch)}
-                  showLine={showLine}
-                />
+                <span className={styles.nextMatchScroll}>
+                  <TextFader
+                    red={getRedStr(nextMatch)}
+                    blue={getBlueStr(nextMatch)}
+                    showLine={showLine}
+                  />
+                </span>
               </Fragment>
             )}
           </td>
@@ -235,6 +237,8 @@ const EventRow = ({
         </tr>
       </>
     );
+  } else {
+    return null;
   }
 };
 

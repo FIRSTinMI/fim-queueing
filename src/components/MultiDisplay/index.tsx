@@ -37,8 +37,8 @@ const MultiQueueing = () => {
         <thead>
           <tr style={{ textAlign: 'center' }}>
             <th>{clock}</th>
-            <th style={{ width: '20vw' }}>Current Match</th>
-            <th style={{ width: '30vw' }}>Next Match</th>
+            <th style={{ width: '16vw' }}>On Field</th>
+            <th style={{ width: '32vw' }}>Next Match</th>
             <th style={{ width: '32vw' }}>Queueing Matches</th>
           </tr>
         </thead>

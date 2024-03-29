@@ -1,5 +1,9 @@
 $border-color: #fafafa;
 
+$teamlist-size: 5.5vh;
+$matchnumber-size: 18vh;
+
+$cell-vertical-negative: -3vh;
 
 
 tr {
@@ -23,13 +27,22 @@ hr {
 
 .matchNumber {
     text-align: center;
-    font-size: 10vh;
+    font-size: $matchnumber-size;
     font-weight: bold;
+    position: relative;
+    top: $cell-vertical-negative;
+    line-height: 0.8;
+}
+
+.nextMatchScroll {
+    position: relative;
+    top: $cell-vertical-negative;
 }
 
 .flexRow {
     display: flex;
     flex-direction: row;
+    font-size: $teamlist-size;
 }
 
 .sponsorLogo {
@@ -48,13 +61,15 @@ hr {
         text-align: center;
         width: 30vw;
         font-weight: bold;
+        border-radius: 1em;
+        font-size: $teamlist-size;
     }
 }
 
 .red {
-    color: red;
+    background: rgba(255, 0, 0, .5);
 }
 
 .blue {
-    color: #5454ff;
+    background: rgba(84, 84, 255, .5);
 }
