@@ -1,77 +1,11 @@
 $border-color: #222;
 
-.infoText {
-    padding-top: 2em;
-    text-align: center;
-}
-
-.assistedInstruction {
-  font-size: 12px;
-  width: 20vw;
-}
-
-.fullHeight {
-    height: 100%;
-}
-
-.qualsDisplay {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-
-    .touchMatchControlButtons {
-        display: none;
-        @media (pointer: coarse) {
-            // Smartphones
-            display: grid;
-        }
-
-        grid-template-columns: 1fr 1fr;
-        gap: 1rem;
-        padding: 1rem;
-        margin-top: -2rem;
-
-        button {
-          width: 100%;
-          font-size: 2rem;
-          line-height: 4rem;
-          height: 4rem;
-        }
-    }
-}
-
-.matches {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-    height: 100%;
-
-    &>.queueingMatches {
-        height: 100%;
-        padding: 0 2vw;
-    }
-    &>:not(:last-child) { border-bottom: 5px solid $border-color; }
-
-    .topBar {
-        display: flex;
-        justify-content: space-between;
-        gap: 20px;
-        &>* {
-            width: 100%;
-            padding: 2vw;
-        }
-
-        &>:not(:last-child) { border-right: 5px solid $border-color; }
-
-        .description {
-            text-align: center;
-            display: block;
-        }
-    }
-
-    .eventName {
-        text-align: center;
-        font-size: 1.5em;
-    }
+.container {
+    background-color: black !important;
+    color: white !important;
+    position: relative;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 100vw;
 }

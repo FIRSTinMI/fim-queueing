@@ -1,6 +1,7 @@
 import { h, Fragment } from 'preact';
 import { useEffect, useState } from 'preact/hooks';
 import EventRow from './EventRow';
+import styles from './styles.module.scss';
 
 const MultiQueueing = () => {
   const searchParams = new URLSearchParams(window.location.search);
@@ -18,7 +19,7 @@ const MultiQueueing = () => {
   }, []);
 
   return (
-    <div>
+    <div className={styles.container}>
       <table>
         <thead>
           <tr style={{ textAlign: 'center' }}>
