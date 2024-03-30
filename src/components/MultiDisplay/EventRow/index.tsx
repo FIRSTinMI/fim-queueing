@@ -5,7 +5,7 @@ import {
   ref,
   onValue,
   off,
-  update,
+  // update,
 } from 'firebase/database';
 import { useEffect, useState, useRef } from 'preact/hooks';
 import { QualMatch, Event } from '@shared/DbTypes';
@@ -14,10 +14,18 @@ import AllianceFader from './AllianceFader';
 
 type LoadingState = 'loading' | 'ready' | 'error' | 'noAutomatic';
 
+type Break = {
+  after: number,
+  level: 'qual',
+  message: string
+};
+
+type MatchOrBreak = QualMatch | Break | null;
+
 type MatchData = {
-  currentMatch: QualMatch | null;
-  nextMatch: QualMatch | null;
-  queueingMatches: QualMatch[];
+  currentMatch: MatchOrBreak | null;
+  nextMatch: MatchOrBreak | null;
+  queueingMatches: MatchOrBreak[];
 };
 
 const EventRow = ({
@@ -41,6 +49,9 @@ const EventRow = ({
   // This row's matches
   const [qualMatches, setQualMatches] = useState<QualMatch[]>([]);
 
+  // This row's breaks
+  const [breaks, setBreaks] = useState<Break[]>([]);
+
   // Matches to display
   // eslint-disable-next-line max-len
   const [displayMatches, setDisplayMatches] = useState<MatchData>({ currentMatch: null, nextMatch: null, queueingMatches: [] });
@@ -59,6 +70,11 @@ const EventRow = ({
       setQualMatches(snap.val() as QualMatch[]);
     });
 
+    const breaksRef = ref(getDatabase(), `/seasons/${season}/breaks/${token}`);
+    onValue(breaksRef, (snap) => {
+      setBreaks(snap.val() as Break[]);
+    });
+
     return () => {
       off(matchesRef);
       off(eventRef);
@@ -73,11 +89,11 @@ const EventRow = ({
 
     if (matchNumber === null || matchNumber === undefined) {
       if (dbEventRef.current === undefined) return; // throw new Error('No event ref');
-      update(dbEventRef.current, {
-        currentMatchNumber: 1,
-      }).catch((err) => {
-        console.error(err);
-      });
+      // update(dbEventRef.current, {
+      //   currentMatchNumber: 1,
+      // }).catch((err) => {
+      //   console.error(err);
+      // });
       return;
     }
 
@@ -91,14 +107,37 @@ const EventRow = ({
         toFill[i] = i + 2;
       });
 
-      const data = {
-        currentMatch: getMatchByNumber(matchNumber),
-        nextMatch: getMatchByNumber(matchNumber + 1),
-        // By default, we'll take the three matches after the one on deck
-        queueingMatches: toFill
+      // Upcoming matches
+      const upcoming: MatchOrBreak[] = [
+        getMatchByNumber(matchNumber),
+        getMatchByNumber(matchNumber + 1),
+      ].concat( // Add Queueing Matches
+        toFill
           .map((x) => getMatchByNumber(matchNumber + x))
           .filter((x) => x !== null) as QualMatch[],
-      };
+      );
+
+      // See if there is an upcoming break
+      breaks.forEach((b: Break) => {
+        // See if break start is inside what we're showing
+        if (b.after < (matchNumber + upcoming.length)) {
+          // Calculate the insert location
+          const insertAt = b.after - matchNumber;
+          // Sanity
+          if (insertAt < 0) return;
+          // Insert break
+          upcoming.splice(insertAt, 0, b);
+          // Remove one from the end
+          upcoming.pop();
+        }
+      });
+
+      const data = {
+        currentMatch: upcoming[0],
+        nextMatch: upcoming[1],
+        // By default, we'll take the three matches after the one on deck
+        queueingMatches: upcoming.slice(2),
+      } as MatchData;
 
       setDisplayMatches(data);
       setLoadingState('ready');
@@ -111,7 +150,7 @@ const EventRow = ({
   // On event change, check for matches
   useEffect(() => {
     if (event) updateMatches(event);
-  }, [event.currentMatchNumber, qualMatches]);
+  }, [event.currentMatchNumber, qualMatches, breaks]);
 
   const { currentMatch, nextMatch, queueingMatches } = displayMatches;
 
@@ -184,44 +223,70 @@ const EventRow = ({
           </td>
 
           {/* Current Match */}
-          <td className={styles.matchNumber}>{currentMatch?.number}</td>
+          { currentMatch && (currentMatch as QualMatch)?.number && (
+            <td className={styles.matchNumber}>
+              {(currentMatch as QualMatch)?.number}
+            </td>
+          )}
+
+          {/* Current Match is Break */}
+          { currentMatch && (currentMatch as Break)?.message && (
+            <td className={styles.textCenter}>
+              {(currentMatch as Break)?.message}
+            </td>
+          )}
 
           {/* Next Match */}
           <td className={styles.textCenter}>
-            {nextMatch && (
+            {/* Is a Match */}
+            {nextMatch && (nextMatch as QualMatch).number && (
               <Fragment>
-                <span className={styles.matchNumber}>{nextMatch?.number}</span>
+                <span className={styles.matchNumber}>{(nextMatch as QualMatch)?.number}</span>
                 <span className={styles.nextMatchScroll}>
                   <AllianceFader
-                    red={getRedStr(nextMatch)}
-                    blue={getBlueStr(nextMatch)}
+                    red={getRedStr(nextMatch as QualMatch)}
+                    blue={getBlueStr(nextMatch as QualMatch)}
                     showLine={showLine}
                   />
                 </span>
+              </Fragment>
+            )}
+
+            {/* Is a Break */}
+            {nextMatch && (nextMatch as Break).message && (
+              <Fragment>
+                {(nextMatch as Break).message}
               </Fragment>
             )}
           </td>
 
           {/* Queueing Matches */}
           <td>
-            {queueingMatches.map((x, i) => (
-              <div
-                className={styles.flexRow}
-                style={{
-                  borderBottom:
-                    i < queueingMatches.length - 1
-                      ? 'solid black 3px'
-                      : undefined,
-                }}
-              >
-                <span className={styles.bold}>{x.number} -</span>
-                <AllianceFader
-                  red={getRedStr(x)}
-                  blue={getBlueStr(x)}
-                  showLine={showLine}
-                />
-              </div>
-            ))}
+            {queueingMatches.map((x) => {
+              // Is a match, not a break
+              if (x && (x as QualMatch).number) {
+                const match = x as QualMatch;
+                return (
+                  <div
+                    className={styles.flexRow}
+                  >
+                    <span className={styles.bold}>{match.number} -</span>
+                    <AllianceFader
+                      red={getRedStr(match)}
+                      blue={getBlueStr(match)}
+                      showLine={showLine}
+                    />
+                  </div>
+                );
+              }
+
+              // Is a break
+              return (
+                <div className={styles.textCenter}>
+                  {(x as Break).message}
+                </div>
+              );
+            })}
           </td>
         </tr>
       </>
