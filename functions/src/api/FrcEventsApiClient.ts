@@ -40,6 +40,7 @@ export default class FrcEventsApiClient extends GenericApiClient {
 
     return resp.Schedule.map((x) => ({
       number: x.matchNumber,
+      schedStart: new Date(x.startTime), // This is local time!
       participants: x.teams.filter((team) => !!team.teamNumber)
         .reduce((prev, team) => ({
           ...prev,
