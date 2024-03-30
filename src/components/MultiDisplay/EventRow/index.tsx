@@ -118,7 +118,7 @@ const EventRow = ({
       );
 
       // See if there is an upcoming break
-      breaks.forEach((b: Break) => {
+      breaks?.forEach((b: Break) => {
         // See if break start is inside what we're showing
         if (b.after < (matchNumber + upcoming.length)) {
           // Calculate the insert location
@@ -135,7 +135,6 @@ const EventRow = ({
       const data = {
         currentMatch: upcoming[0],
         nextMatch: upcoming[1],
-        // By default, we'll take the three matches after the one on deck
         queueingMatches: upcoming.slice(2),
       } as MatchData;
 
