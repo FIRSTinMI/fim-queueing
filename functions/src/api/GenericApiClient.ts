@@ -96,7 +96,7 @@ export default abstract class GenericApiClient {
    */
   public abstract getCurrentQualMatch(eventCode: string, season: number,
     lastKnown: number | undefined): Promise<number | null>;
-  public abstract getQualSchedule(eventCode: string, season: number): Promise<QualMatch[]>;
+  public abstract getQualSchedule(eventCode: string, season: number): Promise<ScheduleQualMatch[]>;
   // public abstract getPlayoffSchedule(eventCode: string, season: string)
   // : Promise<Partial<PlayoffMatch>[]>;
   // public abstract getPlayoffMatches(eventCode: string, season: number): Promise<MatchResult[]>;
@@ -122,6 +122,10 @@ export type MatchResult = {
   'scoreBlueFoul': number;
   'scoreBlueAuto': number;
   'participants': Record<DriverStation, number>,
+};
+
+export type ScheduleQualMatch = QualMatch & {
+  schedStart?: Date
 };
 
 export type ScoreBreakdown = {

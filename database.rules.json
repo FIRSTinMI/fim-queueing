@@ -35,6 +35,12 @@
             }
           }
         },
+        "breaks": {
+          "$eventKey": {
+            ".read": "root.child('seasons/'+$season+'/events/'+$eventKey).child('startMs').val() < now && root.child('seasons/'+$season+'/events/'+$eventKey).child('endMs').val() > now",
+            ".write": false
+          }
+        },
         "qual": {
           "$eventKey": {
             ".read": "root.child('seasons/'+$season+'/events/'+$eventKey).child('startMs').val() < now && root.child('seasons/'+$season+'/events/'+$eventKey).child('endMs').val() > now",
