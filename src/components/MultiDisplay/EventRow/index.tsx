@@ -29,14 +29,6 @@ const EventRow = ({
   // This row's events
   const [event, setEvent] = useState<Event>({} as any);
 
-  // Matches to display
-  // eslint-disable-next-line max-len
-  const [qualDisplayMatches, setQualDisplayMatches] = useState<QualMatchData>({
-    currentMatch: null,
-    nextMatch: null,
-    queueingMatches: [],
-  });
-
   useEffect(() => {
     if (!token) return () => {};
 
