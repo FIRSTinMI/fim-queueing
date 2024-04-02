@@ -15,6 +15,16 @@
     z-index: 10;
   }
 
+  .eventName {
+    position: relative;
+    z-index: 10;
+    background: #ccc;
+    width: 100vw;
+    text-align: center;
+    font-size: 1.3em;
+    padding-bottom: 0.3em;
+  }
+
   table {
     transform: translate3d(0, 0, 0);
     position: relative;

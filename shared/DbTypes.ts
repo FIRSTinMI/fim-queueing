@@ -62,6 +62,12 @@ export type QualMatch = {
   participants: Record<DriverStation, number>;
 };
 
+export type Break = {
+  level: 'qual' | 'playoff',
+  after: number | 'F',
+  message: string
+};
+
 export type TeamRanking = {
   rank: number;
   teamNumber: number;

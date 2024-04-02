@@ -37,6 +37,10 @@ const TeamRankings = () => {
     <>
       <MenuBar event={event} season={season} />
       <div className={styles.teamRankings}>
+        {/* TODO(@evanlihou): This should be toggleable from this page */}
+        {event?.options.showEventName === true && (
+          <div className={styles.eventName}>{event.name} ({season})</div>
+        )}
         <table>
           <thead>
             <tr>
