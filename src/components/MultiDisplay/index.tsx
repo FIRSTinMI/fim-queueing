@@ -10,7 +10,11 @@ const MultiQueueing = () => {
 
   const calcClock = (): string => {
     const now = new Date();
-    const str = now.toLocaleString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+    const str = now.toLocaleString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    });
     return str;
   };
 
@@ -38,8 +42,8 @@ const MultiQueueing = () => {
           <tr style={{ textAlign: 'center' }}>
             <th style={{ width: '15vw' }}>{clock}</th>
             <th style={{ width: '18vw' }}>On Field</th>
-            <th style={{ width: '32vw' }}>Next Match</th>
-            <th style={{ width: '38vw' }}>Queueing Matches</th>
+            <th style={{ width: '32vw' }}>Up Next</th>
+            <th style={{ width: '38vw' }}>Queueing</th>
           </tr>
         </thead>
         <tbody>

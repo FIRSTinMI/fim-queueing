@@ -27,11 +27,6 @@ tbody > tr {
     line-height: 0.8;
 }
 
-.nextMatchScroll {
-    position: relative;
-    top: $cell-vertical-negative;
-}
-
 .flexRow {
     display: flex;
     flex-direction: row;
@@ -53,4 +48,48 @@ tbody > tr {
 
 .bold {
     font-weight: bold;
+}
+
+.w100 {
+    width: 100%;
+}
+
+.messageContainer {
+    transition: all ease .5s;
+    position: relative;
+    z-index: 3;
+    height: 0;
+    width: 0;
+    left: -101vw;
+}
+
+.messageMover {
+    width: 100vw;
+    height: 22vh;
+    background-color: black;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+
+    &>span {
+        width: 80%;
+    }
+}
+
+.faderContainer {
+    width: 30vw;
+    height: 22vh;
+
+    &>* {
+        position: absolute;
+        transition: all ease .5s;
+        text-align: center;
+        width: 30vw;
+        top: 0;
+        font-weight: bold;
+        align-items: center;
+        justify-content: center;
+    };
+
 }
