@@ -26,7 +26,7 @@ const MultiQueueing = () => {
       setShowLine((sl: 0 | 1) => (sl === 0 ? 1 : 0));
     }, 5000);
 
-    const clockInterval = setInterval(() => setClock(calcClock()), 60000);
+    const clockInterval = setInterval(() => setClock(calcClock()), 10000);
     calcClock();
 
     return () => {

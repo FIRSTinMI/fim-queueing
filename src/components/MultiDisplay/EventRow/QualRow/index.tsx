@@ -182,9 +182,10 @@ const QualRow = ({
             <span>
               {loadingState === 'error' && case1
                 ? 'Failed to fetch matches'
-                : loadingState === 'loading'
-                ? 'Loading Matches...'
-                : 'Waiting for schedule to be posted...'}
+                : loadingState === 'loading' && !qualMatches?.length
+                  ? 'Waiting for schedule to be posted...'
+                  : 'Loading Matches...'
+              }
             </span>
           </td>
         </tr>
