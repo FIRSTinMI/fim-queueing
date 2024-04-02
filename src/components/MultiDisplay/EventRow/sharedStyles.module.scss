@@ -1,0 +1,50 @@
+$border-color: #fafafa;
+
+$teamlist-size: 5.5vh;
+$matchnumber-size: 18vh;
+
+$cell-vertical-negative: -3vh;
+
+.textCenter {
+    text-align: center;
+}
+
+.matchNumber {
+    text-align: center;
+    font-size: $matchnumber-size;
+    font-weight: bold;
+    position: relative;
+    top: $cell-vertical-negative;
+    line-height: 0.8;
+}
+
+.flexRow {
+    display: flex;
+    flex-direction: row;
+    font-size: $teamlist-size;
+    margin-bottom: 3px;
+}
+
+.sponsorLogo {
+    display: block;
+    margin-top: 1vh;
+    margin-bottom: 1vh;
+    margin-left: auto;
+    margin-right: auto;
+    width: auto;
+    height: auto;
+    max-width: 15vw;
+    max-height: 15vh;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+.queueingMatchNumber {
+    font-weight: bold;
+    font-size: 7vh;
+}
+.w100 {
+    width: 100%;
+}

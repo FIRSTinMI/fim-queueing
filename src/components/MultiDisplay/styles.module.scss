@@ -8,4 +8,20 @@ $border-color: #222;
     left: 0;
     height: 100vh;
     width: 100vw;
+    overflow: hidden;
+    tr {
+        color: #fafafa !important;
+    }
+
+    hr {
+        margin: 0;
+        position: absolute;
+        width: 100vw;
+        border-width: 3px;
+        border: 3px solid white;
+    }
+
+    tbody>tr {
+        height: 22vh;
+    }
 }

@@ -1,0 +1,58 @@
+.messageContainer {
+    transition: all ease .5s;
+    position: relative;
+    z-index: 3;
+    height: 0;
+    width: 0;
+    left: -101vw;
+}
+
+.messageMover {
+    width: 100vw;
+    height: 22vh;
+    background-color: black;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+
+    &>span {
+        width: 80%;
+    }
+}
+
+.messageText {
+    text-align: center;
+    width: 75vw !important;
+    font-weight: bold;
+}
+
+.faderContainer {
+    width: 25vw;
+    height: 22vh;
+
+    &>* {
+        position: absolute;
+        transition: all ease .5s;
+        text-align: center;
+        width: 25vw;
+        top: 0;
+        font-weight: bold;
+        align-items: center;
+        justify-content: center;
+    }
+
+    ;
+}
+
+.sponsorLogo {
+    display: block;
+    margin-top: 1vh;
+    margin-bottom: 1vh;
+    margin-left: auto;
+    margin-right: auto;
+    width: auto;
+    height: auto;
+    max-width: 15vw;
+    max-height: 15vh;
+}
