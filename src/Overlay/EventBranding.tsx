@@ -26,16 +26,21 @@ const Branding = styled(animated.div)<{ showTicker: boolean, background: string,
   transition-timing-function: ease-in-out;
   -webkit-clip-path: polygon(0 0, calc(100% - 1.2em) 0, 100% 100%, 0 100%);
   clip-path: polygon(0 0, calc(100% - 1.2em) 0, 100% 100%, 0 100%);
+
+  .branding-container {
+    display: flex;
+    align-items: center;
+  }
 `;
 
 const BrandingImage = styled.img`
-  display: block;
+  display: inline-block;
   margin: 0 auto;
   max-height: 1.5em;
   min-height: 1.5em;
   padding-top: 0.2em;
   padding-bottom: 0.2em;
-  padding-right: .1em;
+  padding-right: 0.5em;
 `;
 
 type BrandingInfo = {
@@ -135,8 +140,10 @@ function EventBranding({
       background={displayedBrandingInfo.backgroundColor}
       textColor={displayedBrandingInfo.textColor}
     >
-      {displayedBrandingInfo?.brandingImage && <BrandingImage src={displayedBrandingInfo.brandingImage} alt="Branding Logo" />}
-      {displayedBrandingInfo?.brandingText}
+      <div className="branding-container">
+        {displayedBrandingInfo?.brandingImage && <BrandingImage src={displayedBrandingInfo.brandingImage} alt="Branding Logo" />}
+        {displayedBrandingInfo?.brandingText}
+      </div>
     </Branding>
   );
 }

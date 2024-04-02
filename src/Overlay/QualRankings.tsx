@@ -13,7 +13,7 @@ import RankingList from '@/components/Tickers/RankingList';
 import Ranking from '@/components/Tickers/Ranking';
 import AppContext from '@/AppContext';
 
-const TickerHeight = '2em';
+const TickerHeight = '1.5em';
 const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
 const units = {
   day: 24 * 60 * 60 * 1000,
