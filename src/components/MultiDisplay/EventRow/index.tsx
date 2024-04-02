@@ -8,11 +8,8 @@ import {
   // update,
 } from 'firebase/database';
 import { useEffect, useState, useRef } from 'preact/hooks';
-import { QualMatch, Event } from '@shared/DbTypes';
-import styles from './sharedStyles.module.scss';
-import { Break, MatchOrBreak, QualMatchData } from '@/models/MatchData';
+import { Event } from '@shared/DbTypes';
 import QualRow from './QualRow';
-import MessageRow from './MessageRow';
 import PlayoffRow from './PlayoffRow';
 
 const EventRow = ({

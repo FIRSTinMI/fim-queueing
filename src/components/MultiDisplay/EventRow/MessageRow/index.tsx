@@ -44,7 +44,7 @@ const MessageRow = ({ event, showLine }: { event: Event; showLine: 0 | 1 }) => {
         </div>
 
         {/* Message */}
-        <span className={styles.textCenter + ' ' + styles.bold}>
+        <span className={styles.messageText}>
           <Textfit mode="single" forceSingleModeWidth={true} max="300">
             {event.message || event.name}
           </Textfit>

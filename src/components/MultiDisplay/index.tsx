@@ -39,8 +39,8 @@ const MultiQueueing = () => {
     <div className={styles.container}>
       <table>
         <thead>
-          <tr style={{ textAlign: 'center' }}>
-            <th style={{ width: '15vw' }}>{clock}</th>
+          <tr style={{ textAlign: 'center', fontSize: '7vh' }}>
+            <th style={{ width: '18vw' }}>{clock}</th>
             <th style={{ width: '18vw' }}>On Field</th>
             <th style={{ width: '32vw' }}>Up Next</th>
             <th style={{ width: '38vw' }}>Queueing</th>

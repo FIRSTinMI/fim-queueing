@@ -14,6 +14,7 @@ import { Break, MatchOrBreak, QualMatchData } from '@/models/MatchData';
 import AllianceFader from '../AllianceFader';
 import { useEffect, useState } from 'react';
 import MessageRow from '../MessageRow';
+import { reload } from 'firebase/auth';
 
 type LoadingState = 'loading' | 'ready' | 'error' | 'noAutomatic';
 
@@ -272,12 +273,14 @@ const QualRow = ({
                   const match = x as QualMatch;
                   return (
                     <div className={styles.flexRow}>
-                      <span className={styles.bold}>{match.number} -</span>
-                      <AllianceFader
-                        red={getRedStr(match)}
-                        blue={getBlueStr(match)}
-                        showLine={showLine}
-                      />
+                      <span className={styles.queueingMatchNumber}>{match.number} -</span>
+                      <div style={{ marginLeft: '16vw', position: 'relative', top: '4vh' }}>
+                        <AllianceFader
+                          red={getRedStr(match)}
+                          blue={getBlueStr(match)}
+                          showLine={showLine}
+                        />
+                      </div>
                     </div>
                   );
                 }
