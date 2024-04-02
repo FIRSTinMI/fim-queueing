@@ -13,6 +13,7 @@ import styles from './sharedStyles.module.scss';
 import { Break, MatchOrBreak, QualMatchData } from '@/models/MatchData';
 import QualRow from './QualRow';
 import MessageRow from './MessageRow';
+import PlayoffRow from './PlayoffRow';
 
 const EventRow = ({
   token,
@@ -45,10 +46,18 @@ const EventRow = ({
 
   return (
     <>
+      {/* Beginning of Event */}
       {['Pending', 'AwaitingQualSchedule', 'QualsInProgress'].includes(
         event.state
-      ) && (
+      ) ? (
         <QualRow
+          event={event}
+          season={season}
+          token={token}
+          showLine={showLine}
+        />
+      ) : (
+        <PlayoffRow
           event={event}
           season={season}
           token={token}
