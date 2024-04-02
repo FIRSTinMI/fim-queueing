@@ -3,25 +3,16 @@ module.exports = {
   env: {
     es6: true,
   },
-  extends: [
-    'airbnb',
-    'airbnb-typescript',
-  ],
+  extends: ['airbnb', 'airbnb-typescript'],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     project: ['tsconfig.eslint.json'],
     sourceType: 'module',
   },
-  ignorePatterns: [
-    '/functions/lib/**/*',
-    '/build/**/*',
-    '**/node_modules',
-  ],
-  plugins: [
-    '@typescript-eslint',
-    'import',
-  ],
+  ignorePatterns: ['/functions/lib/**/*', '/build/**/*', '**/node_modules'],
+  plugins: ['@typescript-eslint', 'import'],
   rules: {
+    'linebreak-style': 'off',
     'no-console': 'off',
     'import/extensions': [
       'error',

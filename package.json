@@ -7,9 +7,11 @@
     "build": "vite build",
     "serve": "sirv build --port 8080 --cors --single",
     "dev": "vite",
-    "lint": "eslint './src/**/*.{js,jsx,ts,tsx}' './functions/src/**/*.{js,ts}'"
+    "lint": "eslint './src/**/*.{js,jsx,ts,tsx}' './functions/src/**/*.{js,ts}'",
+    "lint-win": "eslint src/ functions/"
   },
   "dependencies": {
+    "@gmurph91/react-textfit": "^1.1.4",
     "@microsoft/signalr": "^7.0.7",
     "@preact/preset-vite": "^2.5.0",
     "@react-spring/web": "^9.7.3",
@@ -31,6 +33,7 @@
     "@types/color": "^3.0.3",
     "@types/js-cookie": "^3.0.3",
     "@types/react": "^18.2.14",
+    "@types/react-textfit": "^1.1.4",
     "@types/styled-components": "^5.1.26",
     "babel-plugin-module-resolver": "^5.0.0",
     "dotenv-webpack": "^7.1.0",
