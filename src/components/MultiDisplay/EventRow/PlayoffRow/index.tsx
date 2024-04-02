@@ -1,5 +1,5 @@
 import { h, Fragment } from 'preact';
-import { QualMatch, Event, PlayoffMatch } from '@shared/DbTypes';
+import { Event, PlayoffMatch } from '@shared/DbTypes';
 import {
   getDatabase,
   ref,
@@ -7,16 +7,15 @@ import {
   off,
   // update,
 } from 'firebase/database';
-import styles from '../sharedStyles.module.scss';
 // @ts-ignore
 import { Textfit } from '@gmurph91/react-textfit';
-import { Break, MatchOrBreak, PlayoffMatchData } from '@/models/MatchData';
-import AllianceFader from '../AllianceFader';
-import { useEffect, useState } from 'react';
-import MessageRow from '../MessageRow';
+import { useEffect, useState } from 'preact/hooks';
 import DoubleEliminationBracketMapping, {
   BracketMatchNumber,
 } from '@shared/DoubleEliminationBracketMapping';
+import styles from '../sharedStyles.module.scss';
+import { PlayoffMatchData } from '@/models/MatchData';
+import MessageRow from '../MessageRow';
 import { PlayoffMatchDisplay } from '@/components/PlayoffQueueing/PlayoffMatchDisplay';
 
 type LoadingState = 'loading' | 'ready' | 'error' | 'noAutomatic';
@@ -37,15 +36,12 @@ const PlayoffRow = ({
 
   // This row's matches
   const [results, setResults] = useState<
-    Partial<Record<BracketMatchNumber, PlayoffMatch>>
+  Partial<Record<BracketMatchNumber, PlayoffMatch>>
   >({});
 
   // URL parameters
   const searchParams = new URLSearchParams(window.location.search);
   const useShortName = typeof searchParams.get('useShortName') === 'string';
-
-  // This row's breaks
-  const [breaks, setBreaks] = useState<Break[]>([]);
 
   // Matches to display
   // eslint-disable-next-line max-len
@@ -58,11 +54,11 @@ const PlayoffRow = ({
   useEffect(() => {
     const bracketRef = ref(
       getDatabase(),
-      `/seasons/${season}/bracket/${token}`
+      `/seasons/${season}/bracket/${token}`,
     );
     onValue(bracketRef, (snap) => {
       setResults(
-        snap.val() as Partial<Record<BracketMatchNumber, PlayoffMatch>>
+        snap.val() as Partial<Record<BracketMatchNumber, PlayoffMatch>>,
       );
     });
 
@@ -76,12 +72,12 @@ const PlayoffRow = ({
    */
   const updateMatches = (): void => {
     // Get the basic list of matches
-    const matchDisplays: PlayoffMatchDisplay[] =
-      DoubleEliminationBracketMapping.matches.map((m) => ({
-        result: results ? results[m.number] ?? null : null,
-        match: m,
-        num: m?.number,
-      }));
+    // eslint-disable-next-line max-len
+    const matchDisplays: PlayoffMatchDisplay[] = DoubleEliminationBracketMapping.matches.map((m) => ({
+      result: results ? results[m.number] ?? null : null,
+      match: m,
+      num: m?.number,
+    }));
     // TODO: Find a better way to do this?
     // TODO: Add multiple entries for finals with break between?
 
@@ -103,15 +99,14 @@ const PlayoffRow = ({
     });
 
     // Get the last match that has a winner
-    let currentMatchIndex =
-      matchDisplays.reduce((v, m, i) => (m.result?.winner ? i : v), -1) + 1;
+    let currentMatchIndex = matchDisplays.reduce((v, m, i) => (m.result?.winner ? i : v), -1) + 1;
     console.log(currentMatchIndex);
 
     // We have no way of knowing when a break is over, so to reduce confusion never show a break
     // as the current match. If we're at the end of the matches we can show that
     if (
-      matchDisplays[currentMatchIndex].customDisplayText &&
-      matchDisplays.length - 1 > currentMatchIndex
+      matchDisplays[currentMatchIndex].customDisplayText
+      && matchDisplays.length - 1 > currentMatchIndex
     ) {
       currentMatchIndex += 1;
     }
@@ -137,18 +132,6 @@ const PlayoffRow = ({
   useEffect(() => {
     updateMatches();
   }, [results]);
-
-  // Calculate Red alliance string
-  const getRedStr = (match: PlayoffMatch | null): string => {
-    if (!match) return '';
-    return `${match.participants.Red1} ${match.participants.Red2} ${match.participants.Red3}`;
-  };
-
-  // Calculate Blue alliance string
-  const getBlueStr = (match: PlayoffMatch | null): string => {
-    if (!match) return '';
-    return `${match.participants.Blue1} ${match.participants.Blue2} ${match.participants.Blue3}`;
-  };
 
   // Spread the match data
   const { currentMatch, nextMatch, queueingMatches } = displayMatches;
@@ -203,10 +186,10 @@ const PlayoffRow = ({
             {/* Use event short name */}
             {useShortName && (
               <div
-                className={styles.textCenter + ' ' + styles.bold}
+                className={`${styles.textCenter} ${styles.bold}`}
                 style={{ width: '15vw' }}
               >
-                <Textfit mode="single" forceSingleModeWidth={true} max="300">
+                <Textfit mode="single" forceSingleModeWidth max="300">
                   {event.nameShort || event.name}
                 </Textfit>
               </div>
@@ -239,8 +222,8 @@ const PlayoffRow = ({
                     blue={getBlueStr(nextMatch)}
                     showLine={showLine}
                   />
-                </span> 
-                
+                </span>
+
                 */}
               </Fragment>
             )}
@@ -249,25 +232,23 @@ const PlayoffRow = ({
           {/* Queueing Matches */}
           <td className={styles.textCenter}>
             {/* Multiple Queueing Matches */}
-            {queueingMatches.length > 1 &&
-              queueingMatches.map((x) => {
-                return (
-                  <div className={styles.flexRow}>
-                    <span className={styles.bold}>
-                      {x.customDisplayText ?? x?.num === 'F'
-                        ? 'F'
-                        : `M${x?.num}`}
-                    </span>
-                    {/* TODO: Reenable when sync doesnt suck? 
+            {queueingMatches.length > 1
+              && queueingMatches.map((x) => (
+                <div className={styles.flexRow}>
+                  <span className={styles.bold}>
+                    {x.customDisplayText ?? x?.num === 'F'
+                      ? 'F'
+                      : `M${x?.num}`}
+                  </span>
+                  {/* TODO: Reenable when sync doesnt suck?
                     <AllianceFader
                       red={getRedStr(match)}
                       blue={getBlueStr(match)}
                       showLine={showLine}
                     />
                      */}
-                  </div>
-                );
-              })}
+                </div>
+              ))}
 
             {/* Single Queueing Match */}
             {queueingMatches.length === 1 && queueingMatches[0] && (
@@ -275,13 +256,13 @@ const PlayoffRow = ({
                 {queueingMatches[0] && (
                   <Fragment>
                     <span className={styles.matchNumber}>
-                      {queueingMatches[0].customDisplayText ??
-                      queueingMatches[0]?.num === 'F'
+                      {queueingMatches[0].customDisplayText
+                        ?? queueingMatches[0]?.num === 'F'
                         ? 'F'
                         : `M${queueingMatches[0]?.num}`}
                     </span>
 
-                    {/* TODO: Reenable when sync doesnt suck? 
+                    {/* TODO: Reenable when sync doesnt suck?
                     <span>
                       <AllianceFader
                         red={getRedStr(queueingMatches[0])}

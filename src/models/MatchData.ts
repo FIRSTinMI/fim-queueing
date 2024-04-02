@@ -1,5 +1,5 @@
-import { PlayoffMatchDisplay } from '@/components/PlayoffQueueing/PlayoffMatchDisplay';
 import { QualMatch } from '@shared/DbTypes';
+import { PlayoffMatchDisplay } from '@/components/PlayoffQueueing/PlayoffMatchDisplay';
 
 // TODO: this should be moved to DbTypes once the type is available
 export type Break = {

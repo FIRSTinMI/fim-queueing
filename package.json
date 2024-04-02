@@ -7,7 +7,8 @@
     "build": "vite build",
     "serve": "sirv build --port 8080 --cors --single",
     "dev": "vite",
-    "lint": "eslint './src/**/*.{js,jsx,ts,tsx}' './functions/src/**/*.{js,ts}'"
+    "lint": "eslint './src/**/*.{js,jsx,ts,tsx}' './functions/src/**/*.{js,ts}'",
+    "lint-win": "eslint src/ functions/"
   },
   "dependencies": {
     "@gmurph91/react-textfit": "^1.1.4",

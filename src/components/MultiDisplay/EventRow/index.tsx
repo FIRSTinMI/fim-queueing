@@ -28,7 +28,7 @@ const EventRow = ({
   const [event, setEvent] = useState<Event>({} as any);
 
   useEffect(() => {
-    if (!token) return () => {};
+    if (!token) return () => { };
 
     const eventRef = ref(getDatabase(), `/seasons/${season}/events/${token}`);
     dbEventRef.current = eventRef;
@@ -45,7 +45,7 @@ const EventRow = ({
     <>
       {/* Beginning of Event */}
       {['Pending', 'AwaitingQualSchedule', 'QualsInProgress'].includes(
-        event.state
+        event.state,
       ) ? (
         <QualRow
           event={event}
@@ -53,14 +53,14 @@ const EventRow = ({
           token={token}
           showLine={showLine}
         />
-      ) : (
-        <PlayoffRow
-          event={event}
-          season={season}
-          token={token}
-          showLine={showLine}
-        />
-      )}
+        ) : (
+          <PlayoffRow
+            event={event}
+            season={season}
+            token={token}
+            showLine={showLine}
+          />
+        )}
     </>
   );
 };

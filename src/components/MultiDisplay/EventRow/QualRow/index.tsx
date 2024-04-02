@@ -1,4 +1,5 @@
 import { h, Fragment } from 'preact';
+import { useEffect, useState } from 'preact/hooks';
 import { QualMatch, Event } from '@shared/DbTypes';
 import {
   getDatabase,
@@ -7,14 +8,12 @@ import {
   off,
   // update,
 } from 'firebase/database';
-import styles from '../sharedStyles.module.scss';
 // @ts-ignore
 import { Textfit } from '@gmurph91/react-textfit';
+import styles from '../sharedStyles.module.scss';
 import { Break, MatchOrBreak, QualMatchData } from '@/models/MatchData';
 import AllianceFader from '../AllianceFader';
-import { useEffect, useState } from 'react';
 import MessageRow from '../MessageRow';
-import { reload } from 'firebase/auth';
 
 type LoadingState = 'loading' | 'ready' | 'error' | 'noAutomatic';
 
@@ -68,8 +67,7 @@ const QualRow = ({
   }, [season]);
 
   // eslint-disable-next-line max-len -- HOW TO MAKE THIS SHORT?
-  const getMatchByNumber = (matchNumber: number): QualMatch | null =>
-    qualMatches?.find((x) => x.number === matchNumber) ?? null;
+  const getMatchByNumber = (matchNumber: number): QualMatch | null => qualMatches?.find((x) => x.number === matchNumber) ?? null;
 
   const updateMatches = (e: Event): void => {
     const matchNumber = e.currentMatchNumber;
@@ -90,10 +88,9 @@ const QualRow = ({
 
     try {
       // Make a new array of max queuing matches to display
-      const maxQ =
-        typeof e.options?.maxQueueingToShow === 'number'
-          ? e.options?.maxQueueingToShow
-          : 3;
+      const maxQ = typeof e.options?.maxQueueingToShow === 'number'
+        ? e.options?.maxQueueingToShow
+        : 3;
       const toFill = new Array(maxQ).fill(null);
       toFill.forEach((_, i) => {
         toFill[i] = i + 2;
@@ -107,7 +104,7 @@ const QualRow = ({
         // Add Queueing Matches
         toFill
           .map((x) => getMatchByNumber(matchNumber + x))
-          .filter((x) => x !== null) as QualMatch[]
+          .filter((x) => x !== null) as QualMatch[],
       );
 
       // See if there is an upcoming break
@@ -180,12 +177,12 @@ const QualRow = ({
               </span>
             )}
             <span>
+              {/* eslint-disable-next-line no-nested-ternary */}
               {loadingState === 'error' && case1
                 ? 'Failed to fetch matches'
                 : loadingState === 'loading' && !qualMatches?.length
                   ? 'Waiting for schedule to be posted...'
-                  : 'Loading Matches...'
-              }
+                  : 'Loading Matches...'}
             </span>
           </td>
         </tr>
@@ -216,10 +213,10 @@ const QualRow = ({
             {/* Use event short name */}
             {useShortName && (
               <div
-                className={styles.textCenter + ' ' + styles.bold}
+                className={`${styles.textCenter} ${styles.bold}`}
                 style={{ width: '15vw' }}
               >
-                <Textfit mode="single" forceSingleModeWidth={true} max="300">
+                <Textfit mode="single" forceSingleModeWidth max="300">
                   {event.nameShort || event.name}
                 </Textfit>
               </div>
@@ -267,8 +264,8 @@ const QualRow = ({
           {/* Queueing Matches */}
           <td className={styles.textCenter}>
             {/* Multiple Queueing Matches */}
-            {queueingMatches.length > 1 &&
-              queueingMatches.map((x) => {
+            {queueingMatches.length > 1
+              && queueingMatches.map((x) => {
                 // Is a match, not a break
                 if (x && (x as QualMatch).number) {
                   const match = x as QualMatch;
@@ -297,8 +294,8 @@ const QualRow = ({
             {/* Single Queueing Match */}
             {queueingMatches.length === 1 && queueingMatches[0] && (
               <>
-                {queueingMatches[0] &&
-                  (queueingMatches[0] as QualMatch).number && (
+                {queueingMatches[0]
+                  && (queueingMatches[0] as QualMatch).number && (
                     <Fragment>
                       <span className={styles.matchNumber}>
                         {(queueingMatches[0] as QualMatch)?.number}
@@ -311,7 +308,7 @@ const QualRow = ({
                         />
                       </span>
                     </Fragment>
-                  )}
+                )}
 
                 {/* Is a Break */}
                 {nextMatch && (queueingMatches[0] as Break).message && (
