@@ -70,7 +70,7 @@ const PlayoffRow = ({
   /**
    * (Re)populate the match displays with latest data and calculate the current + next matches
    */
-  const updateMatches = (): void => {
+  const updateMatches = (e: Event): void => {
     // Get the basic list of matches
     // eslint-disable-next-line max-len
     const matchDisplays: PlayoffMatchDisplay[] = DoubleEliminationBracketMapping.matches.map((m) => ({
@@ -111,26 +111,36 @@ const PlayoffRow = ({
       currentMatchIndex += 1;
     }
 
+    // Make a new array of max queuing matches to display
+    const maxQ = typeof e.options?.maxQueueingToShow === 'number'
+      ? e.options?.maxQueueingToShow
+      : 3;
+
+    const toFill = new Array(maxQ).fill(null);
+    toFill.forEach((_, i) => {
+      toFill[i] = i + 2;
+    });
+
     try {
       setDisplayMatches({
         currentMatch: matchDisplays[currentMatchIndex],
         nextMatch: matchDisplays[currentMatchIndex + 1],
         // By default, we'll take the three matches after the one on deck
-        queueingMatches: [2, 3, 4]
+        queueingMatches: toFill
           .map((x) => matchDisplays[currentMatchIndex + x])
           .filter((x) => x !== undefined) as PlayoffMatchDisplay[],
       });
       setLoadingState('ready');
-    } catch (e) {
+    } catch (err) {
       setLoadingState('error');
-      console.error(e);
+      console.error(err);
     }
   };
 
   // FIXME (@evanlihou): This effect runs twice on initial load, which causes the "waiting for
   // schedule to be posted" message to flash on the screen for one rendering cycle
   useEffect(() => {
-    updateMatches();
+    updateMatches(event);
   }, [results]);
 
   // Spread the match data
