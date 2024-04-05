@@ -112,7 +112,7 @@ const QualRow = ({
         // See if break start is inside what we're showing
         if (b.after < matchNumber + upcoming.length) {
           // Calculate the insert location
-          const insertAt = b.after - matchNumber;
+          const insertAt = (b.after - matchNumber) - 1;
           // Sanity
           if (insertAt < 0) return;
           // Insert break
