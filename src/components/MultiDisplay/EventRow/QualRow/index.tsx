@@ -107,6 +107,9 @@ const QualRow = ({
           .filter((x) => x !== null) as QualMatch[],
       );
 
+      // Calculate the max # of matches we should be displaying
+      const maxMatches = 2 + maxQ; // current + next + queueing
+
       // See if there is an upcoming break
       breaks?.forEach((b: Break) => {
         // See if break start is inside what we're showing
@@ -117,8 +120,10 @@ const QualRow = ({
           if (insertAt < 0) return;
           // Insert break
           upcoming.splice(insertAt, 0, b);
-          // Remove one from the end
-          upcoming.pop();
+          // Verify that the array is not too long
+          if (upcoming.length > maxMatches) {
+            upcoming.splice(maxMatches, upcoming.length - maxMatches);
+          }
         }
       });
 
