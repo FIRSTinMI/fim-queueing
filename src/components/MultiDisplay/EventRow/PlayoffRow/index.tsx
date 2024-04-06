@@ -37,9 +37,7 @@ const PlayoffRow = ({
   const [loadingState, setLoadingState] = useState<LoadingState>('loading');
 
   // This row's matches
-  const [results, setResults] = useState<
-  Partial<Record<BracketMatchNumber, PlayoffMatch>>
-  >({});
+  const [results, setResults] = useState<Partial<Record<BracketMatchNumber, PlayoffMatch>>>({});
 
   // URL parameters
   const searchParams = new URLSearchParams(window.location.search);
@@ -123,6 +121,10 @@ const PlayoffRow = ({
       toFill[i] = i + 2;
     });
 
+    console.log(matchDisplays[currentMatchIndex]);
+    console.log(matchDisplays[currentMatchIndex + 1]);
+    console.log(toFill.map((x) => matchDisplays[currentMatchIndex + x]));
+
     try {
       setDisplayMatches({
         currentMatch: matchDisplays[currentMatchIndex],
@@ -147,6 +149,15 @@ const PlayoffRow = ({
 
   // Spread the match data
   const { currentMatch, nextMatch, queueingMatches } = displayMatches;
+
+  // Get the display text from a playoff match
+  const getDisplayText = (match: PlayoffMatchDisplay): string => {
+    if (match.customDisplayText) {
+      return match.customDisplayText;
+    }
+
+    return match.num === 'F' ? 'F' : `M${match.num}`;
+  };
 
   // Loading/Error Text
   if (['loading', 'error'].includes(loadingState)) {
@@ -222,17 +233,17 @@ const PlayoffRow = ({
             {/* Is a Match */}
             {nextMatch && (
               <Fragment>
-                <span className={styles.matchNumber}>
-                  {nextMatch.customDisplayText ?? nextMatch?.num === 'F'
-                    ? 'F'
-                    : `M${nextMatch?.num}`}
+                <span className={styles.matchNumber} style={{ fontSize: !nextMatch?.match ? '7vw' : undefined }}>
+                  {getDisplayText(nextMatch)}
                 </span>
                 <span className={styles.nextMatchScroll}>
-                  <AllianceFader
-                    red={getGenericText(nextMatch?.match?.participants?.red)}
-                    blue={getGenericText(nextMatch?.match?.participants?.blue)}
-                    showLine={showLine}
-                  />
+                  {nextMatch?.match && (
+                    <AllianceFader
+                      red={getGenericText(nextMatch?.match?.participants?.red)}
+                      blue={getGenericText(nextMatch?.match?.participants?.blue)}
+                      showLine={showLine}
+                    />
+                  )}
                 </span>
               </Fragment>
             )}
@@ -244,16 +255,16 @@ const PlayoffRow = ({
             {queueingMatches.length > 1
               && queueingMatches.map((x) => (
                 <div className={styles.flexRow}>
-                  <span className={styles.bold}>
-                    {x.customDisplayText ?? x?.num === 'F'
-                      ? 'F'
-                      : `M${x?.num}`}
+                  <span className={styles.bold} style={{ fontSize: !x?.match ? '7vw' : undefined }}>
+                    {getDisplayText(x)}
                   </span>
-                  <AllianceFader
-                    red={getGenericText(x?.match?.participants?.red)}
-                    blue={getGenericText(x?.match?.participants?.blue)}
-                    showLine={showLine}
-                  />
+                  {x?.match && (
+                    <AllianceFader
+                      red={getGenericText(x?.match?.participants?.red)}
+                      blue={getGenericText(x?.match?.participants?.blue)}
+                      showLine={showLine}
+                    />
+                  )}
                 </div>
               ))}
 
@@ -262,18 +273,17 @@ const PlayoffRow = ({
               <>
                 {queueingMatches[0] && (
                   <Fragment>
-                    <span className={styles.matchNumber}>
-                      {queueingMatches[0].customDisplayText
-                        ?? queueingMatches[0]?.num === 'F'
-                        ? 'F'
-                        : `M${queueingMatches[0]?.num}`}
+                    <span className={styles.matchNumber} style={{ fontSize: !queueingMatches[0]?.match ? '7vw' : undefined }}>
+                      {getDisplayText(queueingMatches[0])}
                     </span>
                     <span>
-                      <AllianceFader
-                        red={getGenericText(queueingMatches[0]?.match?.participants?.red)}
-                        blue={getGenericText(queueingMatches[0]?.match?.participants?.blue)}
-                        showLine={showLine}
-                      />
+                      {queueingMatches[0]?.match && (
+                        <AllianceFader
+                          red={getGenericText(queueingMatches[0]?.match?.participants?.red)}
+                          blue={getGenericText(queueingMatches[0]?.match?.participants?.blue)}
+                          showLine={showLine}
+                        />
+                      )}
                     </span>
                   </Fragment>
                 )}
