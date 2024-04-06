@@ -17,6 +17,8 @@ import styles from '../sharedStyles.module.scss';
 import { PlayoffMatchData } from '@/models/MatchData';
 import MessageRow from '../MessageRow';
 import { PlayoffMatchDisplay } from '@/components/PlayoffQueueing/PlayoffMatchDisplay';
+import AllianceFader from '../AllianceFader';
+import getGenericText from '@/util/getGenericText';
 
 type LoadingState = 'loading' | 'ready' | 'error' | 'noAutomatic';
 
@@ -225,16 +227,13 @@ const PlayoffRow = ({
                     ? 'F'
                     : `M${nextMatch?.num}`}
                 </span>
-                {/* TODO: Reenable when sync doesnt suck?
                 <span className={styles.nextMatchScroll}>
                   <AllianceFader
-                    red={getRedStr(nextMatch)}
-                    blue={getBlueStr(nextMatch)}
+                    red={getGenericText(nextMatch?.match?.participants?.red)}
+                    blue={getGenericText(nextMatch?.match?.participants?.blue)}
                     showLine={showLine}
                   />
                 </span>
-
-                */}
               </Fragment>
             )}
           </td>
@@ -250,13 +249,11 @@ const PlayoffRow = ({
                       ? 'F'
                       : `M${x?.num}`}
                   </span>
-                  {/* TODO: Reenable when sync doesnt suck?
-                    <AllianceFader
-                      red={getRedStr(match)}
-                      blue={getBlueStr(match)}
-                      showLine={showLine}
-                    />
-                     */}
+                  <AllianceFader
+                    red={getGenericText(x?.match?.participants?.red)}
+                    blue={getGenericText(x?.match?.participants?.blue)}
+                    showLine={showLine}
+                  />
                 </div>
               ))}
 
@@ -271,16 +268,13 @@ const PlayoffRow = ({
                         ? 'F'
                         : `M${queueingMatches[0]?.num}`}
                     </span>
-
-                    {/* TODO: Reenable when sync doesnt suck?
                     <span>
                       <AllianceFader
-                        red={getRedStr(queueingMatches[0])}
-                        blue={getBlueStr(queueingMatches[0])}
+                        red={getGenericText(queueingMatches[0]?.match?.participants?.red)}
+                        blue={getGenericText(queueingMatches[0]?.match?.participants?.blue)}
                         showLine={showLine}
                       />
                     </span>
-                     */}
                   </Fragment>
                 )}
               </>

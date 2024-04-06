@@ -1,9 +1,8 @@
 import { h, Fragment } from 'preact';
-
 import { DriverStation } from '@shared/DbTypes';
-import { ParticipantSource } from '@shared/DoubleEliminationBracketMapping';
 import { PlayoffMatchDisplay } from '../PlayoffMatchDisplay';
 import styles from './styles.module.scss';
+import getGenericText from '@/util/getGenericText';
 
 type MatchDisplayProps = {
   match: PlayoffMatchDisplay | null;
@@ -39,35 +38,6 @@ function MatchDisplay({ halfWidth, match, className }: MatchDisplayProps): JSX.E
         </div>
       </div>
     );
-  }
-  function getGenericText(part: ParticipantSource | undefined): JSX.Element {
-    if (part === undefined) return (<></>);
-
-    if ('winnerFrom' in part) {
-      return (
-        <>
-          Winner of M
-          {part.winnerFrom}
-        </>
-      );
-    }
-    if ('loserFrom' in part) {
-      return (
-        <>
-          Loser of M
-          {part.loserFrom}
-        </>
-      );
-    }
-    if ('allianceNumber' in part) {
-      return (
-        <>
-          Alliance{' '}
-          {part.allianceNumber}
-        </>
-      );
-    }
-    throw new Error('ParticipantSource not as expected');
   }
 
   let redContent: JSX.Element;

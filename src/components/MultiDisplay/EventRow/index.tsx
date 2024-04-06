@@ -25,7 +25,7 @@ const EventRow = ({
   const dbEventRef = useRef<DatabaseReference>();
 
   // This row's events
-  const [event, setEvent] = useState<Event>({} as any);
+  const [event, setEvent] = useState<Event>();
 
   useEffect(() => {
     if (!token) return () => { };
@@ -34,12 +34,15 @@ const EventRow = ({
     dbEventRef.current = eventRef;
     onValue(dbEventRef.current, (snap) => {
       setEvent(snap.val() as Event);
+      console.log(snap.val());
     });
 
     return () => {
       off(eventRef);
     };
   }, [season, token]);
+
+  if (!event) return null;
 
   return (
     <>
