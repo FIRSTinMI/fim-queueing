@@ -24,8 +24,8 @@ const Branding = styled(animated.div)<{ showTicker: boolean, background: string,
   transition-property: padding-left, padding-right, padding-top, padding-bottom;
   transition-duration: 0.5s;
   transition-timing-function: ease-in-out;
-  -webkit-clip-path: polygon(0 0, calc(100% - 1.2em) 0, 100% 100%, 0 100%);
-  clip-path: polygon(0 0, calc(100% - 1.2em) 0, 100% 100%, 0 100%);
+  -webkit-clip-path: polygon(1.2em 0, calc(100% - 1.2em) 0, 100% 100%, 0 100%);
+  clip-path: polygon(1.2em 0, calc(100% - 1.2em) 0, 100% 100%, 0 100%);
 
   .branding-container {
     display: flex;
@@ -133,18 +133,20 @@ function EventBranding({
 
   if (!displayedBrandingInfo) return null;
   return (
-    <Branding
-      style={brandingSpring}
-      // Temporarily hardcoded while I decide whether the padding should be consistent or not
-      showTicker={true || cgConfig.showTicker}
-      background={displayedBrandingInfo.backgroundColor}
-      textColor={displayedBrandingInfo.textColor}
-    >
-      <div className="branding-container">
-        {displayedBrandingInfo?.brandingImage && <BrandingImage src={displayedBrandingInfo.brandingImage} alt="Branding Logo" />}
-        {displayedBrandingInfo?.brandingText}
-      </div>
-    </Branding>
+    <div style={{ display: 'flex', justifyContent: 'center', width: '100vw' }}>
+      <Branding
+        style={brandingSpring}
+        // Temporarily hardcoded while I decide whether the padding should be consistent or not
+        showTicker={true || cgConfig.showTicker}
+        background={displayedBrandingInfo.backgroundColor}
+        textColor={displayedBrandingInfo.textColor}
+      >
+        <div className="branding-container">
+          {displayedBrandingInfo?.brandingImage && <BrandingImage src={displayedBrandingInfo.brandingImage} alt="Branding Logo" />}
+          {displayedBrandingInfo?.brandingText}
+        </div>
+      </Branding>
+    </div>
   );
 }
 

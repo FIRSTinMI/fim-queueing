@@ -187,7 +187,7 @@ function QualRankings({
   // if (!displayedBrandingInfo) return null;
   return (
     <>
-      {lastModified && (
+      {false && lastModified && (
         <AsOf
           style={asOfSpring}
           backgroundColor={backgroundColor}
