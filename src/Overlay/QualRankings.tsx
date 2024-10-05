@@ -147,9 +147,8 @@ function QualRankings({
     const lastModifiedDbRef = ref(database, `/seasons/${season}/events/${token}/lastModifiedMs`);
     onValue(lastModifiedDbRef, (snap) => {
       const val = snap.val() as number;
-      console.log('setting last modified', snap.val());
       setLastModified((prev) => {
-        if (cgConfig.showTicker && prev === null && val !== null) animateIn(true);
+        if (shouldShowTicker && prev === null && val !== null) animateIn(true);
         return val;
       });
     });

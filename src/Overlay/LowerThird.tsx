@@ -20,7 +20,7 @@ const LowerThirdContainer = styled(animated.div)<{ showTicker: boolean, textColo
   transition-property: padding-left, padding-right, padding-top, padding-bottom;
   transition-duration: 0.3s;
   transition-timing-function: ease-in-out;
-  -webkit-clip-path: polygon(0 0, 100% 0, calc(100% - 1.2em) 100%, 0 100%);
+  --webkit-clip-path: polygon(0 0, 100% 0, calc(100% - 1.2em) 100%, 0 100%);
   clip-path: polygon(0 0, 100% 0, calc(100% - 1.2em) 100%, 0 100%);
 `;
 
@@ -88,8 +88,14 @@ function LowerThird({
 
   // Decide whether the branding should *actually* be shown
   useEffect(() => {
-    setShouldShow(!!displayedInfo && cgConfig.showLowerThird
-      && (!!displayedInfo.title || !!displayedInfo.subtitle));
+    setShouldShow(
+      !!displayedInfo
+      && cgConfig.showLowerThird
+      && (
+        (!!displayedInfo.title && !!displayedInfo.title.match(/\S/)) 
+        || (!!displayedInfo.subtitle && !!displayedInfo.subtitle.match(/\S/))
+      )
+    );
   }, [
     cgConfig?.showLowerThird,
     displayedInfo?.title,

@@ -60,14 +60,14 @@ function EventBranding({
   ] = useState<BrandingInfo | undefined>(undefined);
   const [brandingSpring, brandingSpringApi] = useSpring(() => ({
     from: {
-      x: '-100%',
+      y: '100%',
       // borderLeftWidth: '0em',
     },
   }));
 
   const animateBrandingOut = async () => {
     await Promise.all(brandingSpringApi.start({
-      x: '-100%',
+      y: '100%',
       // borderLeftWidth: '0em',
       config: { tension: 50, friction: 14, clamp: true },
     }));
@@ -75,7 +75,7 @@ function EventBranding({
 
   const animateBrandingIn = async () => {
     const anim1 = brandingSpringApi.start({
-      x: '0%',
+      y: '0%',
       config: { tension: 50, friction: 14, clamp: true },
     });
     // await new Promise((res) => { setTimeout(res, 400); });
@@ -137,7 +137,7 @@ function EventBranding({
       <Branding
         style={brandingSpring}
         // Temporarily hardcoded while I decide whether the padding should be consistent or not
-        showTicker={true || cgConfig.showTicker}
+        showTicker={cgConfig.showTicker}
         background={displayedBrandingInfo.backgroundColor}
         textColor={displayedBrandingInfo.textColor}
       >
