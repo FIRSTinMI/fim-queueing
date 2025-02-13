@@ -6,6 +6,7 @@ import AppContext from '@/AppContext';
 import MenuBar from '../MenuBar';
 import styles from './styles.module.scss';
 import Routes from '@/routes';
+import { useRealtimeEvent } from "@/hooks/supabase/useRealtimeEvent";
 
 let previousSetupState: { qual: string, playoff: string } | undefined;
 
@@ -14,6 +15,7 @@ export default function ScreenChooser() {
   const { event, season } = ctx;
   const [qualScreen, setQualScreen] = useState<string>('/qual/queueing');
   const [playoffScreen, setPlayoffScreen] = useState<string>('/playoff/queueing');
+  const supaEvent = useRealtimeEvent();
 
   function buildSetupQueryString() {
     const parts = [];

@@ -1,7 +1,7 @@
 import { h, Fragment } from 'preact';
 import { route } from 'preact-router';
 import Cookies from 'js-cookie';
-import { useEffect, useState } from 'preact/hooks';
+import { useContext, useEffect, useMemo, useState } from 'preact/hooks';
 
 import { Event } from '@shared/DbTypes';
 import styles from './styles.module.scss';
@@ -9,10 +9,11 @@ import Fullscreen from '@/assets/fullscreen.svg';
 import FullscreenExit from '@/assets/fullscreen_exit.svg';
 import Home from '@/assets/home.svg';
 import Logout from '@/assets/logout.svg';
+import AppContext from "@/AppContext";
+import { useRealtimeEvent } from "@/hooks/supabase/useRealtimeEvent";
+import { useGetSeason } from "@/hooks/supabase/useGetSeason";
 
 type MenuBarProps = {
-  event: Event | undefined,
-  season: number | undefined,
   alwaysShow?: boolean,
   options?: JSX.Element
 };
@@ -36,13 +37,12 @@ function getBrowserFullscreenStatus(): boolean {
  * Always displays on mobile devices, and slides down upon mouse movement for
  * desktop.
  */
-const MenuBar = (props: MenuBarProps) => {
-  const {
-    event, season, alwaysShow, options,
-  } = props;
-
+const MenuBar = ({ alwaysShow, options }: MenuBarProps) => {
   const [showMenu, setShowMenu] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(getBrowserFullscreenStatus());
+  
+  const context = useContext(AppContext);
+  const supaEvent = useRealtimeEvent();
 
   let mouseTimeout: number | undefined;
   const handleMouseMove = () => {
@@ -55,6 +55,11 @@ const MenuBar = (props: MenuBarProps) => {
       }, 2000);
     }
   };
+  
+  const eventName = useMemo(() => {
+    if (supaEvent.isPending) return '';
+    return `${supaEvent.data?.name} (${supaEvent?.data?.seasons?.name})`;
+  }, [context.features?.useSupabaseData, supaEvent.data]);
 
   // Watch for fullscreenchange
   useEffect(() => {
@@ -113,7 +118,7 @@ const MenuBar = (props: MenuBarProps) => {
     }
   }
 
-  if (event === undefined || season === undefined) return (<></>);
+  //if (event === undefined || season === undefined) return (<></>);
   return (
     <div className={[
       styles.menu,
@@ -121,11 +126,7 @@ const MenuBar = (props: MenuBarProps) => {
     ].join(' ')}
     >
       <div className={styles.eventName}>
-        {event.name}
-        {' '}
-        (
-        {season}
-        )
+        {eventName}
       </div>
       <div className={styles.actions}>
         <div>
