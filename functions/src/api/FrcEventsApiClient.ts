@@ -86,7 +86,7 @@ export default class FrcEventsApiClient extends GenericApiClient {
       if (winner !== null && winner !== undefined) return winner;
 
       // The score details endpoint is season-specific
-      if (season !== 2024) {
+      if (season !== 2025) {
         throw new Error('Unable to handle game-specific tiebreak rules for '
             + 'other seasons');
       }
@@ -110,8 +110,8 @@ export default class FrcEventsApiClient extends GenericApiClient {
       //
 
       if (red.techFoulCount === undefined || blue.techFoulCount === undefined
-        || red.endGameTotalStagePoints === undefined
-        || blue.endGameTotalStagePoints === undefined
+        || red.endGameBargePoints === undefined
+        || blue.endGameBargePoints === undefined
         || red.autoPoints === undefined || blue.autoPoints === undefined
       ) return null;
 
@@ -123,11 +123,11 @@ export default class FrcEventsApiClient extends GenericApiClient {
       if (red.autoPoints > blue.autoPoints) return 'red';
       if (blue.autoPoints > red.autoPoints) return 'blue';
 
-      // 3. Alliance with the most stage points wins
-      if (red.endGameTotalStagePoints
-          > blue.endGameTotalStagePoints) return 'red';
-      if (blue.endGameTotalStagePoints
-            > red.endGameTotalStagePoints) return 'blue';
+      // 3. Alliance with the most barge points wins
+      if (red.endGameBargePoints
+          > blue.endGameBargePoints) return 'red';
+      if (blue.endGameBargePoints
+            > red.endGameBargePoints) return 'blue';
 
       //
       // End season specific logic
