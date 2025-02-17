@@ -17,5 +17,14 @@
   hosts: job_runner
   become: yes
   become_method: sudo
+  vars_files: './secrets.yml'
   roles:
-    - job-runner
+    - role: fim-queueing-sync
+      healthCheckEnabled: '{{ fimqueueing.healthCheckEnabled }}'
+      healthCheckUrl: '{{ fimqueueing.healthCheckUrl }}'
+    - role: fimadminapi-sync
+      syncUrl: '{{ fimadminapi.syncUrl }}'
+      syncToken: '{{ fimadminapi.syncToken }}'
+      healthCheckEnabled: '{{ fimadminapi.healthCheckEnabled }}'
+      healthCheckUrl: '{{ fimadminapi.healthCheckUrl }}'
+      

@@ -1,14 +1,21 @@
 # Set up a fim-job-runner machine
 
 - name: Copy .service file to instance
+  register: service_file
   template: 
     src: fim-updateCurrentMatch.service.j2
     dest: /etc/systemd/system/fim-updateCurrentMatch.service
 
 - name: Copy .timer file to instance
+  register: timer_file
   template:
     src: fim-updateCurrentMatch.timer.j2
     dest: /etc/systemd/system/fim-updateCurrentMatch.timer
+
+- name: daemon-reload
+  systemd_service:
+    daemon_reload: yes
+  when: service_file.changed or timer_file.changed
 
 - name: Ensure timer is started
   service:
