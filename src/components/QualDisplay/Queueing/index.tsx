@@ -1,11 +1,6 @@
 import { h, Fragment } from 'preact';
-import {
-  DatabaseReference, getDatabase, child, ref, update, onValue, off,
-} from 'firebase/database';
-import {
-  useEffect, useState, useRef, 
-} from 'preact/hooks';
-import { TeamRanking } from '@/types';
+import { DatabaseReference, getDatabase, child, ref, update } from 'firebase/database';
+import { useEffect, useState, useRef, } from 'preact/hooks';
 import styles from './styles.module.scss';
 import MatchDisplay from '../MatchDisplay';
 import Ranking from '../../Tickers/Ranking';
@@ -14,6 +9,7 @@ import MenuBar from '../../MenuBar';
 import { useRealtimeMatches } from "@/hooks/supabase/useRealtimeMatches";
 import { useFirebaseEvent } from "@/hooks/firebase/useFirebaseEvent";
 import { useRealtimeEvent } from "@/hooks/supabase/useRealtimeEvent";
+import { useRealtimeRankings } from "@/hooks/supabase/useRealtimeRankings";
 import { Match } from "@/hooks/supabase/useGetMatches";
 
 type LoadingState = 'loading' | 'ready' | 'error' | 'noAutomatic';
@@ -29,11 +25,11 @@ const Queueing = () => {
     nextMatch: Match | null,
     queueingMatches: Match[]
   }>({ currentMatch: null, nextMatch: null, queueingMatches: [] });
-  const [rankings, setRankings] = useState<TeamRanking[]>([]);
+  const rankings = useRealtimeRankings();
 
   useEffect(() => {
     if (!event?.code || !event?.seasons?.name) return () => {};
-    dbEventRef.current = ref(getDatabase(), `/seasons/${event.seasons.name}/events/${event.code}`);
+    dbEventRef.current = ref(getDatabase(), `/seasons/${event.seasons.name}/events/${event.key}`);
   }, [event?.code, event?.seasons?.name]);
 
   const setShowEventName = (value: boolean): void => {
@@ -70,6 +66,7 @@ const Queueing = () => {
     // TODO: Handle schedule deviations
     const unplayedMatches = matches?.sort((a, b) => (a.match_number - b.match_number) || ((a.play_number ?? 0) - (b.play_number ?? 0))).filter(m => !m.actual_start_time && !m.is_discarded);
     if (!unplayedMatches || unplayedMatches.length == 0) {
+      setLoadingState('ready');
       return;
     }
 
@@ -88,21 +85,6 @@ const Queueing = () => {
     }
   }, [matches]);
 
-  useEffect(() => {
-    if (!event?.seasons?.name || !event?.code || !firebaseEvent) return () => {};
-    
-    const rankingsRef = ref(getDatabase(), `/seasons/${event.seasons.name}/rankings/${event.code}`);
-    if (firebaseEvent.options?.showRankings) {
-      onValue(rankingsRef, (snap) => {
-        setRankings((snap.val() as TeamRanking[])?.sort((a, b) => a.rank - b.rank) ?? []);
-      });
-    } else {
-      off(rankingsRef);
-    }
-
-    return () => { off(rankingsRef); };
-  }, [event?.seasons?.name, event?.code, firebaseEvent?.options?.showRankings]);
-
   const { currentMatch, nextMatch, queueingMatches } = displayMatches;
   return (
     <>
@@ -112,6 +94,7 @@ const Queueing = () => {
         {loadingState === 'error' && <div className={styles.infoText}>Failed to fetch matches</div>}
         {loadingState === 'noAutomatic' && <div className={styles.infoText}>Unable to run in automatic mode. Press the &apos;a&apos; key to switch modes.</div>}
         {loadingState === 'ready' && !matches?.length && <div className={styles.infoText}>Waiting for schedule to be posted...</div>}
+        {loadingState === 'ready' && matches?.length !== 0 && currentMatch === null && <div className={styles.infoText}>Qualification matches have ended</div> }
         {loadingState === 'ready' && matches?.length !== 0 && event
           && (
           <div className={styles.qualsDisplay}>
@@ -141,9 +124,9 @@ const Queueing = () => {
                 />
               ))}
             </div>
-            {(firebaseEvent?.options?.showRankings ?? false ? (
+            {((firebaseEvent?.options?.showRankings ?? false) && !rankings.isPending ? (
               <RankingList style={{ height: '1.5em' }}>
-                {rankings.map((x) => (<Ranking teamNumber={x.teamNumber} ranking={x.rank} />))}
+                {rankings.data?.map((x) => (<Ranking teamNumber={x.team_number} ranking={x.rank} />))}
               </RankingList>
             ) : <></>)}
           </div>

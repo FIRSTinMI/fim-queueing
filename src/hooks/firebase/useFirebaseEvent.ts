@@ -14,15 +14,13 @@ export const useFirebaseEvent = () => {
   });
 
   useEffect(() => {
-    if (!data?.seasons?.name || !data?.code) return () => {};
-    const dbRef = ref(getDatabase(), `/seasons/${data?.seasons?.name}/events/${data?.code}`);
+    if (!data?.seasons?.name || !data?.key) return () => {};
+    const dbRef = ref(getDatabase(), `/seasons/${data?.seasons?.name}/events/${data?.key}`);
     const unsubscribe = onValue(dbRef, (snap) => {
-      queryClient.setQueryData(["firebase-event"], () => {
-        snap.val()
-      });
+      queryClient.setQueryData(["firebase-event"], () => snap.val());
     });
     return () => unsubscribe();
-  }, [queryClient, data?.code, data?.seasons?.name]);
+  }, [queryClient, data?.key, data?.seasons?.name]);
   
   return firebaseQuery;
 }

@@ -13,6 +13,7 @@ export type EventStatus =
 
 export type Event = {
   id: string,
+  key: string,
   code: string,
   name: string,
   status: EventStatus,
@@ -29,7 +30,7 @@ export const useGetEvent = (enabled: boolean = true) => {
     queryFn: async (): Promise<Event | null> => {
       const result = await supabase
         .from("events")
-        .select("id,code,name,status,seasons(name)")
+        .select("id,key,code,name,status,seasons(name)")
         .maybeSingle<Event>();
       
       if (result.error != null) throw result.error;

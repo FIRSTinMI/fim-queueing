@@ -10,22 +10,19 @@ import MenuBar from '../../MenuBar';
 import styles from './styles.module.scss';
 import AppContext from '../../../AppContext';
 import numberToOrdinal from '@/util/numberToOrdinal';
+import { useRealtimeRankings } from "@/hooks/supabase/useRealtimeRankings";
+import styled from "styled-components";
 
 const numFmt = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
+const Message = styled.div`
+  text-align: center;
+  width: 100%;
+  padding-block: 5vw;
+`;
+
 const TeamRankings = () => {
-  const { event, season, token } = useContext(AppContext);
-  const [rankings, setRankings] = useState<TeamRanking[]>([]);
-  useEffect(() => {
-    if (!token) throw new Error('Token was somehow empty.');
-
-    const rankingsRef = ref(getDatabase(), `/seasons/${season}/rankings/${token}`);
-    onValue(rankingsRef, (snap) => {
-      setRankings((snap.val() as TeamRanking[])?.sort((a, b) => a.rank - b.rank) ?? []);
-    });
-
-    return () => { off(rankingsRef); };
-  }, []);
+  var rankings = useRealtimeRankings();
 
   const tableRef: RefObject<HTMLTableSectionElement> = createRef();
   useEffect(() => {
@@ -33,14 +30,20 @@ const TeamRankings = () => {
     tableRef.current.style.animationDuration = `${(tableRef.current.clientHeight / 40)}s`;
   }, [tableRef]);
 
+  if (rankings.isError) return (
+    <Message>Failed to load rankings: {rankings.error?.message}</Message>
+  );
+  
+  if (rankings.isPending) return (<Message>Loading...</Message>);
+  
   return (
     <>
-      <MenuBar event={event} season={season} />
+      <MenuBar />
       <div className={styles.teamRankings}>
-        {/* TODO(@evanlihou): This should be toggleable from this page */}
-        {event?.options.showEventName === true && (
-          <div className={styles.eventName}>{event.name} ({season})</div>
-        )}
+        {/* TODO(@evanlihou): Reenable display of event name */}
+        {/*{event?.options.showEventName === true && (*/}
+        {/*  <div className={styles.eventName}>{event.name} ({season})</div>*/}
+        {/*)}*/}
         <table>
           <thead>
             <tr>
@@ -65,16 +68,16 @@ const TeamRankings = () => {
             </tr>
           </thead>
           <tbody ref={tableRef}>
-            {rankings.map((ranking) => (
+            {rankings.data?.map((ranking) => (
               <tr key={ranking.rank}>
                 <td>{numberToOrdinal(ranking.rank)}</td>
-                <td>{ranking.teamNumber}</td>
-                <td>{numFmt.format(ranking.rankingPoints)}</td>
+                <td>{ranking.team_number}</td>
+                <td>{numFmt.format(ranking.sort_orders[0])}</td>
                 {/* Game specific: 2024 */}
-                <td>{numFmt.format(ranking.sortOrder2)}</td>
-                <td>{numFmt.format(ranking.sortOrder3)}</td>
-                <td>{numFmt.format(ranking.sortOrder4)}</td>
-                <td>{numFmt.format(ranking.sortOrder5)}</td>
+                <td>{numFmt.format(ranking.sort_orders[1])}</td>
+                <td>{numFmt.format(ranking.sort_orders[2])}</td>
+                <td>{numFmt.format(ranking.sort_orders[3])}</td>
+                <td>{numFmt.format(ranking.sort_orders[4])}</td>
                 {/* End game specific */}
                 <td className={styles.wtlCell}>
                   <span>{ranking.wins ?? 0}</span>

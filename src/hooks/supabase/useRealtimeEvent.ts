@@ -28,6 +28,7 @@ export const useRealtimeEvent = () => {
             return {
               ...old,
               id: payload.new.id,
+              key: payload.new.key,
               code: payload.new.code,
               name: payload.new.name,
               status: payload.new.status
@@ -42,6 +43,7 @@ export const useRealtimeEvent = () => {
             return {
               ...old,
               id: payload.new.id,
+              key: payload.new.key,
               code: payload.new.code,
               name: payload.new.name,
               status: payload.new.status

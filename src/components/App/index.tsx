@@ -140,8 +140,7 @@ const App = () => {
     sendCurrentStatus();
   }, [hub.current, appContext.token, appContext.event?.eventCode]);
 
-  const onLogin = async (token: string, supaToken: string) => {
-    console.log('onlogin');
+  const onLogin = async (_: string, supaToken: string) => {
     if (appContext === undefined) throw new Error('appContext was undefined');
     if (db === undefined) throw new Error('db was undefined');
 
@@ -369,7 +368,7 @@ const App = () => {
             )}
             {appContent}
           </AppContext.Provider>
-          {import.meta.env.DEV && <ReactQueryDevtools/>}
+          {import.meta.env.DEV && <div style={{fontSize: '16px'}}><ReactQueryDevtools/></div>}
         </QueryClientProvider>
       </ErrorBoundary>
     </div>
