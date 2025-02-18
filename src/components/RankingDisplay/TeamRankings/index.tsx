@@ -22,7 +22,7 @@ const Message = styled.div`
 `;
 
 const TeamRankings = () => {
-  var rankings = useRealtimeRankings();
+  const rankings = useRealtimeRankings();
 
   const tableRef: RefObject<HTMLTableSectionElement> = createRef();
   useEffect(() => {
