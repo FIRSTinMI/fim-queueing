@@ -47,11 +47,11 @@ const TeamRankings = () => {
               <th>Rank</th>
               <th>Team #</th>
               <th>RS</th>
-              {/* Game specific: 2024 */}
+              {/* Game specific: 2025 */}
               <th>Coop</th>
               <th>Match</th>
               <th>Auto</th>
-              <th>Stage</th>
+              <th>Barge</th>
               {/* End game specific */}
               <th>
                 <span className={styles.wtlCell}>

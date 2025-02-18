@@ -1,0 +1,12 @@
+[Unit]
+Description=Run sync current events process in FiMAdminApi
+After=network.target
+StartLimitIntervalSec=5
+StartLimitBurst=2
+
+[Service]
+Type=simple
+User=root
+ExecStart=/usr/bin/env curl -H 'X-fim-sync-secret: {{ syncToken }}' --request PUT {{ syncUrl }}
+# Optionally, send a ping to a health check for alerting if the service stops running
+{% if not healthCheckEnabled or healthCheckUrl == "" %}# {% endif %}ExecStartPost=/usr/bin/env curl -fsS -m 10 --retry 5 -o /dev/null {{ healthCheckUrl or "<<Health Check URL>>" }}

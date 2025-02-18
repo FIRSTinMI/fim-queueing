@@ -1,0 +1,5 @@
+healthCheckEnabled: false
+healthCheckUrl: ""
+intervalSec: 10
+syncUrl: ""
+syncToken: ""
