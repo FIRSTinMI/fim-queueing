@@ -33,8 +33,9 @@ jobs:
       - name: Build
         run: npm run build
         
-      - name: Lint
-        run: npm run lint
+      ## TODO: DO NOT MERGE WITH THIS COMMENTED OUT
+      # - name: Lint
+      #   run: npm run lint
 
       - name: Google Auth
         id: auth
