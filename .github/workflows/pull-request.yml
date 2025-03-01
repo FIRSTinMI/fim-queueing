@@ -48,7 +48,7 @@ jobs:
           echo "SERVICE_ACCOUNT_KEY=$(cat "${{ steps.auth.outputs.credentials_file_path }}" | tr -d '\n')" >> $GITHUB_ENV
 
       - name: Deploy
-        run: npx firebase-tools help
+        run: npx firebase-tools hosting:channel:deploy "${{ github.ref_name }}"
         env:
           GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.auth.outputs.credentials_file_path }}
   
