@@ -35,7 +35,27 @@ jobs:
         
       - name: Lint
         run: npm run lint
+
+      - name: Google Auth
+        id: auth
+        uses: 'google-github-actions/auth@v2'
+        with:
+          project_id: fim-queueing
+          workload_identity_provider: '${{ secrets.WIF_PROVIDER }}'
+
+      - run: |
+          echo "SERVICE_ACCOUNT_KEY=$(cat "${{ steps.auth.outputs.credentials_file_path }}" | tr -d '\n')" >> $GITHUB_ENV
+
+      - name: Deploy
+        run: npx firebase-tools help
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.auth.outputs.credentials_file_path }}
+  
   build-functions:
+    # Add 'id-token' with the intended permissions for workload identity federation
+    permissions:
+      contents: 'read'
+      id-token: 'write'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -63,11 +83,3 @@ jobs:
       #     args: hosting:channel:deploy ${{ github.event.pull_request.number }}
       #   env:
       #     GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
-
-      - run: |
-          echo "SERVICE_ACCOUNT_KEY=$(cat "${{ steps.auth.outputs.credentials_file_path }}" | tr -d '\n')" >> $GITHUB_ENV
-
-      - name: Deploy
-        run: npx firebase-tools help
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.auth.outputs.credentials_file_path }}
