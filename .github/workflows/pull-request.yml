@@ -53,10 +53,6 @@ jobs:
           GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.auth.outputs.credentials_file_path }}
   
   build-functions:
-    # Add 'id-token' with the intended permissions for workload identity federation
-    permissions:
-      contents: 'read'
-      id-token: 'write'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -70,17 +66,3 @@ jobs:
       
       - name: Lint
         run: npx eslint 'functions/src/**/*.{js,ts}' -c functions/.eslintrc.js
-
-      - name: Google Auth
-        id: auth
-        uses: 'google-github-actions/auth@v2'
-        with:
-          project_id: fim-queueing
-          workload_identity_provider: '${{ secrets.WIF_PROVIDER }}'
-
-      # - name: Firebase deploy hosting
-      #   uses: w9jds/firebase-action@v2.0.0
-      #   with:
-      #     args: hosting:channel:deploy ${{ github.event.pull_request.number }}
-      #   env:
-      #     GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
