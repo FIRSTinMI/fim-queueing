@@ -1,9 +1,10 @@
 import { h, Fragment } from 'preact';
 import { DriverStation, QualMatch } from '@shared/DbTypes';
 import styles from './styles.module.scss';
+import { Match } from "@/hooks/supabase/useGetMatches";
 
 type MatchDisplayProps = {
-  match: QualMatch | null;
+  match: Match | null;
   // Temp disable till I figure out what to do with avatars
   // teamAvatars: TeamAvatars | undefined;
   halfWidth?: boolean;
@@ -44,12 +45,12 @@ function MatchDisplay({ halfWidth, match, className }: MatchDisplayProps): JSX.E
       */}
       {match && (
       <>
-        <span className={styles.matchNumber}>{match.number}</span>
+        <span className={styles.matchNumber}>{match.match_number}</span>
         <span className={styles.red}>
-          {[1, 2, 3].map((n) => <TeamDisplay key={`${match?.number}r${n}`} team={match?.participants[`Red${n}` as DriverStation]} />)}
+          {match.red_alliance_teams?.map((t, i) => <TeamDisplay key={`${match?.id}r${i}`} team={t} />)}
         </span>
         <span className={styles.blue}>
-          {[1, 2, 3].map((n) => <TeamDisplay key={`${match?.number}b${n}`} team={match?.participants[`Blue${n}` as DriverStation]} />)}
+          {match.blue_alliance_teams?.map((t, i) => <TeamDisplay key={`${match?.id}b${i}`} team={t} />)}
         </span>
       </>
       )}
