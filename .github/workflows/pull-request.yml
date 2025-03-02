@@ -47,10 +47,12 @@ jobs:
       - run: |
           echo "SERVICE_ACCOUNT_KEY=$(cat "${{ steps.auth.outputs.credentials_file_path }}" | tr -d '\n')" >> $GITHUB_ENV
 
-      - name: Deploy
-        run: npx firebase-tools hosting:channel:deploy "${{ github.ref_name }}"
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.auth.outputs.credentials_file_path }}
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: "${{ secrets.GITHUB_TOKEN }}"
+          firebaseServiceAccount: "${{ env.SERVICE_ACCOUNT_KEY }}"
+          projectId: fim-queueing
+          channelId: ${{ github.ref }}
   
   build-functions:
     runs-on: ubuntu-latest
