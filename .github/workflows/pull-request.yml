@@ -44,6 +44,7 @@ jobs:
         with:
           project_id: fim-queueing
           workload_identity_provider: '${{ secrets.WIF_PROVIDER }}'
+          service_account: 'deployment-service@fim-queueing.iam.gserviceaccount.com'
 
       - run: |
           echo "SERVICE_ACCOUNT_KEY=$(cat "${{ steps.auth.outputs.credentials_file_path }}" | tr -d '\n')" >> $GITHUB_ENV
