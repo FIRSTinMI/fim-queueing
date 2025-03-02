@@ -30,6 +30,12 @@ jobs:
 
       - name: Install packages
         run: npm ci
+
+      # Environment variables
+      - name: create env files
+        run: |
+          touch .env;
+          echo "${{ secrets.APP_ENV_VARS }}" > .env;
         
       - name: Build
         run: npm run build
