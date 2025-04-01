@@ -92,9 +92,9 @@ function LowerThird({
       !!displayedInfo
       && cgConfig.showLowerThird
       && (
-        (!!displayedInfo.title && !!displayedInfo.title.match(/\S/)) 
+        (!!displayedInfo.title && !!displayedInfo.title.match(/\S/))
         || (!!displayedInfo.subtitle && !!displayedInfo.subtitle.match(/\S/))
-      )
+      ),
     );
   }, [
     cgConfig?.showLowerThird,
