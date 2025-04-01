@@ -1,14 +1,14 @@
 import { h } from 'preact';
 import { get, getDatabase, ref } from 'firebase/database';
 import Cookies from 'js-cookie';
-import { useContext, useState } from 'preact/hooks';
+import { useContext, useEffect, useState } from 'preact/hooks';
 import styled from 'styled-components';
 
 import AppContext from '../AppContext';
 import Disclaimer from './shared/Disclaimer';
 
 type LoginFormProps = {
-  onLogin: (token: string) => void;
+  onLogin: (token: string, supaToken: string) => void;
 };
 
 const StyledLoginForm = styled.form`
@@ -38,12 +38,18 @@ const LoginForm = ({ onLogin }: LoginFormProps) => {
   const appContext = useContext(AppContext);
   const [eventToken, setEventToken] = useState('');
   const [badToken, setBadToken] = useState(false);
-
-  const handleSuccessfulLogin = (expiration: Date): void => {
+  const [errorText, setErrorText] = useState<string | null>(null);
+  
+  const handleSuccessfulLogin = (supaToken: string): void => {
+    const expFromToken = new Date(JSON.parse(atob(supaToken.split('.')[1]))['exp'] * 1_000);
+    console.log("about to set cookie exp", expFromToken, "token", supaToken, JSON.parse(atob(supaToken.split('.')[1])));
     Cookies.set('queueing-event-key', eventToken, {
-      expires: expiration,
+      expires: expFromToken,
     });
-    onLogin(eventToken);
+    Cookies.set('queueing-supa-token', supaToken, {
+      expires: expFromToken
+    });
+    onLogin(eventToken, supaToken);
   };
 
   const handleFailedLogin = (): void => {
@@ -53,30 +59,44 @@ const LoginForm = ({ onLogin }: LoginFormProps) => {
   const handleSubmit = async (e: Event): Promise<void> => {
     e.preventDefault();
     if (!eventToken || eventToken === '') handleFailedLogin();
+    setErrorText(null);
 
     try {
-      // TODO: Show error if unable to determine season
-      const event = await get(ref(getDatabase(), `/seasons/${appContext.season}/events/${eventToken}`));
-      if (!event) {
+      const loginResponse = await fetch(import.meta.env.APP_ADMIN_SERVER + '/av-token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          eventKey: eventToken
+        })
+      });
+      
+      const loginResponseJson = await loginResponse.json();
+      
+      if (!loginResponse.ok) {
         handleFailedLogin();
-        return;
+        setErrorText(
+          loginResponseJson["detail"]
+          ?? "An error occurred while logging in. Your key may be incorrect or inactive.");
       }
-
-      const now = new Date();
-      const start = new Date(event.child('start').val().replace(' ', 'T'));
-      const end = new Date(event.child('end').val().replace(' ', 'T'));
-
-      if (start > now || end < now) {
-        handleFailedLogin();
-        return;
-      }
-
-      handleSuccessfulLogin(end);
+      
+      const token = loginResponseJson["accessToken"];
+      
+      handleSuccessfulLogin(token);
     } catch (err) {
       handleFailedLogin();
       console.error(err);
     }
   };
+  
+  useEffect(() => {
+    const token = Cookies.get('queueing-event-key');
+    const supa = Cookies.get('queueing-supa-token');
+    if (token && supa) {
+      onLogin(token, supa);
+    }
+  }, []);
 
   return (
     <div>

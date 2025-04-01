@@ -23,8 +23,14 @@ import StaleDataBanner from '../StaleDataBanner';
 import useStateWithRef from '@/useStateWithRef';
 import ErrorMessage from '../ErrorMessage';
 import AuthenticatedRoute from '../AuthenticatedRoute';
+import { supabase } from "@/data/supabase";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { useRealtimeEvent } from "@/hooks/supabase/useRealtimeEvent";
 
 // TODO: Figure out why the event details sometimes aren't getting sent over to SignalR
+
+const queryClient = new QueryClient();
 
 const ErrorFallback = ({ error }: { error: Error }) => {
   // Reload after a while to try a recovery
@@ -53,7 +59,6 @@ const ErrorFallback = ({ error }: { error: Error }) => {
           const encodedValue = encodeURIComponent((error as any)[key]);
           formBody.push(`${encodedKey}=${encodedValue}`);
         });
-        console.log('asd', formBody);
 
         await fetch(import.meta.env.APP_REPORT_ERROR_URL!, {
           method: 'POST',
@@ -94,6 +99,7 @@ const App = () => {
     connectionStatus?: 'online' | 'offline', lastConnectedDate?: Date
   }>();
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const event = useRealtimeEvent();
 
   const [acFeatures, setFeatures] = useState<any>();
   const [acSeason, setSeason] = useState<number | undefined>();
@@ -124,10 +130,11 @@ const App = () => {
   useEffect(() => {
     const newCtx = {
       features: acFeatures,
-      event: acEvent,
+      //event: acEvent,
       season: acSeason,
       token: acToken,
     };
+    //console.log('ac', newCtx)
     setAppContext(newCtx);
   }, [acFeatures, acEvent, acSeason, acToken]);
 
@@ -135,23 +142,25 @@ const App = () => {
     sendCurrentStatus();
   }, [hub.current, appContext.token, appContext.event?.eventCode]);
 
-  const onLogin = (token?: string) => {
+  const onLogin = async (_: string, supaToken: string) => {
     if (appContext === undefined) throw new Error('appContext was undefined');
     if (db === undefined) throw new Error('db was undefined');
 
     setIsAuthenticated(true);
-
-    onValue(ref(db, `/seasons/${appContext.season}/events/${token}`), (snap) => {
-      setEvent(snap.val() as Event);
-      setToken(token);
-    });
+    await supabase.realtime.setAuth(supaToken);
+    (supabase as any).rest.headers.Authorization = `Bearer ${supaToken}`;
+    
+    // onValue(ref(db, `/seasons/${appContext.season}/events/${token}`), (snap) => {
+    //   setEvent(snap.val() as Event);
+    //   setToken(token);
+    // });
   };
 
   // Login if a token is available
   useEffect(() => {
-    if (appContext.token === undefined) return;
-    onLogin(appContext.token);
-  }, [appContext.token]);
+    if (appContext.token === undefined || appContext.supaToken === undefined || !appContext.season) return;
+    onLogin(appContext.token, appContext.supaToken);
+  }, [appContext.token, appContext.supaToken, appContext.season]);
 
   // Initialize app
   useEffect(() => {
@@ -269,17 +278,18 @@ const App = () => {
       });
       cn.on('OverrideEventKey', async (eventToken) => {
         try {
-          // TODO: Show error if unable to determine season
-          const event = await get(ref(getDatabase(), `/seasons/${appContext.season}/events/${eventToken}`));
-          if (!event) {
-            throw new Error('Unable to get event');
-          }
-
-          const end = new Date(event.child('end').val().replace(' ', 'T'));
-          Cookies.set('queueing-event-key', eventToken, {
-            expires: end,
-          });
-          onLogin(eventToken);
+          // TODO: Reimplement with supabase
+          // // TODO: Show error if unable to determine season
+          // const event = await get(ref(getDatabase(), `/seasons/${appContext.season}/events/${eventToken}`));
+          // if (!event) {
+          //   throw new Error('Unable to get event');
+          // }
+          //
+          // const end = new Date(event.child('end').val().replace(' ', 'T'));
+          // Cookies.set('queueing-event-key', eventToken, {
+          //   expires: end,
+          // });
+          // onLogin(eventToken);
         } catch (err) {
           console.error(err);
         }
@@ -323,10 +333,9 @@ const App = () => {
 
   // Change what's rendered based on global application state
   let appContent: JSX.Element;
-  if (!appContext || (!isAuthenticated && connection?.connectionStatus === undefined)
-    || (isAuthenticated && appContext.event === undefined)) {
+  if (!appContext || (!isAuthenticated && connection?.connectionStatus === undefined)) {
     appContent = (<div className={styles.infoText}>Loading...</div>);
-  } else if ((isAuthenticated && appContext.event !== undefined) || skipEventKey) {
+  } else if ((isAuthenticated) || skipEventKey) {
     appContent = (
       <>
         <StaleDataBanner />
@@ -350,16 +359,19 @@ const App = () => {
     <div id="preact_root" className={styles.app}>
       {identifyTO !== null && <div className={styles.identify}>{hub.current?.connectionId}</div>}
       <ErrorBoundary FallbackComponent={ErrorFallback}>
-        <AppContext.Provider value={appContext ?? {}}>
-          {connection?.connectionStatus === 'offline' && (
-            <div className={styles.warningBar}>
-              Check network connection.
-              {connection.lastConnectedDate
-                && ` Last connected ${connection.lastConnectedDate?.toLocaleString([], { timeStyle: 'short' })}`}
-            </div>
-          )}
-          {appContent}
-        </AppContext.Provider>
+        <QueryClientProvider client={queryClient}>
+          <AppContext.Provider value={appContext ?? {}}>
+            {connection?.connectionStatus === 'offline' && (
+              <div className={styles.warningBar}>
+                Check network connection.
+                {connection.lastConnectedDate
+                  && ` Last connected ${connection.lastConnectedDate?.toLocaleString([], { timeStyle: 'short' })}`}
+              </div>
+            )}
+            {appContent}
+          </AppContext.Provider>
+          {import.meta.env.DEV && <div style={{fontSize: '16px'}}><ReactQueryDevtools/></div>}
+        </QueryClientProvider>
       </ErrorBoundary>
     </div>
   );
