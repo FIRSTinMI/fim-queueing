@@ -4,7 +4,7 @@ import { Event } from '@shared/DbTypes';
 import { Textfit } from '@gmurph91/react-textfit';
 import styles from './styles.module.scss';
 
-const MessageRow = ({ event, showLine }: { event: Event; showLine: 0 | 1 }) => (
+const MessageRow = ({ event, showLine }: { event: Event; showLine: 0 | 1 | null }) => (
   <div
     className={styles.messageContainer}
     style={event.message ? { left: 0 } : {}}
@@ -19,7 +19,7 @@ const MessageRow = ({ event, showLine }: { event: Event; showLine: 0 | 1 }) => (
       {/* Logo/Event Name Short Fader */}
       <div className={styles.faderContainer}>
         {/* Logo */}
-        <div style={{ opacity: !event.branding?.logo ? 0 : showLine }}>
+        <div style={{ opacity: showLine !== null && !event.branding?.logo ? 0 : showLine }}>
           <img
             src={event.branding?.logo}
             alt={event.name}
@@ -30,7 +30,7 @@ const MessageRow = ({ event, showLine }: { event: Event; showLine: 0 | 1 }) => (
         <span
           className={`${styles.textCenter} ${styles.bold}`}
           // eslint-disable-next-line no-nested-ternary
-          style={{ opacity: !event.branding?.logo ? 1 : showLine ? 0 : 1 }}
+          style={{ opacity: (showLine === null || !event.branding?.logo) ? 1 : showLine ? 0 : 1 }}
         >
           <Textfit
             mode="single"

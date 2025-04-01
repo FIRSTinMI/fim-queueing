@@ -29,7 +29,7 @@ const PlayoffRow = ({
   token,
 }: {
   event: Event;
-  showLine: 0 | 1;
+  showLine: 0 | 1 | null;
   season: string;
   token: string;
 }) => {
@@ -114,7 +114,7 @@ const PlayoffRow = ({
     // Make a new array of max queuing matches to display
     const maxQ = typeof e.options?.maxQueueingToShow === 'number'
       ? e.options?.maxQueueingToShow
-      : 3;
+      : 1;
 
     const toFill = new Array(maxQ).fill(null);
     toFill.forEach((_, i) => {
@@ -237,7 +237,7 @@ const PlayoffRow = ({
                   {getDisplayText(nextMatch)}
                 </span>
                 <span className={styles.nextMatchScroll}>
-                  {nextMatch?.match && (
+                  {nextMatch?.match && showLine !== null && (
                     <AllianceFader
                       red={getGenericText(nextMatch?.match?.participants?.red)}
                       blue={getGenericText(nextMatch?.match?.participants?.blue)}
@@ -258,7 +258,7 @@ const PlayoffRow = ({
                   <span className={styles.bold} style={{ fontSize: !x?.match ? '7vw' : undefined }}>
                     {getDisplayText(x)}
                   </span>
-                  {x?.match && (
+                  {x?.match && showLine !== null && (
                     <AllianceFader
                       red={getGenericText(x?.match?.participants?.red)}
                       blue={getGenericText(x?.match?.participants?.blue)}
@@ -277,7 +277,7 @@ const PlayoffRow = ({
                       {getDisplayText(queueingMatches[0])}
                     </span>
                     <span>
-                      {queueingMatches[0]?.match && (
+                      {queueingMatches[0]?.match && showLine !== null && (
                         <AllianceFader
                           red={getGenericText(queueingMatches[0]?.match?.participants?.red)}
                           blue={getGenericText(queueingMatches[0]?.match?.participants?.blue)}

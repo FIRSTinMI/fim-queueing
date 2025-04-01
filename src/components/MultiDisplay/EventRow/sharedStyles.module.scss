@@ -18,6 +18,11 @@ $cell-vertical-negative: -3vh;
     line-height: 0.8;
 }
 
+.noTeamNumbers .matchNumber {
+  top: 0;
+  font-size: calc($matchnumber-size * 0.9);
+}
+
 .flexRow {
     display: flex;
     flex-direction: row;
