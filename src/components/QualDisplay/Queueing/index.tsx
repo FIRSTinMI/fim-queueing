@@ -1,6 +1,6 @@
 import { h, Fragment } from 'preact';
 import { DatabaseReference, getDatabase, child, ref, update } from 'firebase/database';
-import { useEffect, useState, useRef, } from 'preact/hooks';
+import { useEffect, useState, useRef, useMemo, } from 'preact/hooks';
 import styles from './styles.module.scss';
 import MatchDisplay from '../MatchDisplay';
 import Ranking from '../../Tickers/Ranking';
@@ -11,21 +11,29 @@ import { useFirebaseEvent } from "@/hooks/firebase/useFirebaseEvent";
 import { useRealtimeEvent } from "@/hooks/supabase/useRealtimeEvent";
 import { useRealtimeRankings } from "@/hooks/supabase/useRealtimeRankings";
 import { Match } from "@/hooks/supabase/useGetMatches";
+import { useRealtimeScheduleDeviations } from "@/hooks/supabase/useRealtimeScheduleDeviations";
+import { ScheduleDeviation } from "@/hooks/supabase/useGetScheduleDeviations";
 
 type LoadingState = 'loading' | 'ready' | 'error' | 'noAutomatic';
+type DisplayMatch = Match | ScheduleDeviation;
+
+const MATCHES_TO_SHOW = 5;
 
 const Queueing = () => {
   const { data: event } = useRealtimeEvent();
   const { data: matches } = useRealtimeMatches('Qualification');
+  const { data: scheduleDeviations } = useRealtimeScheduleDeviations('Qualification');
   const { data: firebaseEvent } = useFirebaseEvent();
   const [loadingState, setLoadingState] = useState<LoadingState>('loading');
   const dbEventRef = useRef<DatabaseReference>();
   const [displayMatches, setDisplayMatches] = useState<{
-    currentMatch: Match | null,
-    nextMatch: Match | null,
-    queueingMatches: Match[]
+    currentMatch: DisplayMatch | null,
+    nextMatch: DisplayMatch | null,
+    queueingMatches: DisplayMatch[]
   }>({ currentMatch: null, nextMatch: null, queueingMatches: [] });
   const rankings = useRealtimeRankings();
+  const sortedRankings = useMemo(() => 
+    rankings.data ? rankings.data.sort((a, b) => a.rank - b.rank) : [], [rankings.data]);
 
   useEffect(() => {
     if (!event?.code || !event?.seasons?.name) return () => {};
@@ -64,26 +72,42 @@ const Queueing = () => {
 
   useEffect(() => {
     // TODO: Handle schedule deviations
-    const unplayedMatches = matches?.sort((a, b) => (a.match_number - b.match_number) || ((a.play_number ?? 0) - (b.play_number ?? 0))).filter(m => !m.actual_start_time && !m.is_discarded);
-    if (!unplayedMatches || unplayedMatches.length == 0) {
+    const scheduleItems : (Match | ScheduleDeviation)[] | undefined = matches?.sort((a, b) => (a.match_number - b.match_number) || ((a.play_number ?? 0) - (b.play_number ?? 0))).filter(m => !m.actual_start_time && !m.is_discarded);
+    if (!scheduleItems || scheduleItems.length == 0) {
       setLoadingState('ready');
       return;
+    }
+    
+    for (let i = 0; i < MATCHES_TO_SHOW; i++) {
+      const matchId = scheduleItems[i]?.id;
+      const deviationAfter = scheduleDeviations
+        ? scheduleDeviations.find(d => d.after_match_id.id == matchId)
+        : null;
+      
+      if (deviationAfter) {
+        if (deviationAfter.description) {
+          scheduleItems.splice(i + 1, 0, deviationAfter);
+          i++;
+        }
+      }
     }
 
     try {
       setDisplayMatches({
-        currentMatch: unplayedMatches[0],
-        nextMatch: unplayedMatches[1],
+        currentMatch: scheduleItems[0],
+        nextMatch: MATCHES_TO_SHOW > 1 ? scheduleItems[1] : null,
         // By default, we'll take the three matches after the one on deck
-        queueingMatches: [2, 3, 4].map((x) => unplayedMatches[x])
-          .filter((x) => x),
+        queueingMatches: MATCHES_TO_SHOW > 2 
+          ? [...Array(MATCHES_TO_SHOW - 2)].map((_, i) => scheduleItems[i+2])
+            .filter((x) => x)
+          : [],
       });
       setLoadingState('ready');
     } catch (e) {
       setLoadingState('error');
       console.error(e);
     }
-  }, [matches]);
+  }, [matches, scheduleDeviations]);
 
   const { currentMatch, nextMatch, queueingMatches } = displayMatches;
   return (
@@ -105,28 +129,27 @@ const Queueing = () => {
               <div className={styles.topBar}>
                 {currentMatch && (
                 <div>
-                  <MatchDisplay halfWidth match={currentMatch} />
+                  {'match_number' in currentMatch && <MatchDisplay halfWidth match={currentMatch} /> }
+                  {'description' in currentMatch && <p className={styles.scheduleDeviation}>{currentMatch.description}</p>}
                   <span className={styles.description}>On Field</span>
                 </div>
                 )}
                 {nextMatch && (
                 <div>
-                  <MatchDisplay halfWidth match={nextMatch} />
+                  {'match_number' in nextMatch && <MatchDisplay halfWidth match={nextMatch} /> }
+                  {'description' in nextMatch && <p className={styles.scheduleDeviation}>{nextMatch.description}</p>}
                   <span className={styles.description}>On Deck</span>
                 </div>
                 )}
               </div>
-              {queueingMatches.map((x) => (
-                <MatchDisplay
-                  className={styles.queueingMatches}
-                  match={x}
-                  key={x.id}
-                />
-              ))}
+              {queueingMatches.map((x) => (<>
+                {'match_number' in x && <MatchDisplay key={x.id} match={x} className={styles.queueingMatches} /> }
+                {'description' in x && <p key={`sd-${x.id}`} className={styles.scheduleDeviation}>{x.description}</p>}
+              </>))}
             </div>
             {((firebaseEvent?.options?.showRankings ?? false) && !rankings.isPending ? (
               <RankingList style={{ height: '1.5em' }}>
-                {rankings.data?.map((x) => (<Ranking teamNumber={x.team_number} ranking={x.rank} />))}
+                {sortedRankings.map((x) => (<Ranking teamNumber={x.team_number} ranking={x.rank} />))}
               </RankingList>
             ) : <></>)}
           </div>

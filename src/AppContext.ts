@@ -8,7 +8,6 @@ type Features = {
 };
 
 export type AppContextType = {
-  supaToken?: string;
   features?: Features
 };
 

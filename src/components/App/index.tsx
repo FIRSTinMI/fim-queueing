@@ -26,6 +26,7 @@ import AuthenticatedRoute from '../AuthenticatedRoute';
 import { supabase } from "@/data/supabase";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { useRealtimeEvent } from "@/hooks/supabase/useRealtimeEvent";
 
 // TODO: Figure out why the event details sometimes aren't getting sent over to SignalR
 
@@ -98,6 +99,7 @@ const App = () => {
     connectionStatus?: 'online' | 'offline', lastConnectedDate?: Date
   }>();
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const event = useRealtimeEvent();
 
   const [acFeatures, setFeatures] = useState<any>();
   const [acSeason, setSeason] = useState<number | undefined>();
