@@ -24,7 +24,7 @@ const QualRow = ({
   token,
 }: {
   event: Event;
-  showLine: 0 | 1;
+  showLine: 0 | 1 | null;
   season: string;
   token: string;
 }) => {
@@ -90,7 +90,7 @@ const QualRow = ({
       // Make a new array of max queuing matches to display
       const maxQ = typeof e.options?.maxQueueingToShow === 'number'
         ? e.options?.maxQueueingToShow
-        : 3;
+        : 1;
       const toFill = new Array(maxQ).fill(null);
       toFill.forEach((_, i) => {
         toFill[i] = i + 2;
@@ -250,13 +250,15 @@ const QualRow = ({
                 <span className={styles.matchNumber}>
                   {(nextMatch as QualMatch)?.number}
                 </span>
-                <span className={styles.nextMatchScroll}>
-                  <AllianceFader
-                    red={getRedStr(nextMatch as QualMatch)}
-                    blue={getBlueStr(nextMatch as QualMatch)}
-                    showLine={showLine}
-                  />
-                </span>
+                {showLine !== null ? (
+                  <span className={styles.nextMatchScroll}>
+                    <AllianceFader
+                      red={getRedStr(nextMatch as QualMatch)}
+                      blue={getBlueStr(nextMatch as QualMatch)}
+                      showLine={showLine}
+                    />
+                  </span>
+                ) : <></>}
               </Fragment>
             )}
 
@@ -277,13 +279,15 @@ const QualRow = ({
                   return (
                     <div className={styles.flexRow}>
                       <span className={styles.queueingMatchNumber}>{match.number} -</span>
-                      <div style={{ marginLeft: '16vw', position: 'relative', top: '4vh' }}>
-                        <AllianceFader
-                          red={getRedStr(match)}
-                          blue={getBlueStr(match)}
-                          showLine={showLine}
-                        />
-                      </div>
+                      {showLine !== null && (
+                        <div style={{ marginLeft: '16vw', position: 'relative', top: '4vh' }}>
+                          <AllianceFader
+                            red={getRedStr(match)}
+                            blue={getBlueStr(match)}
+                            showLine={showLine}
+                          />
+                        </div>
+                      )}
                     </div>
                   );
                 }
@@ -305,13 +309,15 @@ const QualRow = ({
                       <span className={styles.matchNumber}>
                         {(queueingMatches[0] as QualMatch)?.number}
                       </span>
-                      <span>
-                        <AllianceFader
-                          red={getRedStr(queueingMatches[0] as QualMatch)}
-                          blue={getBlueStr(queueingMatches[0] as QualMatch)}
-                          showLine={showLine}
-                        />
-                      </span>
+                      {showLine !== null && (
+                        <span>
+                          <AllianceFader
+                            red={getRedStr(queueingMatches[0] as QualMatch)}
+                            blue={getBlueStr(queueingMatches[0] as QualMatch)}
+                            showLine={showLine}
+                          />
+                        </span>
+                      )}
                     </Fragment>
                 )}
 

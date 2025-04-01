@@ -19,7 +19,7 @@ const EventRow = ({
 }: {
   token: string;
   season: string;
-  showLine: 0 | 1;
+  showLine: 0 | 1 | null;
 }) => {
   // Ref to the event in the database
   const dbEventRef = useRef<DatabaseReference>();
