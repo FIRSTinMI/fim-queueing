@@ -9,7 +9,7 @@ import {
   // update,
 } from 'firebase/database';
 // @ts-ignore
-import { Textfit } from '@gmurph91/react-textfit';
+// import { Textfit } from '@gmurph91/react-textfit';
 import styles from '../sharedStyles.module.scss';
 import { Break, MatchOrBreak, QualMatchData } from '@/models/MatchData';
 import AllianceFader from '../AllianceFader';
@@ -218,12 +218,12 @@ const QualRow = ({
             {/* Use event short name */}
             {useShortName && (
               <div
-                className={`${styles.textCenter} ${styles.bold}`}
-                style={{ width: '15vw' }}
+                className={`${styles.textLeft} ${styles.bold} ${styles.eventName}`}
+                // style={{ width: '15vw', fontSize: '8.5vw' }}
               >
-                <Textfit mode="single" forceSingleModeWidth max="300">
+                {/* <Textfit mode="single" forceSingleModeWidth max="300"> */}
                   {event.nameShort || event.name}
-                </Textfit>
+                {/* </Textfit> */}
               </div>
             )}
           </td>

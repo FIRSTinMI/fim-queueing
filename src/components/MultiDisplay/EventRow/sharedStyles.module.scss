@@ -9,6 +9,10 @@ $cell-vertical-negative: -3vh;
     text-align: center;
 }
 
+.textLeft {
+  text-align: left !important;
+}
+
 .matchNumber {
     text-align: center;
     font-size: $matchnumber-size;
@@ -16,6 +20,12 @@ $cell-vertical-negative: -3vh;
     position: relative;
     top: $cell-vertical-negative;
     line-height: 0.8;
+}
+
+.eventName {
+  text-align: left;
+  font-size: calc($matchnumber-size * 0.8);
+  font-weight: bold;
 }
 
 .noTeamNumbers .matchNumber {
