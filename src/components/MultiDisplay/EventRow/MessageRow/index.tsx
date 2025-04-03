@@ -20,11 +20,11 @@ const MessageRow = ({ event, showLine }: { event: Event; showLine: 0 | 1 | null 
       <div className={styles.faderContainer}>
         {/* Logo */}
         <div style={{ opacity: showLine !== null && !event.branding?.logo ? 0 : showLine }}>
-          <img
+          {/* <img
             src={event.branding?.logo}
             alt={event.name}
             className={styles.sponsorLogo}
-          />
+          /> */}
         </div>
         {/* Text */}
         <span
@@ -44,7 +44,7 @@ const MessageRow = ({ event, showLine }: { event: Event; showLine: 0 | 1 | null 
       </div>
 
       {/* Message */}
-      <span className={styles.messageText}>
+      <span className={styles.messageText} style={{ paddingLeft: '5vw', paddingRight: '2vw' }}>
         <Textfit mode="single" forceSingleModeWidth max="300">
           {event.message || event.name}
         </Textfit>
