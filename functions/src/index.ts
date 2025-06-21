@@ -1,10 +1,8 @@
 import { Request, Response } from 'firebase-functions';
 
 const functions = require('firebase-functions');
-const { onValueWritten } = require('firebase-functions/v2/database');
 const admin = require('firebase-admin/app');
 const { updateCurrentMatch } = require('./updateCurrentMatch');
-const { statusUpdateHandler } = require('./statusUpdateHandler');
 
 admin.initializeApp();
 functions.logger.info('Initialized Firebase app');
