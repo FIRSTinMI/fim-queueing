@@ -14,21 +14,21 @@ exports.updateCurrentMatch = functions.pubsub.schedule('every 1 minutes')
     await updateCurrentMatch();
   });
 
-exports.notifyStateChanges = onValueWritten({
-  ref: '/seasons/{season}/events/{eventKey}/state',
-  instance: 'fim-queueing-default-rtdb',
-}, async (event: any) => {
-  const original = event.data.before.val();
-  const updated = event.data.after.val();
+// exports.notifyStateChanges = onValueWritten({
+//   ref: '/seasons/{season}/events/{eventKey}/state',
+//   instance: 'fim-queueing-default-rtdb',
+// }, async (event: any) => {
+//   const original = event.data.before.val();
+//   const updated = event.data.after.val();
 
-  if (!original || !updated) {
-    return null;
-  }
+//   if (!original || !updated) {
+//     return null;
+//   }
 
-  await statusUpdateHandler(original, updated, event.params.season, event.params.eventKey);
+//   await statusUpdateHandler(original, updated, event.params.season, event.params.eventKey);
 
-  return null;
-});
+//   return null;
+// });
 
 exports.reportError = functions.https.onRequest(
   (req: Request, res: Response) => {
