@@ -8,7 +8,6 @@ import Embeddable, { EmbeddableRouteParams } from './components/Embeddable';
 import PlayoffBracket from './components/PlayoffBracket';
 import PlayoffQueueing from './components/PlayoffQueueing/Queueing';
 import Queueing from './components/QualDisplay/Queueing';
-// import KeyableTicker from './components/RankingDisplay/KeyableTicker';
 import TeamRankings from './components/RankingDisplay/TeamRankings';
 import UserLogin from './components/Manage/UserLogin';
 import Options from './components/Manage/Options';
@@ -62,12 +61,6 @@ const Routes: Route<any>[] = [
     component: PlayoffBracket,
     usedIn: ['playoff'],
   },
-  // {
-  //   name: 'Rankings Ticker (Audience Display)',
-  //   url: '/ranking/ticker',
-  //   component: KeyableTicker,
-  //   usedIn: [],
-  // },
   {
     name: 'FRC Pit Display',
     url: '/frcpitdisplay',
@@ -83,7 +76,20 @@ const Routes: Route<any>[] = [
     component: Embeddable,
     usedIn: ['qual', 'playoff'],
     params: {
-      iframeUrl: (_, evt) => evt.streamEmbedLink?.replace('%HOST%', window?.location?.host),
+      iframeUrl: (_, evt) => evt.streamEmbedLink?.replace('%HOST%', window?.location?.hostname),
+    },
+  } as Route<EmbeddableRouteParams>,
+  {
+    name: 'Nexus for FRC',
+    url: '/nexus',
+    component: Embeddable,
+    usedIn: ['qual', 'playoff'],
+    params: {
+      iframeUrl: (season, evt) => `https://frc.nexus/en/event/${
+        /^\d/.test(evt.eventCode)
+          ? evt.eventCode.toLowerCase()
+          : `${season}${evt.eventCode.toLowerCase()}`
+      }/display/pit`,
     },
   } as Route<EmbeddableRouteParams>,
   {

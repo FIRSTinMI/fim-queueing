@@ -6,13 +6,20 @@ import GenericApiClient from './api/GenericApiClient';
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 
-// const { get } = require('./helpers/frcEventsApiClient');
 const { updateQualSchedule } = require('./helpers/schedule');
 const {
   updatePlayoffBracket,
 } = require('./helpers/playoffs');
 
 exports.updateCurrentMatch = async function updateCurrentMatch() {
+  try {
+    const enabled = (await admin.database().ref('/features/legacySync').get()).val();
+
+    if (enabled === false) return;
+  } catch (_) {
+    // pass, best to fall back to still syncing
+  }
+
   const season = (await admin.database().ref('/current_season').get())
     .val();
 

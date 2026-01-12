@@ -1,8 +1,8 @@
 .embeddable {
-  height: 100vh;
+  flex-grow: 1;
 
   >div:last-child {
-    height: 100vh;
+    height: 100%;
   }
 
   iframe {
