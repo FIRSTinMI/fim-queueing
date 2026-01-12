@@ -6,6 +6,8 @@ import MenuBar from '../MenuBar';
 import AppErrorMessage, { ErrorMessageType } from '../ErrorMessage';
 import Link from '../Link';
 import Routes from '@/routes';
+import { useRealtimeEvent } from "@/hooks/supabase/useRealtimeEvent";
+import Disclaimer from "@/components/shared/Disclaimer";
 
 type AutomatedProps = {
   matches: {
@@ -15,7 +17,7 @@ type AutomatedProps = {
 };
 
 const Automated = (props: AutomatedProps) => {
-  const { event, season } = useContext(AppContext);
+  const { isPending, data } = useRealtimeEvent();
   const { matches: { playoff, qual } } = props;
 
   const ErrorMessage = ({ children, type }: {
@@ -23,7 +25,7 @@ const Automated = (props: AutomatedProps) => {
     type?: ErrorMessageType,
   }) => (
     <>
-      <MenuBar event={event} season={season} alwaysShow />
+      <MenuBar alwaysShow />
       <div>
         <AppErrorMessage type={type}>{ children }</AppErrorMessage>
       </div>
@@ -46,9 +48,16 @@ const Automated = (props: AutomatedProps) => {
       </ErrorMessage>
     );
   }
-  switch (event?.state) {
-    case 'Pending':
-    case 'AwaitingQualSchedule':
+  
+  if (isPending) {
+    return (
+      <Disclaimer>Loading...</Disclaimer>
+    );
+  }
+  
+  switch (data?.status) {
+    case 'NotStarted':
+    case 'AwaitingQuals':
     case 'QualsInProgress':
     {
       const routeToUse = Routes.find((r) => r.url === qual && r.usedIn.includes('qual'));
@@ -63,6 +72,7 @@ const Automated = (props: AutomatedProps) => {
     }
     case 'AwaitingAlliances':
     case 'PlayoffsInProgress':
+    case 'WinnerDetermined':
     {
       const routeToUse = Routes.find((r) => r.url === playoff && r.usedIn.includes('playoff'));
       if (!routeToUse) {
@@ -74,7 +84,7 @@ const Automated = (props: AutomatedProps) => {
       }
       return (<routeToUse.component routeParams={routeToUse.params} />);
     }
-    case 'EventOver':
+    case 'Completed':
       return (
         <ErrorMessage type="arrow">
           The event has ended. See you next time!
