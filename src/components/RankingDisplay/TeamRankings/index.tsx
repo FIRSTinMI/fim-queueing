@@ -47,11 +47,11 @@ const TeamRankings = () => {
               <th>Rank</th>
               <th>Team #</th>
               <th>RS</th>
-              {/* Game specific: 2025 */}
-              <th>Coop</th>
+              {/* Game specific: 2026 */}
               <th>Match</th>
               <th>Auto</th>
-              <th>Barge</th>
+              <th>Tower</th>
+              {/* sort order 5, RNG, is excluded from this display */}
               {/* End game specific */}
               <th>
                 <span className={styles.wtlCell}>
@@ -74,7 +74,6 @@ const TeamRankings = () => {
                 <td>{numFmt.format(ranking.sortOrder2)}</td>
                 <td>{numFmt.format(ranking.sortOrder3)}</td>
                 <td>{numFmt.format(ranking.sortOrder4)}</td>
-                <td>{numFmt.format(ranking.sortOrder5)}</td>
                 {/* End game specific */}
                 <td className={styles.wtlCell}>
                   <span>{ranking.wins ?? 0}</span>
