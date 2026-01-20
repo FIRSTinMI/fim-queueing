@@ -60,6 +60,12 @@ export type PlayoffMatch = {
 export type QualMatch = {
   number: number;
   participants: Record<DriverStation, number>;
+  type: 'match'
+};
+
+export type QualBreak = {
+  description: string
+  type: 'break'
 };
 
 export type Break = {

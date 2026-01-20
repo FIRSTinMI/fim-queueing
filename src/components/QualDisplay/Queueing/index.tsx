@@ -6,7 +6,7 @@ import {
   useContext, useEffect, useState, useRef, useReducer,
 } from 'preact/hooks';
 
-import { AppMode, QualMatch } from '@shared/DbTypes';
+import { AppMode, QualBreak, QualMatch } from '@shared/DbTypes';
 import { TeamRanking } from '@/types';
 import AppContext from '@/AppContext';
 import styles from './styles.module.scss';
@@ -25,9 +25,9 @@ const Queueing = () => {
   const dbEventRef = useRef<DatabaseReference>();
   const [qualMatches, setQualMatches] = useState<QualMatch[]>([]);
   const [displayMatches, setDisplayMatches] = useState<{
-    currentMatch: QualMatch | null,
-    nextMatch: QualMatch | null,
-    queueingMatches: QualMatch[]
+    currentMatch: QualMatch | QualBreak | null,
+    nextMatch: QualMatch | QualBreak | null,
+    queueingMatches: QualMatch[] | QualBreak[]
   }>({ currentMatch: null, nextMatch: null, queueingMatches: [] });
   const [rankings, setRankings] = useState<TeamRanking[]>([]);
 
@@ -46,9 +46,13 @@ const Queueing = () => {
     };
   }, [event.eventCode, season, token]);
 
-  const getMatchByNumber = (matchNumber: number): QualMatch | null => qualMatches?.find(
+  const getMatchIdxByNumber = (matchNumber: number): number | null => qualMatches?.findIndex(
     (x) => x.number === matchNumber,
   ) ?? null;
+  const getMatchByIndex = (index: number | null): QualMatch | QualBreak | null => (
+    index && qualMatches
+      ? (qualMatches[index] ?? null)
+      : null);
 
   const updateMatches = (): void => {
     const matchNumber = event.currentMatchNumber;
@@ -62,13 +66,23 @@ const Queueing = () => {
     }
 
     try {
-      setDisplayMatches({
-        currentMatch: getMatchByNumber(matchNumber),
-        nextMatch: getMatchByNumber(matchNumber + 1),
-        // By default, we'll take the three matches after the one on deck
-        queueingMatches: [2, 3, 4].map((x) => getMatchByNumber(matchNumber + x))
-          .filter((x) => x !== null) as QualMatch[],
-      });
+      const currentIdx = getMatchIdxByNumber(matchNumber);
+      if (currentIdx !== null) {
+        setDisplayMatches({
+          currentMatch: getMatchByIndex(currentIdx),
+          nextMatch: getMatchByIndex(currentIdx + 1),
+          // By default, we'll take the three matches after the one on deck
+          queueingMatches: [2, 3, 4].map((x) => getMatchByIndex(currentIdx + x))
+            .filter((x) => x !== null) as QualMatch[],
+        });
+      } else {
+        setDisplayMatches({
+          currentMatch: null,
+          nextMatch: null,
+          queueingMatches: [],
+        });
+      }
+
       setLoadingState('ready');
     } catch (e) {
       setLoadingState('error');

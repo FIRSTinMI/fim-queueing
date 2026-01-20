@@ -1,9 +1,9 @@
 import { h, Fragment } from 'preact';
-import { DriverStation, QualMatch } from '@shared/DbTypes';
+import { DriverStation, QualBreak, QualMatch } from '@shared/DbTypes';
 import styles from './styles.module.scss';
 
 type MatchDisplayProps = {
-  match: QualMatch | null;
+  match: QualMatch | QualBreak | null;
   // Temp disable till I figure out what to do with avatars
   // teamAvatars: TeamAvatars | undefined;
   halfWidth?: boolean;
@@ -43,15 +43,22 @@ function MatchDisplay({ halfWidth, match, className }: MatchDisplayProps): JSX.E
         Either we're in a test match or at the end of the schedule
       */}
       {match && (
-      <>
-        <span className={styles.matchNumber}>{match.number}</span>
-        <span className={styles.red}>
-          {[1, 2, 3].map((n) => <TeamDisplay key={`${match?.number}r${n}`} team={match?.participants[`Red${n}` as DriverStation]} />)}
-        </span>
-        <span className={styles.blue}>
-          {[1, 2, 3].map((n) => <TeamDisplay key={`${match?.number}b${n}`} team={match?.participants[`Blue${n}` as DriverStation]} />)}
-        </span>
-      </>
+        <>
+          {match && match.type === 'break' && (
+            <div className={styles.break}>{match.description}</div>
+          )}
+          {match?.type !== 'break' && (
+            <>
+              <span className={styles.matchNumber}>{match.number}</span>
+              <span className={styles.red}>
+                {[1, 2, 3].map((n) => <TeamDisplay key={`${match?.number}r${n}`} team={match?.participants[`Red${n}` as DriverStation]} />)}
+              </span>
+              <span className={styles.blue}>
+                {[1, 2, 3].map((n) => <TeamDisplay key={`${match?.number}b${n}`} team={match?.participants[`Blue${n}` as DriverStation]} />)}
+              </span>
+            </>
+          )}
+        </>
       )}
     </div>
   );

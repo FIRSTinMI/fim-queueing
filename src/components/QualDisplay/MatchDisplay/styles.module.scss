@@ -51,4 +51,10 @@
             font-size: min(4vh, 4vw);
         }
     }
+
+    .break {
+      text-align: center;
+      grid-column: 1/-1;
+      grid-row: 1/-1;
+    }
 }
