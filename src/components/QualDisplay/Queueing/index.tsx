@@ -288,7 +288,7 @@ const Queueing = () => {
                 <MatchDisplay
                   className={styles.queueingMatches}
                   match={x}
-                  key={x.number}
+                  key={x.type === 'break' ? x.description : x.number}
                 />
               ))}
             </div>

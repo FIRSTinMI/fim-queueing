@@ -57,6 +57,7 @@ export default class BlueAllianceApiClient extends GenericApiClient {
     return resp.filter((m) => m.comp_level === 'qm').map((m) => ({
       number: m.match_number,
       participants: BlueAllianceApiClient.AllianceTeamsToParticipants(m.alliances),
+      type: 'match',
     }));
   }
 
