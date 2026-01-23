@@ -23,7 +23,7 @@ const Queueing = () => {
 
   const [loadingState, setLoadingState] = useState<LoadingState>('loading');
   const dbEventRef = useRef<DatabaseReference>();
-  const [qualMatches, setQualMatches] = useState<QualMatch[]>([]);
+  const [qualMatches, setQualMatches] = useState<(QualMatch | QualBreak)[]>([]);
   const [displayMatches, setDisplayMatches] = useState<{
     currentMatch: QualMatch | QualBreak | null,
     nextMatch: QualMatch | QualBreak | null,
@@ -38,7 +38,7 @@ const Queueing = () => {
 
     const matchesRef = ref(getDatabase(), `/seasons/${season}/qual/${token}`);
     onValue(matchesRef, (snap) => {
-      setQualMatches(snap.val() as QualMatch[]);
+      setQualMatches([...snap.val() as (QualMatch | QualBreak)[], { type: 'break', description: '(END)' }]);
     });
 
     return () => {
@@ -46,11 +46,18 @@ const Queueing = () => {
     };
   }, [event.eventCode, season, token]);
 
-  const getMatchIdxByNumber = (matchNumber: number): number | null => qualMatches?.findIndex(
-    (x) => x.number === matchNumber,
-  ) ?? null;
+  const getMatchIdxByNumber = (matchNumber: number): number | null => {
+    const res = qualMatches?.findIndex(
+      (x) => x.type !== 'break' && x.number === matchNumber,
+    ) ?? null;
+
+    if (res === null || res === -1) return null;
+
+    return res;
+  };
+
   const getMatchByIndex = (index: number | null): QualMatch | QualBreak | null => (
-    index && qualMatches
+    index !== null && qualMatches
       ? (qualMatches[index] ?? null)
       : null);
 
