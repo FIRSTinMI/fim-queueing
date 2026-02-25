@@ -21,21 +21,23 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
+      - uses: pnpm/action-setup@v4
 
       - name: Install packages
-        run: npm ci
+        run: pnpm ci
         
       - name: Build
-        run: npm run build
+        run: pnpm run build
         
       - name: Lint
-        run: npm run lint
+        run: pnpm run lint
   build-functions:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - uses: pnpm/action-setup@v4
       - name: Install packages (webapp)
-        run: npm ci
+        run: pnpm ci
       - name: Install packages (functions)
         run: npm ci --prefix=functions
 

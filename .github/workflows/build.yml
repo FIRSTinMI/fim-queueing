@@ -30,9 +30,10 @@ jobs:
 
       - name: Setup Node.js environment
         uses: actions/setup-node@v3.0.0
+      - uses: pnpm/action-setup@v4
       
       - name: Install packages
-        run: npm ci
+        run: pnpm ci
       
       # Environment variables
       - name: create env files
@@ -44,7 +45,7 @@ jobs:
       
       # Build, with no base url since in prod it's expected to be hosted on the same server at the root
       - name: Build
-        run: npm run build
+        run: pnpm run build
         
       - name: Functions npm ci
         run: npm ci --prefix "functions"
