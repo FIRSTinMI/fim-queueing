@@ -34,7 +34,6 @@ const EventRow = ({
     dbEventRef.current = eventRef;
     onValue(dbEventRef.current, (snap) => {
       setEvent(snap.val() as Event);
-      console.log(snap.val());
     });
 
     return () => {

@@ -1,3 +1,4 @@
+@use "sass:color";
 @import "./custom_variables.scss";
 @import "milligram/src/_Color.sass";
 @import "milligram/src/_Button.sass";
@@ -5,13 +6,21 @@
 @import "milligram/src/_List.sass";
 @import "milligram/src/_Link.sass";
 
+// TODO: Move away from imports
+// Note: The last attempt to do so totally visually broke the app, be careful!
+//@use "sass:color";
+//@use "custom_variables";
+//@forward "milligram/src/milligram" with (
+//  $color-primary: custom_variables.$color-primary
+//);
+
 button {
   font-size: .8rem;
   line-height: 2rem;
   height: 2rem;
 
   &:focus {
-    box-shadow: 0px 0px 0px 3px darken($color-primary, 20%);
+    box-shadow: 0 0 0 3px color.scale($color-primary, $lightness: -20%);
     background-color: $color-primary;
   }
 }

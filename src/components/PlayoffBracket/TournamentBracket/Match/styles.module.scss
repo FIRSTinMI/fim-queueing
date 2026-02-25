@@ -1,3 +1,5 @@
+@use "sass:color";
+
 div.wrapper {
   background-color: white;
   border-radius: 0.25em;
@@ -14,7 +16,7 @@ p.topText {
   color: black;
   font-weight: 700;
 
-  flex: 0 0 none;
+  flex: 0 0 auto;
   text-align: center;
   margin-bottom: 0.2rem;
   min-height: 0;
@@ -57,7 +59,7 @@ div.side {
   @mixin sideColors($name, $color) {
     &.#{$name} {
       box-shadow: inset 0.5rem 0 0 0 $color;
-      background-color: scale-color($color: $color, $lightness: 85%);
+      background-color: color.scale($color: $color, $lightness: 85%);
     }
   }
   @include sideColors("red", #f00);

@@ -24,7 +24,6 @@ const UserLogin = () => {
     const auth = getAuth();
     setIsLoading(true);
     signInWithPopup(auth, provider).then((res) => {
-      console.log(res);
       const redirect = (new URLSearchParams(window.location.search))?.get('redirect') ?? '/manage/options';
       route(redirect);
     }).catch((err) => {

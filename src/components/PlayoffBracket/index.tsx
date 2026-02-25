@@ -26,13 +26,11 @@ const PlayoffBracket = () => {
     if (!token) return () => {};
     const alliancesRef = ref(getDatabase(), `/seasons/${season}/alliances/${token}`);
     onValue(alliancesRef, (snap) => {
-      console.log('alliances', snap.val());
       setAlliances(snap.val() as Alliance[]);
     });
 
     const bracketRef = ref(getDatabase(), `/seasons/${season}/bracket/${token}`);
     onValue(bracketRef, (snap) => {
-      console.log('bracket', snap.val());
       setBracket(snap.val() as Record<BracketMatchNumber, PlayoffMatch>);
     });
 

@@ -76,7 +76,6 @@ const PlayoffQueueing = () => {
 
     // Get the last match that has a winner
     let currentMatchIndex = matchDisplays.reduce((v, m, i) => (m.result?.winner ? i : v), -1) + 1;
-    console.log(currentMatchIndex);
 
     // We have no way of knowing when a break is over, so to reduce confusion never show a break
     // as the current match. If we're at the end of the matches we can show that

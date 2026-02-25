@@ -65,7 +65,6 @@ const SavedLowerThirds = ({
     if (savedRef) {
       onValue(savedRef, (snap) => {
         setSaved(snap.val() ?? {});
-        console.log(snap.val());
       });
     }
 
@@ -83,10 +82,6 @@ const SavedLowerThirds = ({
         return;
       }
 
-      console.log({
-        title: lowerThirdTitle,
-        subtitle: lowerThirdSubtitle,
-      });
       await push(savedRef, {
         title: lowerThirdTitle,
         subtitle: lowerThirdSubtitle,

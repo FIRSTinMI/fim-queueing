@@ -1,4 +1,4 @@
-import { h, Fragment } from 'preact';
+import { h, Fragment, JSX } from 'preact';
 import Cookies from 'js-cookie';
 import { getApp, initializeApp } from 'firebase/app';
 import {
@@ -26,7 +26,7 @@ import AuthenticatedRoute from '../AuthenticatedRoute';
 
 // TODO: Figure out why the event details sometimes aren't getting sent over to SignalR
 
-const ErrorFallback = ({ error }: { error: Error }) => {
+const ErrorFallback = ({ error }: { error: unknown }) => {
   // Reload after a while to try a recovery
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -53,7 +53,6 @@ const ErrorFallback = ({ error }: { error: Error }) => {
           const encodedValue = encodeURIComponent((error as any)[key]);
           formBody.push(`${encodedKey}=${encodedValue}`);
         });
-        console.log('asd', formBody);
 
         await fetch(import.meta.env.APP_REPORT_ERROR_URL!, {
           method: 'POST',
@@ -82,7 +81,7 @@ const ErrorFallback = ({ error }: { error: Error }) => {
         {' '}
         FiM Slack channel for support.
       </ErrorMessage>
-      <small style={{ fontSize: '.5em', display: 'block', paddingTop: '1em' }}>{error.message}</small>
+      <small style={{ fontSize: '.5em', display: 'block', paddingTop: '1em' }}>{(error as Error)?.message}</small>
     </div>
   );
 };
@@ -156,7 +155,6 @@ const App = () => {
   // Initialize app
   useEffect(() => {
     console.log('Running initialization...');
-    console.log(import.meta.env);
     const firebaseConfig = {
       apiKey: import.meta.env.APP_FIRE_KEY,
       databaseURL: import.meta.env.APP_RTDB_URL,
@@ -228,7 +226,7 @@ const App = () => {
    */
   useEffect(() => {
     if (!import.meta.env.APP_SIGNALR_SERVER) return;
-    import(/* webpackChunkName: "signalr" */ '@microsoft/signalr').then(async (signalR) => {
+    import('@microsoft/signalr').then(async (signalR) => {
       const cn = new signalR.HubConnectionBuilder()
         .withUrl(`${import.meta.env.APP_SIGNALR_SERVER}/DisplayHub`).withAutomaticReconnect({
           nextRetryDelayInMilliseconds(retryContext) {
