@@ -171,7 +171,6 @@ function Queueing() {
 
     return () => { off(rankingsRef); };
   }, [event.options?.showRankings]);
-
   const {
     now: currentMatch,
     next: nextMatch,
@@ -210,11 +209,15 @@ function Queueing() {
                 <div className={styles.eventName}>{event.name}</div>
               )}
               <div className={styles.topBar}>
-                {currentMatch && (
-                <div>
-                  <MatchDisplay halfWidth match={currentMatch} />
-                  <span className={styles.description}>On Field</span>
-                </div>
+                {currentMatch ? (
+                  <div>
+                    <MatchDisplay halfWidth match={currentMatch} />
+                    <span className={styles.description}>On Field</span>
+                  </div>
+                ) : (
+                  <div>
+                    <span className={styles.description}>Qualification matches have concluded</span>
+                  </div>
                 )}
                 {nextMatch && (
                 <div>

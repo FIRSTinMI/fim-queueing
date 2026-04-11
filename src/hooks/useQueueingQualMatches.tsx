@@ -74,7 +74,6 @@ export default function useQueueingQualMatches(props: UseQueueingQualMatchesProp
 
     if (matchNumber === null || matchNumber === undefined) {
       if (dbEventRef.current === undefined) return;
-      console.log('setting match number to 1');
       update(dbEventRef.current, {
         currentMatchNumber: 1,
       });
@@ -97,7 +96,7 @@ export default function useQueueingQualMatches(props: UseQueueingQualMatchesProp
       } else {
         setDisplayMatches({
           state: 'ready',
-          hasSchedule: false,
+          hasSchedule: qualMatches && qualMatches.length > 0,
           now: null,
           next: null,
           queueing: [],
