@@ -1,5 +1,5 @@
 
-$teamlist-size: 5.5vh;
+$teamlist-size: 4vh;
 
 .faderBase {
 
@@ -13,7 +13,7 @@ $teamlist-size: 5.5vh;
         position: absolute;
         transition: all ease .5s;
         text-align: center;
-        width: 30vw;
+        width: 25vw;
         font-weight: bold;
         border-radius: 1em;
         font-size: $teamlist-size;
