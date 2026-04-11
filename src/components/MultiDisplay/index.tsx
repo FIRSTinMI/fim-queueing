@@ -4,7 +4,7 @@ import EventRow from './EventRow';
 import styles from './styles.module.scss';
 import sharedStyles from './EventRow/sharedStyles.module.scss';
 
-const MultiQueueing = () => {
+function MultiQueueing() {
   const searchParams = new URLSearchParams(window.location.search);
   const events = searchParams.getAll('e');
   const season = searchParams.get('s') ?? new Date().getFullYear().toString();
@@ -64,6 +64,6 @@ const MultiQueueing = () => {
       </table>
     </div>
   );
-};
+}
 
 export default MultiQueueing;
