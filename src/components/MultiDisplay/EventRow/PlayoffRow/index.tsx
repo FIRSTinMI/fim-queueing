@@ -22,6 +22,19 @@ import getGenericText from '@/util/getGenericText';
 
 type LoadingState = 'loading' | 'ready' | 'error' | 'noAutomatic';
 
+function allianceDisplay(match: PlayoffMatchDisplay, alliance: 'red' | 'blue'): string {
+  if (alliance === 'red') {
+    if (match.result?.redAlliance) return `Alliance ${match.result.redAlliance}`;
+    return getGenericText(match.match?.participants.red);
+  }
+  if (alliance === 'blue') {
+    if (match.result?.blueAlliance) return `Alliance ${match.result.blueAlliance}`;
+    return getGenericText(match.match?.participants.blue);
+  }
+
+  return '';
+}
+
 function PlayoffRow({
   event,
   showLine,
@@ -255,8 +268,8 @@ function PlayoffRow({
                 <span className={styles.nextMatchScroll}>
                   {nextMatch?.match && showLine !== null && (
                     <AllianceFader
-                      red={getGenericText(nextMatch?.match?.participants?.red)}
-                      blue={getGenericText(nextMatch?.match?.participants?.blue)}
+                      red={allianceDisplay(nextMatch, 'red')}
+                      blue={allianceDisplay(nextMatch, 'blue')}
                       showLine={showLine}
                     />
                   )}
@@ -276,8 +289,8 @@ function PlayoffRow({
                   </span>
                   {x?.match && showLine !== null && (
                     <AllianceFader
-                      red={getGenericText(x?.match?.participants?.red)}
-                      blue={getGenericText(x?.match?.participants?.blue)}
+                      red={allianceDisplay(x, 'red')}
+                      blue={allianceDisplay(x, 'blue')}
                       showLine={showLine}
                     />
                   )}
@@ -294,8 +307,8 @@ function PlayoffRow({
                   <span>
                     {queueingMatches[0]?.match && showLine !== null && (
                       <AllianceFader
-                        red={getGenericText(queueingMatches[0]?.match?.participants?.red)}
-                        blue={getGenericText(queueingMatches[0]?.match?.participants?.blue)}
+                        red={allianceDisplay(queueingMatches[0], 'red')}
+                        blue={allianceDisplay(queueingMatches[0], 'blue')}
                         showLine={showLine}
                       />
                     )}
