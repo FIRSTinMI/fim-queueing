@@ -14,6 +14,7 @@ export type UseQueueingQualMatchesProps = {
 
 export type QueueingQualMatches = {
   state: 'loading' | 'error' | 'ready',
+  hasSchedule: boolean,
   now: QualMatch | QualBreak | null,
   next: QualMatch | QualBreak | null,
   queueing: (QualMatch | QualBreak)[] | null
@@ -27,6 +28,7 @@ export default function useQueueingQualMatches(props: UseQueueingQualMatchesProp
   const [qualMatches, setQualMatches] = useState<(QualMatch | QualBreak)[]>([]);
   const [displayMatches, setDisplayMatches] = useState<QueueingQualMatches>({
     state: 'loading',
+    hasSchedule: false,
     now: null,
     next: null,
     queueing: null,
@@ -84,6 +86,7 @@ export default function useQueueingQualMatches(props: UseQueueingQualMatchesProp
       if (currentIdx !== null) {
         setDisplayMatches({
           state: 'ready',
+          hasSchedule: qualMatches && qualMatches.length > 0,
           now: getMatchByIndex(currentIdx),
           next: getMatchByIndex(currentIdx + 1),
           queueing: Array(props.numQueueing).fill(2)
@@ -94,6 +97,7 @@ export default function useQueueingQualMatches(props: UseQueueingQualMatchesProp
       } else {
         setDisplayMatches({
           state: 'ready',
+          hasSchedule: false,
           now: null,
           next: null,
           queueing: [],

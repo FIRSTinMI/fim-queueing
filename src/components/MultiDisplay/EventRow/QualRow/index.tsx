@@ -35,12 +35,12 @@ function QualRow({
   };
 
   const {
-    state, now, next, queueing,
+    state, now, next, queueing, hasSchedule,
   } = queueingQualMatches;
 
   // Message cases
   const case1 = ['loading', 'error'].includes(state);
-  const case2 = state === 'ready' && now === null;
+  const case2 = state === 'ready' && !hasSchedule;
 
   // Loading/Error Text
   if (case1 || case2) {
@@ -62,7 +62,7 @@ function QualRow({
               {/* eslint-disable-next-line no-nested-ternary */}
               {state === 'error' && case1
                 ? 'Failed to fetch matches'
-                : state === 'loading' && !now
+                : state === 'loading' && !hasSchedule
                   ? 'Waiting for schedule to be posted...'
                   : 'Loading Matches...'}
             </span>
@@ -73,7 +73,7 @@ function QualRow({
   }
 
   // Ready and we have matches
-  if (state === 'ready' && now) {
+  if (state === 'ready' && hasSchedule) {
     return (
       <>
         {/* Message */}

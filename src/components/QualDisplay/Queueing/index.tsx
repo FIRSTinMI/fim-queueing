@@ -177,6 +177,7 @@ function Queueing() {
     next: nextMatch,
     queueing: queueingMatches,
     state: loadingState,
+    hasSchedule,
   } = displayMatches;
   return (
     <>
@@ -184,8 +185,8 @@ function Queueing() {
       <div className={styles.fullHeight}>
         {loadingState === 'loading' && <div className={styles.infoText}>Loading matches...</div>}
         {loadingState === 'error' && <div className={styles.infoText}>Failed to fetch matches</div>}
-        {loadingState === 'ready' && !currentMatch && <div className={styles.infoText}>Waiting for schedule to be posted...</div>}
-        {loadingState === 'ready' && currentMatch
+        {loadingState === 'ready' && !hasSchedule && <div className={styles.infoText}>Waiting for schedule to be posted...</div>}
+        {loadingState === 'ready' && hasSchedule
           && (
           <div className={styles.qualsDisplay}>
             {event.mode === 'assisted' && (

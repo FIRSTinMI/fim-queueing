@@ -154,6 +154,27 @@ function PlayoffRow({
     return match.num === 'F' ? 'F' : `M${match.num}`;
   };
 
+  if (event.state === 'AwaitingAlliances') {
+    return (
+      <>
+        <MessageRow event={event} showLine={showLine} />
+        <tr>
+          <td colSpan={4} className={styles.textCenter}>
+            {event && event.name && (
+              <span>
+                <b>{event.name}</b>
+                <br />
+              </span>
+            )}
+            <span>
+              Alliance Selection in Progress...
+            </span>
+          </td>
+        </tr>
+      </>
+    );
+  }
+
   // Loading/Error Text
   if (['loading', 'error'].includes(loadingState)) {
     return (

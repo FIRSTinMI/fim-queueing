@@ -38,7 +38,7 @@ function MessageRow({ event, showLine }: { event: Event; showLine: 0 | 1 | null 
             <Textfit
               mode="single"
               forceSingleModeWidth={false}
-              max="300"
+              max={300}
               style={{ height: '22vh', width: '25vw' }}
             >
               {event.nameShort || event.name}
@@ -48,7 +48,7 @@ function MessageRow({ event, showLine }: { event: Event; showLine: 0 | 1 | null 
 
         {/* Message */}
         <span className={styles.messageText} style={{ paddingLeft: '5vw', paddingRight: '2vw' }}>
-          <Textfit mode="single" forceSingleModeWidth max="300">
+          <Textfit mode="single" forceSingleModeWidth max={300}>
             {event.message || event.name}
           </Textfit>
         </span>
