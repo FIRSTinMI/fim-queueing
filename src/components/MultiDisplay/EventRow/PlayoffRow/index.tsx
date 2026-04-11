@@ -13,12 +13,14 @@ import { useEffect, useState } from 'preact/hooks';
 import DoubleEliminationBracketMapping, {
   BracketMatchNumber,
 } from '@shared/DoubleEliminationBracketMapping';
+import { AnimatePresence } from 'motion/react';
 import styles from '../sharedStyles.module.scss';
 import { PlayoffMatchData } from '@/models/MatchData';
 import MessageRow from '../MessageRow';
 import { PlayoffMatchDisplay } from '@/components/PlayoffQueueing/PlayoffMatchDisplay';
 import AllianceFader from '../AllianceFader';
 import getGenericText from '@/util/getGenericText';
+import PushInDiv from '../Shared/PushInDiv';
 
 type LoadingState = 'loading' | 'ready' | 'error' | 'noAutomatic';
 
@@ -117,7 +119,8 @@ function PlayoffRow({
     // We have no way of knowing when a break is over, so to reduce confusion never show a break
     // as the current match. If we're at the end of the matches we can show that
     if (
-      matchDisplays[currentMatchIndex].customDisplayText
+      matchDisplays[currentMatchIndex]
+      && matchDisplays[currentMatchIndex].customDisplayText
       && matchDisplays.length - 1 > currentMatchIndex
     ) {
       currentMatchIndex += 1;
@@ -249,73 +252,81 @@ function PlayoffRow({
           </td>
 
           {/* Current Match */}
-          {currentMatch && (
-            <td className={styles.matchNumber}>
-              {currentMatch.customDisplayText ?? currentMatch?.num === 'F'
-                ? 'F'
-                : `M${currentMatch?.num}`}
-            </td>
-          )}
-
-          {/* Next Match */}
-          <td className={styles.textCenter}>
-            {/* Is a Match */}
-            {nextMatch && (
-              <Fragment>
-                <span className={styles.matchNumber} style={{ fontSize: !nextMatch?.match ? '7vw' : undefined }}>
-                  {getDisplayText(nextMatch)}
-                </span>
-                <span className={styles.nextMatchScroll}>
-                  {nextMatch?.match && showLine !== null && (
-                    <AllianceFader
-                      red={allianceDisplay(nextMatch, 'red')}
-                      blue={allianceDisplay(nextMatch, 'blue')}
-                      showLine={showLine}
-                    />
-                  )}
-                </span>
-              </Fragment>
-            )}
+          <td className={styles.matchNumber}>
+            <AnimatePresence>
+              {currentMatch && (
+                <PushInDiv key={`${currentMatch.customDisplayText ?? currentMatch?.num}`}>
+                  {currentMatch.customDisplayText ?? currentMatch?.num === 'F'
+                    ? 'F'
+                    : `M${currentMatch?.num}`}
+                </PushInDiv>
+              )}
+            </AnimatePresence>
           </td>
 
-          {/* Queueing Matches */}
-          <td className={styles.textCenter}>
-            {/* Multiple Queueing Matches */}
-            {queueingMatches.length > 1
-              && queueingMatches.map((x) => (
-                <div className={styles.flexRow}>
-                  <span className={styles.bold} style={{ fontSize: !x?.match ? '7vw' : undefined }}>
-                    {getDisplayText(x)}
+          {/* Next Match */}
+          <td className={styles.textCenter} style={{ position: 'relative' }}>
+            {/* Is a Match */}
+            <AnimatePresence>
+              {nextMatch && (
+                <PushInDiv key={`${getDisplayText(nextMatch)}`}>
+                  <span className={styles.matchNumber} style={{ fontSize: !nextMatch?.match ? '7vw' : undefined }}>
+                    {getDisplayText(nextMatch)}
                   </span>
-                  {x?.match && showLine !== null && (
-                    <AllianceFader
-                      red={allianceDisplay(x, 'red')}
-                      blue={allianceDisplay(x, 'blue')}
-                      showLine={showLine}
-                    />
-                  )}
-                </div>
-              ))}
-
-            {/* Single Queueing Match */}
-            {queueingMatches.length === 1 && queueingMatches[0] && (
-              queueingMatches[0] && (
-                <>
-                  <span className={styles.matchNumber} style={{ fontSize: !queueingMatches[0]?.match ? '7vw' : undefined }}>
-                    {getDisplayText(queueingMatches[0])}
-                  </span>
-                  <span>
-                    {queueingMatches[0]?.match && showLine !== null && (
+                  <span className={styles.nextMatchScroll}>
+                    {nextMatch?.match && showLine !== null && (
                       <AllianceFader
-                        red={allianceDisplay(queueingMatches[0], 'red')}
-                        blue={allianceDisplay(queueingMatches[0], 'blue')}
+                        red={allianceDisplay(nextMatch, 'red')}
+                        blue={allianceDisplay(nextMatch, 'blue')}
                         showLine={showLine}
                       />
                     )}
                   </span>
-                </>
-              )
-            )}
+                </PushInDiv>
+              )}
+            </AnimatePresence>
+          </td>
+
+          {/* Queueing Matches */}
+          <td className={styles.textCenter} style={{ position: 'relative' }}>
+            <AnimatePresence>
+              {/* Multiple Queueing Matches */}
+              {queueingMatches.length > 1
+                && queueingMatches.map((x) => (
+                  <div className={styles.flexRow}>
+                    <span className={styles.bold} style={{ fontSize: !x?.match ? '7vw' : undefined }}>
+                      {getDisplayText(x)}
+                    </span>
+                    {x?.match && showLine !== null && (
+                      <AllianceFader
+                        red={allianceDisplay(x, 'red')}
+                        blue={allianceDisplay(x, 'blue')}
+                        showLine={showLine}
+                      />
+                    )}
+                  </div>
+                ))}
+
+              {/* Single Queueing Match */}
+              {queueingMatches.length === 1 && queueingMatches[0] && (
+                queueingMatches[0] && (
+                  <PushInDiv key={`${getDisplayText(queueingMatches[0])}`}>
+                    <span className={styles.matchNumber} style={{ fontSize: !queueingMatches[0]?.match ? '7vw' : undefined }}>
+                      {getDisplayText(queueingMatches[0])}
+                    </span>
+                    <span>
+                      {queueingMatches[0]?.match && showLine !== null && (
+                        <AllianceFader
+                          red={allianceDisplay(queueingMatches[0], 'red')}
+                          blue={allianceDisplay(queueingMatches[0], 'blue')}
+                          showLine={showLine}
+                        />
+                      )}
+                    </span>
+                  </PushInDiv>
+                )
+              )}
+            </AnimatePresence>
           </td>
         </tr>
       </>

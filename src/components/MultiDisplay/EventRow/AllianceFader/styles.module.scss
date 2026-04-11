@@ -8,6 +8,7 @@ $teamlist-size: 4vh;
     // Center items
     justify-content: center;
     align-items: center;
+    height: $teamlist-size;
 
     &> div {
         position: absolute;
