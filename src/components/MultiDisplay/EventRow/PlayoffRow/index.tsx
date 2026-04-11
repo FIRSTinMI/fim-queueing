@@ -22,7 +22,7 @@ import getGenericText from '@/util/getGenericText';
 
 type LoadingState = 'loading' | 'ready' | 'error' | 'noAutomatic';
 
-const PlayoffRow = ({
+function PlayoffRow({
   event,
   showLine,
   season,
@@ -32,7 +32,7 @@ const PlayoffRow = ({
   showLine: 0 | 1 | null;
   season: string;
   token: string;
-}) => {
+}) {
   // Loading state
   const [loadingState, setLoadingState] = useState<LoadingState>('loading');
 
@@ -265,24 +265,22 @@ const PlayoffRow = ({
 
             {/* Single Queueing Match */}
             {queueingMatches.length === 1 && queueingMatches[0] && (
-              <>
-                {queueingMatches[0] && (
-                  <Fragment>
-                    <span className={styles.matchNumber} style={{ fontSize: !queueingMatches[0]?.match ? '7vw' : undefined }}>
-                      {getDisplayText(queueingMatches[0])}
-                    </span>
-                    <span>
-                      {queueingMatches[0]?.match && showLine !== null && (
-                        <AllianceFader
-                          red={getGenericText(queueingMatches[0]?.match?.participants?.red)}
-                          blue={getGenericText(queueingMatches[0]?.match?.participants?.blue)}
-                          showLine={showLine}
-                        />
-                      )}
-                    </span>
-                  </Fragment>
-                )}
-              </>
+              queueingMatches[0] && (
+                <>
+                  <span className={styles.matchNumber} style={{ fontSize: !queueingMatches[0]?.match ? '7vw' : undefined }}>
+                    {getDisplayText(queueingMatches[0])}
+                  </span>
+                  <span>
+                    {queueingMatches[0]?.match && showLine !== null && (
+                      <AllianceFader
+                        red={getGenericText(queueingMatches[0]?.match?.participants?.red)}
+                        blue={getGenericText(queueingMatches[0]?.match?.participants?.blue)}
+                        showLine={showLine}
+                      />
+                    )}
+                  </span>
+                </>
+              )
             )}
           </td>
         </tr>
@@ -291,6 +289,6 @@ const PlayoffRow = ({
   }
 
   return null;
-};
+}
 
 export default PlayoffRow;

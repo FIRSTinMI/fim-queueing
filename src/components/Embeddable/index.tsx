@@ -1,4 +1,4 @@
-import { h } from 'preact';
+import { h, JSX } from 'preact';
 import {
   useContext, useEffect, useRef, useState,
 } from 'preact/hooks';
@@ -21,7 +21,7 @@ type EmbeddableProps = {
   routeParams: EmbeddableRouteParams,
 };
 
-const Embeddable = (props: EmbeddableProps) => {
+function Embeddable(props: EmbeddableProps) {
   const { routeParams: { iframeUrl: iframeUrlFn } } = props;
   const appContext = useContext(AppContext);
   const [iframeUrl, setIframeUrl] = useState<string | undefined>(undefined);
@@ -65,6 +65,6 @@ const Embeddable = (props: EmbeddableProps) => {
       { content }
     </div>
   );
-};
+}
 
 export default Embeddable;

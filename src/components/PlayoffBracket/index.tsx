@@ -16,7 +16,7 @@ import Match from './TournamentBracket/Match';
 /**
  * TODO: A bracket for double elimination playoffs
  */
-const PlayoffBracket = () => {
+function PlayoffBracket() {
   const { event, season, token } = useContext(AppContext);
   const [alliances, setAlliances] = useState<Alliance[] | undefined>(undefined);
   const [bracket, setBracket] = useState<Record<BracketMatchNumber, PlayoffMatch> | undefined>();
@@ -61,6 +61,6 @@ const PlayoffBracket = () => {
       )}
     </div>
   );
-};
+}
 
 export default PlayoffBracket;

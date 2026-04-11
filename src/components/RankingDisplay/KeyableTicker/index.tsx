@@ -15,7 +15,7 @@ import Ranking from '../../Tickers/Ranking';
 import RankingList from '../../Tickers/RankingList';
 import MenuBar from '../../MenuBar';
 
-const KeyableTicker = () => {
+function KeyableTicker() {
   const { event, season, token } = useContext(AppContext);
   if (event === undefined || season === undefined) throw new Error('App context has undefineds');
   const dbEventRef = useRef<DatabaseReference>();
@@ -234,6 +234,6 @@ const KeyableTicker = () => {
       </div>
     </>
   );
-};
+}
 
 export default KeyableTicker;

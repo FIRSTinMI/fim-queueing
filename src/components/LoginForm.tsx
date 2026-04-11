@@ -34,7 +34,7 @@ const StyledBadCode = styled.div`
 /**
  * Form displayed to the user when they do not already have an event token.
  */
-const LoginForm = ({ onLogin }: LoginFormProps) => {
+function LoginForm({ onLogin }: LoginFormProps) {
   const appContext = useContext(AppContext);
   const [eventToken, setEventToken] = useState('');
   const [badToken, setBadToken] = useState(false);
@@ -101,6 +101,6 @@ const LoginForm = ({ onLogin }: LoginFormProps) => {
       </Disclaimer>
     </div>
   );
-};
+}
 
 export default LoginForm;

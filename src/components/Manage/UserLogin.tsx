@@ -16,14 +16,14 @@ const ButtonContainer = styled.div`
 
 const provider = new GoogleAuthProvider();
 
-const UserLogin = () => {
+function UserLogin() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const onClickLogin = () => {
     const auth = getAuth();
     setIsLoading(true);
-    signInWithPopup(auth, provider).then((res) => {
+    signInWithPopup(auth, provider).then(() => {
       const redirect = (new URLSearchParams(window.location.search))?.get('redirect') ?? '/manage/options';
       route(redirect);
     }).catch((err) => {
@@ -52,6 +52,6 @@ const UserLogin = () => {
       {errorMessage && <ErrorMessage type="error">{errorMessage}</ErrorMessage>}
     </UserLoginPage>
   );
-};
+}
 
 export default UserLogin;

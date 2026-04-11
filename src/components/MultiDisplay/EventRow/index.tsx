@@ -12,7 +12,7 @@ import { Event } from '@shared/DbTypes';
 import QualRow from './QualRow';
 import PlayoffRow from './PlayoffRow';
 
-const EventRow = ({
+function EventRow({
   token,
   season,
   showLine,
@@ -20,7 +20,7 @@ const EventRow = ({
   token: string;
   season: string;
   showLine: 0 | 1 | null;
-}) => {
+}) {
   // Ref to the event in the database
   const dbEventRef = useRef<DatabaseReference>();
 
@@ -51,7 +51,6 @@ const EventRow = ({
       ) ? (
         <QualRow
           event={event}
-          season={season}
           token={token}
           showLine={showLine}
         />
@@ -65,6 +64,6 @@ const EventRow = ({
         )}
     </>
   );
-};
+}
 
 export default EventRow;

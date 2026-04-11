@@ -1,7 +1,7 @@
 import { h } from 'preact';
 import styles from './styles.module.scss';
 
-const AllianceFader = ({
+function AllianceFader({
   red,
   blue,
   showLine,
@@ -9,25 +9,27 @@ const AllianceFader = ({
   red: string;
   blue: string;
   showLine: 0 | 1;
-}) => (
-  <div className={styles.faderBase}>
-    <div
-      className={styles.red}
-      style={{
-        opacity: showLine ? 0 : 1,
-      }}
-    >
-      R: {red}
+}) {
+  return (
+    <div className={styles.faderBase}>
+      <div
+        className={styles.red}
+        style={{
+          opacity: showLine ? 0 : 1,
+        }}
+      >
+        R: {red}
+      </div>
+      <div
+        className={styles.blue}
+        style={{
+          opacity: showLine,
+        }}
+      >
+        B: {blue}
+      </div>
     </div>
-    <div
-      className={styles.blue}
-      style={{
-        opacity: showLine,
-      }}
-    >
-      B: {blue}
-    </div>
-  </div>
-);
+  );
+}
 
 export default AllianceFader;

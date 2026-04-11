@@ -1,4 +1,4 @@
-import { h, Fragment } from 'preact';
+import { h } from 'preact';
 import { Route, RouteProps, route } from 'preact-router';
 import { useEffect, useState } from 'preact/hooks';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
@@ -9,8 +9,8 @@ export default function AuthenticatedRoute<T>(props: RouteProps<T> & Partial<T>)
     (async () => {
       const auth = getAuth();
       await Promise.race([
-        new Promise((res) => setTimeout(res, 5000)),
-        new Promise<void>((res) => onAuthStateChanged(auth, () => res())),
+        new Promise((res) => { setTimeout(res, 5000); }),
+        new Promise<void>((res) => { onAuthStateChanged(auth, () => res()); }),
       ]);
       const isLoggedIn = auth.currentUser != null;
       if (!isLoggedIn) {
@@ -21,7 +21,7 @@ export default function AuthenticatedRoute<T>(props: RouteProps<T> & Partial<T>)
   }, []);
 
   // not logged in, render nothing:
-  if (!loggedIn) return <></>;
+  if (!loggedIn) return null;
 
   // eslint-disable-next-line react/jsx-props-no-spreading
   return <Route {...props} />;

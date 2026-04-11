@@ -14,7 +14,7 @@ import { PlayoffMatchDisplay } from '../PlayoffMatchDisplay';
 
 type LoadingState = 'loading' | 'ready' | 'error' | 'noAutomatic';
 
-const PlayoffQueueing = () => {
+function PlayoffQueueing() {
   const { event, season, token } = useContext(AppContext);
   if (event === undefined || season === undefined) throw new Error('App context has undefineds');
 
@@ -107,13 +107,11 @@ const PlayoffQueueing = () => {
   };
 
   const menuOptions = () => (
-    <>
-      <label htmlFor="eventNameDisplay">
-        Show event name:
-        {/* @ts-ignore */}
-        <input type="checkbox" checked={event.options?.showEventName ?? false} onInput={(e): void => setShowEventName(e.target.checked)} id="eventNameDisplay" />
-      </label>
-    </>
+    <label htmlFor="eventNameDisplay">
+      Show event name:
+      {/* @ts-ignore */}
+      <input type="checkbox" checked={event.options?.showEventName ?? false} onInput={(e): void => setShowEventName(e.target.checked)} id="eventNameDisplay" />
+    </label>
   );
 
   // FIXME (@evanlihou): This effect runs twice on initial load, which causes the "waiting for
@@ -163,6 +161,6 @@ const PlayoffQueueing = () => {
       </div>
     </>
   );
-};
+}
 
 export default PlayoffQueueing;

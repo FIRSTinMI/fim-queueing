@@ -1,4 +1,4 @@
-import { h, Fragment } from 'preact';
+import { h } from 'preact';
 import {
   useContext, useEffect, useRef, useState,
 } from 'preact/hooks';
@@ -13,7 +13,7 @@ const units = {
   second: 1000,
 };
 
-const StaleDataBanner = (): JSX.Element => {
+function StaleDataBanner() {
   const context = useContext(AppContext);
   const contextRef = useRef<AppContextType>();
   const intervalRef = useRef<ReturnType<typeof setTimeout> | null>();
@@ -61,7 +61,7 @@ const StaleDataBanner = (): JSX.Element => {
   }, [context?.event?.lastModifiedMs]);
 
   if (context.features?.showStaleDataBanner === false || window.location.pathname.includes('overlay')) {
-    return <></>;
+    return null;
   }
 
   if (isShown) {
@@ -72,7 +72,7 @@ const StaleDataBanner = (): JSX.Element => {
     );
   }
 
-  return <></>;
-};
+  return null;
+}
 
 export default StaleDataBanner;

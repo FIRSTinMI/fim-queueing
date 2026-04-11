@@ -109,7 +109,7 @@ const Note = styled.span`
   }
 `;
 
-const Options = () => {
+function Options() {
   const email = useMemo(() => getAuth().currentUser?.email, undefined);
   const { event, season, token } = useContext(AppContext);
 
@@ -328,6 +328,6 @@ const Options = () => {
       </footer>
     </OptionsPage>
   );
-};
+}
 
 export default Options;

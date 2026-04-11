@@ -10,7 +10,7 @@ import MatchWrapper from './MatchWrapper';
 import { defaultStyle, getCalculatedStyles } from './settings';
 import { MatchComponentProps } from './Match';
 
-const DoubleEliminationBracket = ({
+function DoubleEliminationBracket({
   matchResults,
   matchComponent,
   alliances,
@@ -18,7 +18,7 @@ const DoubleEliminationBracket = ({
   matchResults: Record<BracketMatchNumber, PlayoffMatch> | undefined,
   matchComponent: FunctionalComponent<MatchComponentProps>,
   alliances: Alliance[],
-}) => {
+}) {
   // TODO: I really do not like this whole calculated styles thing, and I don't
   // think we're even using it. Consider removing for a simpler solution.
   const calculatedStyles = getCalculatedStyles(defaultStyle);
@@ -157,6 +157,6 @@ const DoubleEliminationBracket = ({
       </svg>
     </div>
   );
-};
+}
 
 export default DoubleEliminationBracket;

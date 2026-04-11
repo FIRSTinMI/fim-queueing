@@ -14,6 +14,7 @@ export type MatchComponentProps = {
   alliances: Alliance[]
 };
 
+// eslint-disable-next-line react/function-component-definition
 const Match: FunctionalComponent<MatchComponentProps> = ({
   matchName,
   matchResult,

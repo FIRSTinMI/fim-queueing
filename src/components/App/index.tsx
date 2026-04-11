@@ -26,7 +26,7 @@ import AuthenticatedRoute from '../AuthenticatedRoute';
 
 // TODO: Figure out why the event details sometimes aren't getting sent over to SignalR
 
-const ErrorFallback = ({ error }: { error: unknown }) => {
+function ErrorFallback({ error }: { error: unknown }) {
   // Reload after a while to try a recovery
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -84,9 +84,9 @@ const ErrorFallback = ({ error }: { error: unknown }) => {
       <small style={{ fontSize: '.5em', display: 'block', paddingTop: '1em' }}>{(error as Error)?.message}</small>
     </div>
   );
-};
+}
 
-const App = () => {
+function App() {
   const [db, setDb] = useState<Database>();
   const hub = useRef<HubConnection | undefined>(undefined);
   const [connection, setConnection] = useState<{
@@ -348,6 +348,7 @@ const App = () => {
     <div id="preact_root" className={styles.app}>
       {identifyTO !== null && <div className={styles.identify}>{hub.current?.connectionId}</div>}
       <ErrorBoundary FallbackComponent={ErrorFallback}>
+        {/* eslint-disable-next-line react/jsx-no-constructed-context-values */}
         <AppContext.Provider value={appContext ?? {}}>
           {connection?.connectionStatus === 'offline' && (
             <div className={styles.warningBar}>
@@ -361,6 +362,6 @@ const App = () => {
       </ErrorBoundary>
     </div>
   );
-};
+}
 
 export default App;
