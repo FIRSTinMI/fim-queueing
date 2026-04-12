@@ -7,3 +7,4 @@ node_modules
 functions/*-debug.log
 size-plugin.json
 .idea
+dist
