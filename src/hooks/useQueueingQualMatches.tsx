@@ -63,6 +63,16 @@ export default function useQueueingQualMatches(props: UseQueueingQualMatchesProp
     return res;
   };
 
+  const getMatchIdxById = (matchId: number): number | null => {
+    const res = qualMatches?.findIndex(
+      (x) => x.type !== 'break' && x.id === matchId,
+    ) ?? null;
+
+    if (res === null || res === -1) return null;
+
+    return res;
+  };
+
   const getMatchByIndex = (index: number | null): QualMatch | QualBreak | null => (
     index !== null && qualMatches
       ? (qualMatches[index] ?? null)
@@ -81,7 +91,9 @@ export default function useQueueingQualMatches(props: UseQueueingQualMatchesProp
     }
 
     try {
-      const currentIdx = getMatchIdxByNumber(matchNumber);
+      const currentIdx = event.currentMatchId
+        ? getMatchIdxById(event.currentMatchId)
+        : getMatchIdxByNumber(matchNumber);
       if (currentIdx !== null) {
         setDisplayMatches({
           state: 'ready',
@@ -113,7 +125,7 @@ export default function useQueueingQualMatches(props: UseQueueingQualMatchesProp
 
   useEffect(() => {
     updateMatches();
-  }, [event?.currentMatchNumber, qualMatches]);
+  }, [event?.currentMatchNumber, event?.currentMatchId, qualMatches]);
 
   return displayMatches;
 }
