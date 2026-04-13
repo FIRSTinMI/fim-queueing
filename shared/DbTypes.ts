@@ -19,6 +19,7 @@ export type Event = {
   nameShort?: string;
   eventCode: string;
   currentMatchNumber: number | null;
+  currentMatchId?: number | null;
   playoffMatchNumber: BracketMatchNumber | null;
   streamEmbedLink?: string;
   numQualMatches: number | null;
@@ -58,6 +59,7 @@ export type PlayoffMatch = {
 };
 
 export type QualMatch = {
+  id?: number;
   number: number;
   participants: Record<DriverStation, number>;
   type: 'match'
