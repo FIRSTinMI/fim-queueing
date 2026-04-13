@@ -55,9 +55,9 @@ const Container = styled.div`
   }
 `;
 
-const SavedLowerThirds = ({
+function SavedLowerThirds({
   lowerThirdTitle, lowerThirdSubtitle, cgConfigRef, onLoad,
-}: SavedLowerThirdsProps) => {
+}: SavedLowerThirdsProps) {
   const savedRef = useMemo(() => (cgConfigRef.current ? child(cgConfigRef.current, 'lowerThirds') : undefined), [cgConfigRef.current]);
   const [saved, setSaved] = useState<{ [_: string]: SavedLowerThirdRecord }>({});
 
@@ -163,6 +163,6 @@ const SavedLowerThirds = ({
       </table>
     </Container>
   );
-};
+}
 
 export default SavedLowerThirds;

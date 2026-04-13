@@ -2,55 +2,35 @@ import { h } from 'preact';
 import { Event } from '@shared/DbTypes';
 // @ts-ignore
 import { Textfit } from '@gmurph91/react-textfit';
+import { AnimatePresence } from 'motion/react';
 import styles from './styles.module.scss';
+import PushInDiv from '../Shared/PushInDiv';
 
-const MessageRow = ({ event, showLine }: { event: Event; showLine: 0 | 1 | null }) => (
-  <div
-    className={styles.messageContainer}
-    style={event.message ? { left: 0 } : {}}
-  >
-    <div
-      className={styles.messageMover}
-      style={{
-        color: event.branding?.textColor,
-        backgroundColor: event.branding?.bgColor,
-      }}
-    >
-      {/* Logo/Event Name Short Fader */}
-      <div className={styles.faderContainer}>
-        {/* Logo */}
-        <div style={{ opacity: showLine !== null && !event.branding?.logo ? 0 : showLine }}>
-          {/* <img
-            src={event.branding?.logo}
-            alt={event.name}
-            className={styles.sponsorLogo}
-          /> */}
-        </div>
-        {/* Text */}
-        <span
-          className={`${styles.textCenter} ${styles.bold}`}
-          // eslint-disable-next-line no-nested-ternary
-          style={{ opacity: (showLine === null || !event.branding?.logo) ? 1 : showLine ? 0 : 1 }}
-        >
-          <Textfit
-            mode="single"
-            forceSingleModeWidth={false}
-            max="300"
-            style={{ height: '22vh', width: '25vw' }}
-          >
-            {event.nameShort || event.name}
-          </Textfit>
-        </span>
+function MessageRow({ event, overrideMessage }: { event: Event, overrideMessage?: string }) {
+  const effectiveMessage = overrideMessage || event.message || event.name;
+  return (
+    <td colSpan={3}>
+      <div className={styles.messageText} style={{ position: 'relative', paddingLeft: '5vw', paddingRight: '2vw' }}>
+        <AnimatePresence>
+          <PushInDiv key={effectiveMessage}>
+            <Textfit
+              style={{ width: '100%', height: '22vh' }}
+              mode="single"
+              forceSingleModeWidth
+              max={150}
+              key={effectiveMessage}
+            >
+              {effectiveMessage}
+            </Textfit>
+          </PushInDiv>
+        </AnimatePresence>
       </div>
+    </td>
+  );
+}
 
-      {/* Message */}
-      <span className={styles.messageText} style={{ paddingLeft: '5vw', paddingRight: '2vw' }}>
-        <Textfit mode="single" forceSingleModeWidth max="300">
-          {event.message || event.name}
-        </Textfit>
-      </span>
-    </div>
-  </div>
-);
+MessageRow.defaultProps = {
+  overrideMessage: undefined,
+};
 
 export default MessageRow;

@@ -1,4 +1,4 @@
-import { h, Fragment } from 'preact';
+import { h, JSX } from 'preact';
 import { route } from 'preact-router';
 import Cookies from 'js-cookie';
 import { useEffect, useState } from 'preact/hooks';
@@ -36,7 +36,7 @@ function getBrowserFullscreenStatus(): boolean {
  * Always displays on mobile devices, and slides down upon mouse movement for
  * desktop.
  */
-const MenuBar = (props: MenuBarProps) => {
+function MenuBar(props: MenuBarProps) {
   const {
     event, season, alwaysShow, options,
   } = props;
@@ -113,7 +113,7 @@ const MenuBar = (props: MenuBarProps) => {
     }
   }
 
-  if (event === undefined || season === undefined) return (<></>);
+  if (event === undefined || season === undefined) return null;
   return (
     <div className={[
       styles.menu,
@@ -166,10 +166,10 @@ const MenuBar = (props: MenuBarProps) => {
       </div>
     </div>
   );
-};
+}
 
 MenuBar.defaultProps = {
-  options: (<></>),
+  options: null,
   alwaysShow: false,
 };
 

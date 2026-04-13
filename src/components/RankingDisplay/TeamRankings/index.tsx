@@ -13,7 +13,7 @@ import numberToOrdinal from '@/util/numberToOrdinal';
 
 const numFmt = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-const TeamRankings = () => {
+function TeamRankings() {
   const { event, season, token } = useContext(AppContext);
   const [rankings, setRankings] = useState<TeamRanking[]>([]);
   useEffect(() => {
@@ -89,6 +89,6 @@ const TeamRankings = () => {
       </div>
     </>
   );
-};
+}
 
 export default TeamRankings;

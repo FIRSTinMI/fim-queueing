@@ -6,7 +6,7 @@ import {
   useContext, useEffect, useState, useRef, useReducer,
 } from 'preact/hooks';
 
-import { AppMode, QualBreak, QualMatch } from '@shared/DbTypes';
+import { AppMode } from '@shared/DbTypes';
 import { TeamRanking } from '@/types';
 import AppContext from '@/AppContext';
 import styles from './styles.module.scss';
@@ -14,88 +14,23 @@ import MatchDisplay from '../MatchDisplay';
 import Ranking from '../../Tickers/Ranking';
 import RankingList from '../../Tickers/RankingList';
 import MenuBar from '../../MenuBar';
+import useQueueingQualMatches from '@/hooks/useQueueingQualMatches';
 
-type LoadingState = 'loading' | 'ready' | 'error' | 'noAutomatic';
-
-const Queueing = () => {
+function Queueing() {
   const { event, season, token } = useContext(AppContext);
   if (event === undefined || season === undefined) throw new Error('App context has undefineds');
 
-  const [loadingState, setLoadingState] = useState<LoadingState>('loading');
   const dbEventRef = useRef<DatabaseReference>();
-  const [qualMatches, setQualMatches] = useState<(QualMatch | QualBreak)[]>([]);
-  const [displayMatches, setDisplayMatches] = useState<{
-    currentMatch: QualMatch | QualBreak | null,
-    nextMatch: QualMatch | QualBreak | null,
-    queueingMatches: QualMatch[] | QualBreak[]
-  }>({ currentMatch: null, nextMatch: null, queueingMatches: [] });
+  const displayMatches = useQueueingQualMatches({
+    numQueueing: 3,
+  });
   const [rankings, setRankings] = useState<TeamRanking[]>([]);
 
   useEffect(() => {
-    if (!token) return () => {};
+    if (!token) return;
 
     dbEventRef.current = ref(getDatabase(), `/seasons/${season}/events/${token}`);
-
-    const matchesRef = ref(getDatabase(), `/seasons/${season}/qual/${token}`);
-    onValue(matchesRef, (snap) => {
-      setQualMatches([...snap.val() as (QualMatch | QualBreak)[], { type: 'break', description: '(END)' }]);
-    });
-
-    return () => {
-      off(matchesRef);
-    };
   }, [event.eventCode, season, token]);
-
-  const getMatchIdxByNumber = (matchNumber: number): number | null => {
-    const res = qualMatches?.findIndex(
-      (x) => x.type !== 'break' && x.number === matchNumber,
-    ) ?? null;
-
-    if (res === null || res === -1) return null;
-
-    return res;
-  };
-
-  const getMatchByIndex = (index: number | null): QualMatch | QualBreak | null => (
-    index !== null && qualMatches
-      ? (qualMatches[index] ?? null)
-      : null);
-
-  const updateMatches = (): void => {
-    const matchNumber = event.currentMatchNumber;
-
-    if (matchNumber === null || matchNumber === undefined) {
-      if (dbEventRef.current === undefined) return; // throw new Error('No event ref');
-      update(dbEventRef.current, {
-        currentMatchNumber: 1,
-      });
-      return;
-    }
-
-    try {
-      const currentIdx = getMatchIdxByNumber(matchNumber);
-      if (currentIdx !== null) {
-        setDisplayMatches({
-          currentMatch: getMatchByIndex(currentIdx),
-          nextMatch: getMatchByIndex(currentIdx + 1),
-          // By default, we'll take the three matches after the one on deck
-          queueingMatches: [2, 3, 4].map((x) => getMatchByIndex(currentIdx + x))
-            .filter((x) => x !== null) as QualMatch[],
-        });
-      } else {
-        setDisplayMatches({
-          currentMatch: null,
-          nextMatch: null,
-          queueingMatches: [],
-        });
-      }
-
-      setLoadingState('ready');
-    } catch (e) {
-      setLoadingState('error');
-      console.error(e);
-    }
-  };
 
   /**
    * Swap the event's mode
@@ -107,11 +42,6 @@ const Queueing = () => {
     if (dbEventRef.current === undefined) throw new Error('No event ref');
     let appMode = mode;
     if (appMode === null) appMode = event.mode === 'assisted' ? 'automatic' : 'assisted';
-    if (appMode === 'assisted') {
-      if (loadingState === 'noAutomatic' || event.currentMatchNumber === null) {
-        updateMatches();
-      }
-    }
     update(dbEventRef.current, {
       mode: appMode,
     });
@@ -152,6 +82,7 @@ const Queueing = () => {
     } else {
       throw new Error('Unknown action type passed to match number reducer');
     }
+
     update(dbEventRef.current, {
       currentMatchNumber: newMatchNumber,
     });
@@ -229,10 +160,6 @@ const Queueing = () => {
   }, []);
 
   useEffect(() => {
-    updateMatches();
-  }, [event.currentMatchNumber, qualMatches]);
-
-  useEffect(() => {
     const rankingsRef = ref(getDatabase(), `/seasons/${season}/rankings/${token}`);
     if (event.options?.showRankings) {
       onValue(rankingsRef, (snap) => {
@@ -244,17 +171,21 @@ const Queueing = () => {
 
     return () => { off(rankingsRef); };
   }, [event.options?.showRankings]);
-
-  const { currentMatch, nextMatch, queueingMatches } = displayMatches;
+  const {
+    now: currentMatch,
+    next: nextMatch,
+    queueing: queueingMatches,
+    state: loadingState,
+    hasSchedule,
+  } = displayMatches;
   return (
     <>
       <MenuBar event={event} season={season} options={menuOptions()} />
       <div className={styles.fullHeight}>
         {loadingState === 'loading' && <div className={styles.infoText}>Loading matches...</div>}
         {loadingState === 'error' && <div className={styles.infoText}>Failed to fetch matches</div>}
-        {loadingState === 'noAutomatic' && <div className={styles.infoText}>Unable to run in automatic mode. Press the &apos;a&apos; key to switch modes.</div>}
-        {loadingState === 'ready' && !qualMatches?.length && <div className={styles.infoText}>Waiting for schedule to be posted...</div>}
-        {loadingState === 'ready' && qualMatches?.length !== 0
+        {loadingState === 'ready' && !hasSchedule && <div className={styles.infoText}>Waiting for schedule to be posted...</div>}
+        {loadingState === 'ready' && hasSchedule
           && (
           <div className={styles.qualsDisplay}>
             {event.mode === 'assisted' && (
@@ -278,11 +209,15 @@ const Queueing = () => {
                 <div className={styles.eventName}>{event.name}</div>
               )}
               <div className={styles.topBar}>
-                {currentMatch && (
-                <div>
-                  <MatchDisplay halfWidth match={currentMatch} />
-                  <span className={styles.description}>On Field</span>
-                </div>
+                {currentMatch ? (
+                  <div>
+                    <MatchDisplay halfWidth match={currentMatch} />
+                    <span className={styles.description}>On Field</span>
+                  </div>
+                ) : (
+                  <div>
+                    <span className={styles.description}>Qualification matches have concluded</span>
+                  </div>
                 )}
                 {nextMatch && (
                 <div>
@@ -291,7 +226,7 @@ const Queueing = () => {
                 </div>
                 )}
               </div>
-              {queueingMatches.map((x) => (
+              {queueingMatches?.map((x) => (
                 <MatchDisplay
                   className={styles.queueingMatches}
                   match={x}
@@ -299,16 +234,16 @@ const Queueing = () => {
                 />
               ))}
             </div>
-            {(event.options?.showRankings ?? false ? (
+            {((event.options?.showRankings ?? false) && (
               <RankingList style={{ height: '1.5em' }}>
                 {rankings.map((x) => (<Ranking teamNumber={x.teamNumber} ranking={x.rank} />))}
               </RankingList>
-            ) : <></>)}
+            ))}
           </div>
           )}
       </div>
     </>
   );
-};
+}
 
 export default Queueing;

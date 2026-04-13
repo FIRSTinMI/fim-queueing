@@ -8,7 +8,7 @@ export type ErrorMessageProps = {
   type?: ErrorMessageType,
 };
 
-const ErrorMessage = (props: ErrorMessageProps) => {
+function ErrorMessage(props: ErrorMessageProps) {
   const { children } = props;
   let { type } = props;
   if (type === undefined) type = 'info';
@@ -22,7 +22,7 @@ const ErrorMessage = (props: ErrorMessageProps) => {
       { children }
     </div>
   );
-};
+}
 
 ErrorMessage.defaultProps = {
   type: 'info',

@@ -1,4 +1,4 @@
-import { Fragment, FunctionalComponent, h } from 'preact';
+import { Fragment, h } from 'preact';
 
 import { ParticipantSource } from '@shared/DoubleEliminationBracketMapping';
 import { DriverStation, PlayoffMatch } from '@shared/DbTypes';
@@ -14,13 +14,13 @@ export type MatchComponentProps = {
   alliances: Alliance[]
 };
 
-const Match: FunctionalComponent<MatchComponentProps> = ({
+function Match({
   matchName,
   matchResult,
   red,
   blue,
   alliances,
-}: MatchComponentProps) => {
+}: MatchComponentProps) {
   const getTeamsInAlliance = (num: number): string => {
     const alliance = alliances?.find((a) => a.number === num);
     if (!alliance) return '';
@@ -103,6 +103,6 @@ const Match: FunctionalComponent<MatchComponentProps> = ({
       </div>
     </div>
   );
-};
+}
 
 export default Match;

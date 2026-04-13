@@ -1,4 +1,4 @@
-import { h, Fragment } from 'preact';
+import { h, JSX } from 'preact';
 import { DriverStation } from '@shared/DbTypes';
 import { PlayoffMatchDisplay } from '../PlayoffMatchDisplay';
 import styles from './styles.module.scss';
@@ -76,11 +76,9 @@ function MatchDisplay({ halfWidth, match, className }: MatchDisplayProps): JSX.E
         Just show a blank entry if the match doesn't exist.
         Either we're in a test match or at the end of the schedule
       */}
-      <>
-        <span className={styles.matchNumber}>{match?.num === 'F' ? 'F' : `M${match?.num}`}</span>
-        {redContent}
-        {blueContent}
-      </>
+      <span className={styles.matchNumber}>{match?.num === 'F' ? 'F' : `M${match?.num}`}</span>
+      {redContent}
+      {blueContent}
     </div>
   );
 }

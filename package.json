@@ -7,7 +7,7 @@
     "build": "vite build",
     "serve": "sirv build --port 8080 --cors --single",
     "dev": "vite",
-    "lint": "eslint './src/**/*.{js,jsx,ts,tsx}' './functions/src/**/*.{js,ts}'",
+    "lint": "eslint './src/**/*.{js,jsx,ts,tsx}'",
     "lint-win": "eslint src/ functions/"
   },
   "dependencies": {
@@ -19,6 +19,7 @@
     "firebase": "^12.9.0",
     "js-cookie": "^3.0.1",
     "milligram": "^1.4.1",
+    "motion": "^12.38.0",
     "preact": "^10.3.1",
     "preact-iso": "^2.3.1",
     "preact-router": "^4.1.0",

@@ -5,24 +5,36 @@ import {
   ref,
   onValue,
   off,
-  // update,
 } from 'firebase/database';
-// @ts-ignore
-// import { Textfit } from '@gmurph91/react-textfit';
 import { useEffect, useState } from 'preact/hooks';
 import DoubleEliminationBracketMapping, {
   BracketMatchNumber,
 } from '@shared/DoubleEliminationBracketMapping';
+import { AnimatePresence } from 'motion/react';
 import styles from '../sharedStyles.module.scss';
 import { PlayoffMatchData } from '@/models/MatchData';
-import MessageRow from '../MessageRow';
 import { PlayoffMatchDisplay } from '@/components/PlayoffQueueing/PlayoffMatchDisplay';
 import AllianceFader from '../AllianceFader';
 import getGenericText from '@/util/getGenericText';
+import PushInDiv from '../Shared/PushInDiv';
+import MessageRow from '../MessageRow';
 
 type LoadingState = 'loading' | 'ready' | 'error' | 'noAutomatic';
 
-const PlayoffRow = ({
+function allianceDisplay(match: PlayoffMatchDisplay, alliance: 'red' | 'blue'): string {
+  if (alliance === 'red') {
+    if (match.result?.redAlliance) return `Alliance ${match.result.redAlliance}`;
+    return getGenericText(match.match?.participants.red);
+  }
+  if (alliance === 'blue') {
+    if (match.result?.blueAlliance) return `Alliance ${match.result.blueAlliance}`;
+    return getGenericText(match.match?.participants.blue);
+  }
+
+  return '';
+}
+
+function PlayoffRow({
   event,
   showLine,
   season,
@@ -32,16 +44,12 @@ const PlayoffRow = ({
   showLine: 0 | 1 | null;
   season: string;
   token: string;
-}) => {
+}) {
   // Loading state
   const [loadingState, setLoadingState] = useState<LoadingState>('loading');
 
   // This row's matches
   const [results, setResults] = useState<Partial<Record<BracketMatchNumber, PlayoffMatch>>>({});
-
-  // URL parameters
-  const searchParams = new URLSearchParams(window.location.search);
-  const useShortName = typeof searchParams.get('useShortName') === 'string';
 
   // Matches to display
   // eslint-disable-next-line max-len
@@ -104,7 +112,8 @@ const PlayoffRow = ({
     // We have no way of knowing when a break is over, so to reduce confusion never show a break
     // as the current match. If we're at the end of the matches we can show that
     if (
-      matchDisplays[currentMatchIndex].customDisplayText
+      matchDisplays[currentMatchIndex]
+      && matchDisplays[currentMatchIndex].customDisplayText
       && matchDisplays.length - 1 > currentMatchIndex
     ) {
       currentMatchIndex += 1;
@@ -157,27 +166,12 @@ const PlayoffRow = ({
   // Loading/Error Text
   if (['loading', 'error'].includes(loadingState)) {
     return (
-      <>
-        {/* Message */}
-        <MessageRow event={event} showLine={showLine} />
-
-        {/* Loading */}
-        <tr>
-          <td colSpan={4} className={styles.textCenter}>
-            {event && event.name && (
-              <span>
-                <b>{event.name}</b>
-                <br />
-              </span>
-            )}
-            <span>
-              {loadingState === 'error'
-                ? 'Failed to fetch matches'
-                : 'Loading Matches...'}
-            </span>
-          </td>
-        </tr>
-      </>
+      <MessageRow
+        event={event}
+        overrideMessage={loadingState === 'error'
+          ? 'Failed to fetch matches'
+          : 'Loading Matches...'}
+      />
     );
   }
 
@@ -185,67 +179,45 @@ const PlayoffRow = ({
   if (loadingState === 'ready') {
     return (
       <>
-        {/* Message */}
-        <MessageRow event={event} showLine={showLine} />
-
-        {/* Quals */}
-        <tr style={{ height: '22vh' }}>
-          {/* Field Name / Logo */}
-          <td>
-            {/* Use event logo */}
-            {!useShortName && (
-              <img
-                src={event.branding?.logo || ''}
-                alt={event.name}
-                className={styles.sponsorLogo}
-              />
+        {/* Current Match */}
+        <td className={styles.matchNumber}>
+          <AnimatePresence>
+            {currentMatch && (
+              <PushInDiv key={`${currentMatch.customDisplayText ?? currentMatch?.num}`}>
+                {currentMatch.customDisplayText ?? currentMatch?.num === 'F'
+                  ? 'F'
+                  : `M${currentMatch?.num}`}
+              </PushInDiv>
             )}
+          </AnimatePresence>
+        </td>
 
-            {/* Use event short name */}
-            {useShortName && (
-              <div
-                className={`${styles.textLeft} ${styles.bold} ${styles.eventName}`}
-                // style={{ width: '15vw', fontSize: '8.5vw' }}
-              >
-                {/* <Textfit mode="single" forceSingleModeWidth max="300"> */}
-                  {event.nameShort || event.name}
-                {/* </Textfit> */}
-              </div>
-            )}
-          </td>
-
-          {/* Current Match */}
-          {currentMatch && (
-            <td className={styles.matchNumber}>
-              {currentMatch.customDisplayText ?? currentMatch?.num === 'F'
-                ? 'F'
-                : `M${currentMatch?.num}`}
-            </td>
-          )}
-
-          {/* Next Match */}
-          <td className={styles.textCenter}>
-            {/* Is a Match */}
+        {/* Next Match */}
+        <td className={styles.textCenter} style={{ position: 'relative' }}>
+          {/* Is a Match */}
+          <AnimatePresence>
             {nextMatch && (
-              <Fragment>
+              <PushInDiv key={`${getDisplayText(nextMatch)}`}>
                 <span className={styles.matchNumber} style={{ fontSize: !nextMatch?.match ? '7vw' : undefined }}>
                   {getDisplayText(nextMatch)}
                 </span>
                 <span className={styles.nextMatchScroll}>
                   {nextMatch?.match && showLine !== null && (
                     <AllianceFader
-                      red={getGenericText(nextMatch?.match?.participants?.red)}
-                      blue={getGenericText(nextMatch?.match?.participants?.blue)}
+                      red={allianceDisplay(nextMatch, 'red')}
+                      blue={allianceDisplay(nextMatch, 'blue')}
                       showLine={showLine}
                     />
                   )}
                 </span>
-              </Fragment>
+              </PushInDiv>
             )}
-          </td>
+          </AnimatePresence>
+        </td>
 
-          {/* Queueing Matches */}
-          <td className={styles.textCenter}>
+        {/* Queueing Matches */}
+        <td className={styles.textCenter} style={{ position: 'relative' }}>
+          <AnimatePresence>
             {/* Multiple Queueing Matches */}
             {queueingMatches.length > 1
               && queueingMatches.map((x) => (
@@ -255,8 +227,8 @@ const PlayoffRow = ({
                   </span>
                   {x?.match && showLine !== null && (
                     <AllianceFader
-                      red={getGenericText(x?.match?.participants?.red)}
-                      blue={getGenericText(x?.match?.participants?.blue)}
+                      red={allianceDisplay(x, 'red')}
+                      blue={allianceDisplay(x, 'blue')}
                       showLine={showLine}
                     />
                   )}
@@ -265,32 +237,30 @@ const PlayoffRow = ({
 
             {/* Single Queueing Match */}
             {queueingMatches.length === 1 && queueingMatches[0] && (
-              <>
-                {queueingMatches[0] && (
-                  <Fragment>
-                    <span className={styles.matchNumber} style={{ fontSize: !queueingMatches[0]?.match ? '7vw' : undefined }}>
-                      {getDisplayText(queueingMatches[0])}
-                    </span>
-                    <span>
-                      {queueingMatches[0]?.match && showLine !== null && (
-                        <AllianceFader
-                          red={getGenericText(queueingMatches[0]?.match?.participants?.red)}
-                          blue={getGenericText(queueingMatches[0]?.match?.participants?.blue)}
-                          showLine={showLine}
-                        />
-                      )}
-                    </span>
-                  </Fragment>
-                )}
-              </>
+              queueingMatches[0] && (
+                <PushInDiv key={`${getDisplayText(queueingMatches[0])}`}>
+                  <span className={styles.matchNumber} style={{ fontSize: !queueingMatches[0]?.match ? '7vw' : undefined }}>
+                    {getDisplayText(queueingMatches[0])}
+                  </span>
+                  <span>
+                    {queueingMatches[0]?.match && showLine !== null && (
+                      <AllianceFader
+                        red={allianceDisplay(queueingMatches[0], 'red')}
+                        blue={allianceDisplay(queueingMatches[0], 'blue')}
+                        showLine={showLine}
+                      />
+                    )}
+                  </span>
+                </PushInDiv>
+              )
             )}
-          </td>
-        </tr>
+          </AnimatePresence>
+        </td>
       </>
     );
   }
 
   return null;
-};
+}
 
 export default PlayoffRow;

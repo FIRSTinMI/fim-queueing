@@ -6,7 +6,7 @@ import { createElement as h } from 'preact/compat';
 import { BracketRound } from '../../../../shared/DoubleEliminationBracketMapping';
 import { ComputedOptions, RoundHeaderOptions } from './settings';
 
-const RoundHeader = ({
+function RoundHeader({
   x,
   y = 0,
   width,
@@ -18,35 +18,37 @@ const RoundHeader = ({
   width: number,
   roundHeader: RoundHeaderOptions,
   text: string
-}) => (
-  <g>
-    <rect
-      x={x}
-      y={y}
-      width={width}
-      height={roundHeader.height}
-      fill={roundHeader.backgroundColor}
-      rx="3"
-      ry="3"
-    />
-    <text
-      fontFamily={roundHeader.fontFamily}
-      x={x + width / 2}
-      y={y + roundHeader.height / 2}
-      style={{
-        fontSize: `${roundHeader.fontSize}px`,
-        color: roundHeader.fontColor,
-      }}
-      fill="currentColor"
-      dominantBaseline="middle"
-      textAnchor="middle"
-    >
-      {text}
-    </text>
-  </g>
-);
+}) {
+  return (
+    <g>
+      <rect
+        x={x}
+        y={y}
+        width={width}
+        height={roundHeader.height}
+        fill={roundHeader.backgroundColor}
+        rx="3"
+        ry="3"
+      />
+      <text
+        fontFamily={roundHeader.fontFamily}
+        x={x + width / 2}
+        y={y + roundHeader.height / 2}
+        style={{
+          fontSize: `${roundHeader.fontSize}px`,
+          color: roundHeader.fontColor,
+        }}
+        fill="currentColor"
+        dominantBaseline="middle"
+        textAnchor="middle"
+      >
+        {text}
+      </text>
+    </g>
+  );
+}
 
-const RoundHeaders = ({
+function RoundHeaders({
   rounds,
   calculatedStyles: {
     roundHeader,
@@ -55,10 +57,10 @@ const RoundHeaders = ({
 }: {
   rounds: BracketRound[];
   calculatedStyles: ComputedOptions;
-}) => (
-  <>
-    {rounds.map(({ name, x }) => (
-      <>
+}) {
+  return (
+    <>
+      {rounds.map(({ name, x }) => (
         <RoundHeader
           x={x}
           y={0}
@@ -66,8 +68,8 @@ const RoundHeaders = ({
           width={width!}
           text={name}
         />
-      </>
-    ))}
-  </>
-);
+      ))}
+    </>
+  );
+}
 export default RoundHeaders;

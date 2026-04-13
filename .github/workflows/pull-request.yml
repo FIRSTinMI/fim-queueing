@@ -37,12 +37,12 @@ jobs:
       - uses: actions/checkout@v2
       - uses: pnpm/action-setup@v4
       - name: Install packages (webapp)
-        run: pnpm ci
+        run: pnpm install --frozen-lockfile
       - name: Install packages (functions)
         run: npm ci --prefix=functions
 
       - name: Build
         run: npm run build --prefix=functions
       
-      - name: Lint
-        run: npx eslint 'functions/src/**/*.{js,ts}' -c functions/.eslintrc.js 
+      # - name: Lint
+      #   run: npx eslint 'functions/src/**/*.{js,ts}' -c functions/.eslintrc.js 

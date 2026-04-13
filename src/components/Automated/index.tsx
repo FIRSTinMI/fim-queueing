@@ -1,6 +1,7 @@
 import { h, Fragment, ComponentChildren } from 'preact';
 import { useContext } from 'preact/hooks';
 
+import { Event } from '@shared/DbTypes';
 import AppContext from '@/AppContext';
 import MenuBar from '../MenuBar';
 import AppErrorMessage, { ErrorMessageType } from '../ErrorMessage';
@@ -14,14 +15,15 @@ type AutomatedProps = {
   }
 };
 
-const Automated = (props: AutomatedProps) => {
-  const { event, season } = useContext(AppContext);
-  const { matches: { playoff, qual } } = props;
-
-  const ErrorMessage = ({ children, type }: {
-    children: ComponentChildren,
-    type?: ErrorMessageType,
-  }) => (
+function ErrorMessage({
+  children, type, event, season,
+}: {
+  children: ComponentChildren,
+  type?: ErrorMessageType,
+  event: Event | undefined,
+  season: number | undefined
+}) {
+  return (
     <>
       <MenuBar event={event} season={season} alwaysShow />
       <div>
@@ -29,14 +31,19 @@ const Automated = (props: AutomatedProps) => {
       </div>
     </>
   );
+}
 
-  ErrorMessage.defaultProps = {
-    type: 'info',
-  };
+ErrorMessage.defaultProps = {
+  type: 'info',
+};
+
+function Automated(props: AutomatedProps) {
+  const { event, season } = useContext(AppContext);
+  const { matches: { playoff, qual } } = props;
 
   if (!playoff || !qual) {
     return (
-      <ErrorMessage>
+      <ErrorMessage event={event} season={season}>
         You&apos;re missing some configuration info... Try going
         {' '}
         {' '}
@@ -54,7 +61,7 @@ const Automated = (props: AutomatedProps) => {
       const routeToUse = Routes.find((r) => r.url === qual && r.usedIn.includes('qual'));
       if (!routeToUse) {
         return (
-          <ErrorMessage>
+          <ErrorMessage event={event} season={season}>
             Double check your configuration, something isn&apos;t right here...
           </ErrorMessage>
         );
@@ -67,7 +74,7 @@ const Automated = (props: AutomatedProps) => {
       const routeToUse = Routes.find((r) => r.url === playoff && r.usedIn.includes('playoff'));
       if (!routeToUse) {
         return (
-          <ErrorMessage>
+          <ErrorMessage event={event} season={season}>
             Double check your configuration, something isn&apos;t right here...
           </ErrorMessage>
         );
@@ -76,17 +83,17 @@ const Automated = (props: AutomatedProps) => {
     }
     case 'EventOver':
       return (
-        <ErrorMessage type="arrow">
+        <ErrorMessage type="arrow" event={event} season={season}>
           The event has ended. See you next time!
         </ErrorMessage>
       );
     default:
       return (
-        <ErrorMessage>
+        <ErrorMessage event={event} season={season}>
           Hmm... I&apos;m not sure what the event is up to right now...
         </ErrorMessage>
       );
   }
-};
+}
 
 export default Automated;

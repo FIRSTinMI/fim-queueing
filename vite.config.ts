@@ -15,8 +15,8 @@ export default defineConfig({
           return code.replace(/\/\*#__PURE__\*\//g, '');
         }
         return null;
-      }
-    }
+      },
+    },
   ],
   envPrefix: 'APP_',
   resolve: {
@@ -28,17 +28,18 @@ export default defineConfig({
   css: {
     preprocessorOptions: {
       scss: {
-        silenceDeprecations: ['import', 'global-builtin'] // HACK: milligram is outdated
-      }
-    }
+        silenceDeprecations: ['import', 'global-builtin'], // HACK: milligram is outdated
+      },
+    },
   },
   build: {
     rollupOptions: {
       output: {
         manualChunks: {
-          signalr: ['@microsoft/signalr']
-        }
-      }
-    }
-  }
+          signalr: ['@microsoft/signalr'],
+          animation: ['motion', '@react-spring/web'],
+        },
+      },
+    },
+  },
 });
