@@ -1,18 +1,18 @@
 import { h, Fragment } from 'preact';
-import { QualMatch, Event } from '@shared/DbTypes';
+import { Event, QualMatch } from '@shared/DbTypes';
 import { AnimatePresence } from 'motion/react';
 import styles from '../sharedStyles.module.scss';
 import AllianceFader from '../AllianceFader';
-import MessageRow from '../MessageRow';
 import useQueueingQualMatches from '@/hooks/useQueueingQualMatches';
 import PushInDiv from '../Shared/PushInDiv';
+import MessageRow from '../MessageRow';
 
 function QualRow({
   event,
   showLine,
   token,
 }: {
-  event: Event;
+  event: Event,
   showLine: 0 | 1 | null;
   token: string;
 }) {
@@ -20,10 +20,6 @@ function QualRow({
     token,
     numQueueing: 1,
   });
-  // URL parameters
-  const searchParams = new URLSearchParams(window.location.search);
-  const useShortName = typeof searchParams.get('useShortName') === 'string';
-
   // Calculate Red alliance string
   const getRedStr = (match: QualMatch | null): string => {
     if (!match) return '';
@@ -40,37 +36,19 @@ function QualRow({
     state, now, next, queueing, hasSchedule,
   } = queueingQualMatches;
 
-  // Message cases
-  const case1 = ['loading', 'error'].includes(state);
-  const case2 = state === 'ready' && !hasSchedule;
-
   // Loading/Error Text
-  if (case1 || case2) {
+  if (state !== 'ready' || !hasSchedule) {
+    let message = 'Loading Matches...';
+    if (state === 'error') {
+      message = 'Failed to fetch matches';
+    } else if (state !== 'loading' && !hasSchedule) {
+      message = 'Waiting for schedule to be posted...';
+    }
     return (
-      <>
-        {/* Message */}
-        <MessageRow event={event} showLine={showLine} />
-
-        {/* Loading */}
-        <tr>
-          <td colSpan={4} className={styles.textCenter}>
-            {event && event.name && (
-              <span>
-                <b>{event.name}</b>
-                <br />
-              </span>
-            )}
-            <span>
-              {/* eslint-disable-next-line no-nested-ternary */}
-              {state === 'error' && case1
-                ? 'Failed to fetch matches'
-                : state === 'loading' && !hasSchedule
-                  ? 'Waiting for schedule to be posted...'
-                  : 'Loading Matches...'}
-            </span>
-          </td>
-        </tr>
-      </>
+      <MessageRow
+        event={event}
+        overrideMessage={message}
+      />
     );
   }
 
@@ -78,38 +56,10 @@ function QualRow({
   if (state === 'ready' && hasSchedule) {
     return (
       <>
-        {/* Message */}
-        <MessageRow event={event} showLine={showLine} />
-
-        {/* Quals */}
-        <tr style={{ height: '22vh' }}>
-          {/* Field Name / Logo */}
-          <td>
-            {/* Use event logo */}
-            {!useShortName && (
-              <img
-                src={event.branding?.logo || ''}
-                alt={event.name}
-                className={styles.sponsorLogo}
-              />
-            )}
-
-            {/* Use event short name */}
-            {useShortName && (
-              <div
-                className={`${styles.textLeft} ${styles.bold} ${styles.eventName}`}
-                // style={{ width: '15vw', fontSize: '8.5vw' }}
-              >
-                {/* <Textfit mode="single" forceSingleModeWidth max="300"> */}
-                  {event.nameShort || event.name}
-                {/* </Textfit> */}
-              </div>
-            )}
-          </td>
-
-          {now && (
-            <td style={{ position: 'relative' }}>
-              <AnimatePresence>
+        <td style={{ position: 'relative' }}>
+          <AnimatePresence>
+            {now && (
+              <>
                 {/* Current Match */}
                 {now && now.type === 'match' && (
                   <PushInDiv className={styles.matchNumber} key={`m${now.number}`}>
@@ -123,105 +73,105 @@ function QualRow({
                     {now.description}
                   </PushInDiv>
                 )}
-              </AnimatePresence>
-            </td>
-          )}
+              </>
+            )}
+          </AnimatePresence>
+        </td>
 
-          {/* Next Match */}
-          <td className={styles.textCenter} style={{ position: 'relative' }}>
-            {/* Is a Match */}
-            <AnimatePresence>
-              {next && next.type === 'match' && (
-                <PushInDiv key={`m${next.number}`}>
-                  <span className={styles.matchNumber}>
-                    {next.number}
+        {/* Next Match */}
+        <td className={styles.textCenter} style={{ position: 'relative' }}>
+          {/* Is a Match */}
+          <AnimatePresence>
+            {next && next.type === 'match' && (
+              <PushInDiv key={`m${next.number}`}>
+                <span className={styles.matchNumber}>
+                  {next.number}
+                </span>
+                {showLine !== null && (
+                  <span className={styles.nextMatchScroll}>
+                    <AllianceFader
+                      red={getRedStr(next)}
+                      blue={getBlueStr(next)}
+                      showLine={showLine}
+                    />
                   </span>
-                  {showLine !== null && (
-                    <span className={styles.nextMatchScroll}>
-                      <AllianceFader
-                        red={getRedStr(next)}
-                        blue={getBlueStr(next)}
-                        showLine={showLine}
-                      />
-                    </span>
-                  )}
-                </PushInDiv>
-              )}
+                )}
+              </PushInDiv>
+            )}
 
-              {/* Is a Break */}
-              {next && next.type === 'break' && (
-                <PushInDiv key={`b${next.description}`}>
-                  {next.description}
-                </PushInDiv>
-              )}
-            </AnimatePresence>
-          </td>
+            {/* Is a Break */}
+            {next && next.type === 'break' && (
+              <PushInDiv key={`b${next.description}`}>
+                {next.description}
+              </PushInDiv>
+            )}
+          </AnimatePresence>
+        </td>
 
-          {/* Queueing Matches */}
-          <td className={styles.textCenter} style={{ position: 'relative' }}>
-            <AnimatePresence>
-              {/* Multiple Queueing Matches */}
-              {queueing && queueing.length > 1
-                && queueing.map((x) => {
-                  // Is a match, not a break
-                  if (x && x.type === 'match') {
-                    const match = x as QualMatch;
-                    return (
-                      <div className={styles.flexRow}>
-                        <span className={styles.queueingMatchNumber}>{match.number} -</span>
-                        {showLine !== null && (
-                          <div style={{ marginLeft: '16vw', position: 'relative', top: '4vh' }}>
-                            <AllianceFader
-                              red={getRedStr(match)}
-                              blue={getBlueStr(match)}
-                              showLine={showLine}
-                            />
-                          </div>
-                        )}
-                      </div>
-                    );
-                  }
-
-                  // Is a break
+        {/* Queueing Matches */}
+        <td className={styles.textCenter} style={{ position: 'relative' }}>
+          <AnimatePresence>
+            {/* Multiple Queueing Matches */}
+            {queueing && queueing.length > 1
+              && queueing.map((x) => {
+                // Is a match, not a break
+                if (x && x.type === 'match') {
+                  const match = x as QualMatch;
                   return (
-                    <div className={styles.textCenter}>
-                      {x.description}
+                    <div className={styles.flexRow}>
+                      <span className={styles.queueingMatchNumber}>{match.number} -</span>
+                      {showLine !== null && (
+                        <div style={{ marginLeft: '16vw', position: 'relative', top: '4vh' }}>
+                          <AllianceFader
+                            red={getRedStr(match)}
+                            blue={getBlueStr(match)}
+                            showLine={showLine}
+                          />
+                        </div>
+                      )}
                     </div>
                   );
-                })}
+                }
 
-              {/* Single Queueing Match */}
-              {queueing?.length === 1 && queueing[0] && (
-                <AnimatePresence>
-                  {queueing[0]
-                    && queueing[0].type === 'match' && (
-                      <PushInDiv key={`m${queueing[0].number}`}>
-                        <span className={styles.matchNumber}>
-                          {queueing[0].number}
+                // Is a break
+                return (
+                  <div className={styles.textCenter}>
+                    {x.description}
+                  </div>
+                );
+              })}
+
+            {/* Single Queueing Match */}
+            {queueing?.length === 1 && queueing[0] && (
+              <>
+                {queueing[0]
+                  && queueing[0].type === 'match' && (
+                    <PushInDiv key={`m${queueing[0].number}`}>
+                      <span className={styles.matchNumber}>
+                        {queueing[0].number}
+                      </span>
+                      {showLine !== null && (
+                        <span>
+                          <AllianceFader
+                            red={getRedStr(queueing[0])}
+                            blue={getBlueStr(queueing[0])}
+                            showLine={showLine}
+                          />
                         </span>
-                        {showLine !== null && (
-                          <span>
-                            <AllianceFader
-                              red={getRedStr(queueing[0])}
-                              blue={getBlueStr(queueing[0])}
-                              showLine={showLine}
-                            />
-                          </span>
-                        )}
-                      </PushInDiv>
-                  )}
-
-                  {/* Is a Break */}
-                  {next && queueing[0].type === 'break' && (
-                    <PushInDiv key={`b${queueing[0].description}`}>
-                      {queueing[0].description}
+                      )}
                     </PushInDiv>
-                  )}
-                </AnimatePresence>
-              )}
-            </AnimatePresence>
-          </td>
-        </tr>
+                )}
+
+                {/* Is a Break */}
+                {next && queueing[0].type === 'break' && (
+                  <PushInDiv key={`b${queueing[0].description}`}>
+                    {queueing[0].description}
+                  </PushInDiv>
+                )}
+              </>
+            )}
+          </AnimatePresence>
+        </td>
       </>
     );
   }
