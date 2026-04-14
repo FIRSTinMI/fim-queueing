@@ -1,12 +1,16 @@
 import { h, Fragment } from 'preact';
 import { useEffect, useState } from 'preact/hooks';
+import { ref, getDatabase, onValue } from 'firebase/database';
 import EventRow from './EventRow';
 import styles from './styles.module.scss';
 import sharedStyles from './EventRow/sharedStyles.module.scss';
+import EventMessage from './EventMessage';
 
 function MultiQueueing() {
   const searchParams = new URLSearchParams(window.location.search);
   const events = searchParams.getAll('e');
+  const parentEvent = searchParams.get('parentEvent');
+  const [parentEventMessage, setParentEventMessage] = useState<string | null>(null);
   const season = searchParams.get('s') ?? new Date().getFullYear().toString();
   const showTeamNumbers = searchParams.get('teamNumbers') !== 'false';
 
@@ -24,6 +28,20 @@ function MultiQueueing() {
   const [clock, setClock] = useState<string>(calcClock());
 
   useEffect(() => {
+    if (!parentEvent) return () => {};
+
+    const eventRef = ref(getDatabase(), `/seasons/${season}/events/${parentEvent}/message`);
+    const unsub = onValue(eventRef, (snap) => {
+      const val = snap.val();
+      if (!val) setParentEventMessage(null);
+      console.log(val.replace('\\n', '\n'));
+      setParentEventMessage(val.replace('\\n', '\n'));
+    });
+
+    return () => unsub();
+  }, [parentEvent]);
+
+  useEffect(() => {
     const interval = showTeamNumbers ? setInterval(() => {
       setShowLine((sl: 0 | 1 | null) => (sl === 0 ? 1 : 0));
     }, 5000) : null;
@@ -36,9 +54,17 @@ function MultiQueueing() {
       clearInterval(clockInterval);
     };
   }, [showTeamNumbers]);
+  // const [canvasWidth, setCanvasWidth] = useState(0);
+  // const [canvasHeight, setCanvasHeight] = useState(0);
+  // useEffect(() => {
+  //   window.onresize(ev => {
+
+  //   });
+  // }, []);
 
   return (
     <div className={[styles.container, showLine === null ? sharedStyles.noTeamNumbers : null].filter((c) => c).join(' ')}>
+      <EventMessage message={parentEventMessage} clock={clock} />
       <table>
         <thead>
           <tr style={{ textAlign: 'center', fontSize: '7vh' }}>
